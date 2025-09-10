@@ -40,6 +40,17 @@
         <div class="hero">
             <h1>Client Launch Portal</h1>
             <p>Complete each step. We'll handle the rest.</p>
+            
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressText">0 of 5 steps completed</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+            </div>
         </div>
 
         <!-- Success Message (hidden initially) -->
@@ -80,7 +91,9 @@
                     Sign SOW (6-month)
                 </a>
             </div>
-            <button class="btn btn-small skip-step" id="skip1" style="display: none;">Skip Step</button>
+            <div class="step-actions">
+                <button class="btn btn-complete" onclick="window.markStepComplete(1)">Mark Step 1 Complete</button>
+            </div>
         </div>
 
         <!-- Step 2: Set Up Payment -->
@@ -97,7 +110,9 @@
                     Set Up Payment Method
                 </a>
             </div>
-            <button class="btn btn-small skip-step" id="skip2" style="display: none;">Skip Step</button>
+            <div class="step-actions">
+                <button class="btn btn-complete" onclick="window.markStepComplete(2)">Mark Step 2 Complete</button>
+            </div>
         </div>
 
         <!-- Step 3: Meta Access & Brand Kit -->
@@ -295,7 +310,9 @@
                     </a>
                 </div>
             </div>
-            <button class="btn btn-small skip-step" id="skip3" style="display: none;">Skip Step</button>
+            <div class="step-actions">
+                <button class="btn btn-complete" onclick="window.markStepComplete(3)">Mark Step 3 Complete</button>
+            </div>
         </div>
 
         <!-- Step 4: Website Access for Tracking -->
@@ -438,7 +455,9 @@
                     </p>
                 </div>
             </div>
-            <button class="btn btn-small skip-step" id="skip4" style="display: none;">Skip Step</button>
+            <div class="step-actions">
+                <button class="btn btn-complete" onclick="window.markStepComplete(4)">Mark Step 4 Complete</button>
+            </div>
         </div>
 
         <!-- Step 5: Creative Approval -->
@@ -487,7 +506,9 @@
                     </div>
                 </div>
             </div>
-            <button class="btn btn-small skip-step" id="skip5" style="display: none;">Skip Step</button>
+            <div class="step-actions">
+                <button class="btn btn-complete" onclick="window.markStepComplete(5)">Mark Step 5 Complete</button>
+            </div>
         </div>
 
         <!-- Footer -->
