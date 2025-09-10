@@ -1,549 +1,669 @@
-/* ===== DRIVE LEAD MEDIA PORTAL STYLES ===== */
-/* Edit this file to change colors, fonts, and design */
+// ===== DRIVE LEAD MEDIA PORTAL FUNCTIONS =====
+// All the JavaScript functionality for the portal
 
-/* ===== BASE STYLES ===== */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+// ===== ADMIN FUNCTIONS =====
+window.toggleAdminPanel = function() {
+    console.log('Admin panel toggle clicked!');
+    const panel = document.getElementById('adminPanel');
+    const isVisible = panel.style.display !== 'none';
+    
+    if (isVisible) {
+        panel.style.display = 'none';
+    } else {
+        panel.style.display = 'block';
+        
+        // Check if already logged in
+        if (window.isAdminLoggedIn()) {
+            document.getElementById('adminControls').style.display = 'block';
+            document.getElementById('adminLogin').style.display = 'none';
+            
+            // Load existing links
+            const existingCreativeLink = window.portalState.creativeLink;
+            if (existingCreativeLink) {
+                document.getElementById('creativeLink').value = existingCreativeLink;
+            }
+            
+            const existingStripeLink = window.portalState.stripePaymentLink;
+            if (existingStripeLink) {
+                document.getElementById('stripePaymentLink').value = existingStripeLink;
+            }
+        } else {
+            document.getElementById('adminControls').style.display = 'none';
+            document.getElementById('adminLogin').style.display = 'block';
+            document.getElementById('adminPassword').value = '';
+        }
+    }
+};
+
+window.isAdminLoggedIn = function() {
+    const loginTime = localStorage.getItem('dlm_admin_login');
+    if (!loginTime) return false;
+    
+    const now = Date.now();
+    const elapsed = now - parseInt(loginTime);
+    
+    if (elapsed > window.DLM_CONFIG.admin.sessionTimeout) {
+        localStorage.removeItem('dlm_admin_login');
+        return false;
+    }
+    
+    return true;
+};
+
+window.adminLogin = function() {
+    console.log('Admin login attempted');
+    const password = document.getElementById('adminPassword').value;
+    
+    if (password === window.DLM_CONFIG.admin.password) {
+        localStorage.setItem('dlm_admin_login', Date.now().toString());
+        document.getElementById('adminControls').style.display = 'block';
+        document.getElementById('adminLogin').style.display = 'none';
+        
+        // Load existing links
+        const existingCreativeLink = window.portalState.creativeLink;
+        if (existingCreativeLink) {
+            document.getElementById('creativeLink').value = existingCreativeLink;
+        }
+        
+        const existingStripeLink = window.portalState.stripePaymentLink;
+        if (existingStripeLink) {
+            document.getElementById('stripePaymentLink').value = existingStripeLink;
+        }
+        
+        window.showAdminStatus('✓ Admin logged in', 'success');
+    } else {
+        window.showAdminStatus('✗ Invalid password', 'error');
+        document.getElementById('adminPassword').value = '';
+    }
+};
+
+window.showAdminStatus = function(message, type) {
+    const status = document.getElementById('adminStatus');
+    status.textContent = message;
+    status.className = `admin-status ${type}`;
+    status.style.display = 'block';
+    
+    setTimeout(() => {
+        status.style.display = 'none';
+    }, 3000);
+};
+
+window.setCreativeLink = function() {
+    const link = document.getElementById('creativeLink').value.trim();
+    
+    if (!link) {
+        window.showAdminStatus('✗ Please enter a link', 'error');
+        return;
+    }
+    
+    try {
+        new URL(link);
+    } catch {
+        window.showAdminStatus('✗ Please enter a valid URL', 'error');
+        return;
+    }
+    
+    window.portalState.creativeLink = link;
+    window.saveState();
+    window.updateCreativeGallery(link);
+    window.showAdminStatus('✓ Creative link set successfully', 'success');
+};
+
+window.removeCreativeLink = function() {
+    window.portalState.creativeLink = null;
+    window.saveState();
+    window.updateCreativeGallery(null);
+    document.getElementById('creativeLink').value = '';
+    window.showAdminStatus('✓ Creative link removed', 'success');
+};
+
+window.setStripeLink = function() {
+    const link = document.getElementById('stripePaymentLink').value.trim();
+    
+    if (!link) {
+        window.showAdminStatus('✗ Please enter a Stripe link', 'error');
+        return;
+    }
+    
+    try {
+        new URL(link);
+    } catch {
+        window.showAdminStatus('✗ Please enter a valid URL', 'error');
+        return;
+    }
+    
+    window.portalState.stripePaymentLink = link;
+    window.saveState();
+    window.updateStripeButton(link);
+    window.showAdminStatus('✓ Stripe link set successfully', 'success');
+};
+
+window.removeStripeLink = function() {
+    window.portalState.stripePaymentLink = null;
+    window.saveState();
+    window.updateStripeButton(window.DLM_CONFIG.stripeUrl);
+    document.getElementById('stripePaymentLink').value = '';
+    window.showAdminStatus('✓ Stripe link removed (reset to default)', 'success');
+};
+
+window.updateStripeButton = function(link) {
+    const stripeBtn = document.getElementById('stripeBtn');
+    stripeBtn.href = link;
+};
+
+window.updateCreativeGallery = function(link) {
+    const gallery = document.getElementById('galleryPlaceholder');
+    
+    if (link) {
+        gallery.innerHTML = `
+            <div style="text-align: center;">
+                <p style="color: #012E40; margin-bottom: 15px; font-weight: 600;">🎨 Your Creative Previews Are Ready!</p>
+                <a href="${link}" class="btn" target="_blank" rel="noopener" style="margin-bottom: 15px;">
+                    View Creative Previews
+                </a>
+                <p style="font-size: 0.9rem; color: #85C7B3;">
+                    Review all creatives, then return here to approve or request changes
+                </p>
+            </div>
+        `;
+    } else {
+        gallery.innerHTML = `
+            <p>Creative previews will be shared via secure link</p>
+            <p style="font-size: 0.9rem; color: #85C7B3; margin-top: 10px;">
+                Links will be provided once creatives are ready for review
+            </p>
+        `;
+    }
+};
+
+// ===== UTILITY FUNCTIONS =====
+window.loadState = function() {
+    try {
+        const saved = localStorage.getItem(window.STORAGE_KEY);
+        if (saved) {
+            window.portalState = { ...window.portalState, ...JSON.parse(saved) };
+        }
+    } catch (e) {
+        console.warn('Could not load portal state:', e);
+    }
+};
+
+window.saveState = function() {
+    try {
+        localStorage.setItem(window.STORAGE_KEY, JSON.stringify(window.portalState));
+    } catch (e) {
+        console.warn('Could not save portal state:', e);
+    }
+};
+
+window.updateStepStates = function() {
+    for (let i = 1; i <= 5; i++) {
+        const stepElement = document.getElementById(`step${i}`);
+        const isCompleted = window.portalState[i.toString()];
+        const isUnlocked = i === 1 || window.portalState[(i - 1).toString()];
+        
+        stepElement.classList.toggle('completed', isCompleted);
+        stepElement.classList.toggle('locked', !isUnlocked);
+    }
+};
+
+window.showSuccessMessage = function() {
+    document.getElementById('successMessage').style.display = 'block';
+    document.getElementById('successMessage').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+    });
+};
+
+window.markStepComplete = function(stepNum) {
+    window.portalState[stepNum.toString()] = true;
+    window.saveState();
+    window.updateStepStates();
+    
+    // Check if all steps are complete
+    const allComplete = Object.keys(window.portalState).filter(key => 
+        key !== 'admin' && key !== 'creativeLink' && key !== 'stripePaymentLink' && window.portalState[key]
+    ).length === 5;
+    
+    if (allComplete) {
+        window.showSuccessMessage();
+    }
+    
+    if (window.DLM_CONFIG.support.webhookUrl) {
+        window.sendWebhook({
+            step: stepNum,
+            completedAt: new Date().toISOString(),
+            action: 'step_completed'
+        });
+    }
+};
+
+// ===== SOW BUTTON UPDATE FUNCTION =====
+window.updateSOWButton = function() {
+    const sow6Radio = document.getElementById('sow6');
+    const sow12Radio = document.getElementById('sow12');
+    const sowBtn = document.getElementById('sowBtn');
+    
+    if (sow12Radio && sow12Radio.checked) {
+        sowBtn.textContent = 'Sign SOW (12-month)';
+        sowBtn.href = window.DLM_CONFIG.docuSign.sow12;
+    } else {
+        sowBtn.textContent = 'Sign SOW (6-month)';
+        sowBtn.href = window.DLM_CONFIG.docuSign.sow6;
+    }
+};
+
+// ===== EMAIL FUNCTIONS =====
+window.emailAdminDetails = function() {
+    const adminName = document.getElementById('adminName').value;
+    const adminEmail = document.getElementById('adminEmail').value;
+    const adminPhone = document.getElementById('adminPhone').value;
+    const platform = document.getElementById('websitePlatform').value;
+    const platformOther = document.getElementById('websitePlatformOther').value;
+    
+    if (!adminEmail) {
+        alert('Please enter admin email address');
+        return;
+    }
+    
+    const platformText = platform === 'other' ? platformOther : platform;
+    const subject = 'Website Admin Contact Details - Client Portal';
+    const body = `Website Admin Contact Details:
+
+
+Name: ${adminName || 'Not provided'}
+Email: ${adminEmail}
+Phone: ${adminPhone || 'Not provided'}
+Platform: ${platformText || 'Not specified'}
+
+Please contact them to coordinate tracking installation.`;
+
+    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailtoLink);
+};
+
+window.emailAccessDetails = function() {
+    const websiteUrl = document.getElementById('websiteUrl').value;
+    const loginUrl = document.getElementById('loginUrl').value;
+    const username = document.getElementById('tempUsername').value;
+    const password = document.getElementById('tempPassword').value;
+    const platform = document.getElementById('sitePlatform').value;
+    const platformOther = document.getElementById('sitePlatformOther').value;
+    
+    if (!websiteUrl || !username || !password) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    const platformText = platform === 'other' ? platformOther : platform;
+    const subject = 'Temporary Website Access Details - Client Portal';
+    const body = `Temporary Website Access Details:
+
+
+Website URL: ${websiteUrl}
+Login URL: ${loginUrl || 'Not provided'}
+Username: ${username}
+Password: ${password}
+Platform: ${platformText || 'Not specified'}
+
+Please install tracking and remove access when complete.`;
+
+    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailtoLink);
+};
+
+window.emailRevisionRequest = function() {
+    const name = document.getElementById('revisionName').value;
+    const email = document.getElementById('revisionEmail').value;
+    const notes = document.getElementById('revisionNotes').value;
+    
+    if (!name || !email || !notes) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    const subject = 'Creative Revision Request - Client Portal';
+    const body = `Creative Revision Request:
+
+
+Client Name: ${name}
+Client Email: ${email}
+
+Revision Notes:
+${notes}`;
+
+    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailtoLink);
+};
+
+window.emailSetupRequest = function() {
+    // Get selected days
+    const selectedDays = [];
+    document.querySelectorAll('input[name="setupDays"]:checked').forEach(checkbox => {
+        selectedDays.push(checkbox.value);
+    });
+    
+    const setupTime = document.getElementById('setupTime').value;
+    const setupPhone = document.getElementById('setupPhone').value;
+    const setupTimezone = document.getElementById('setupTimezone').value;
+    
+    if (selectedDays.length === 0 || !setupTime || !setupPhone || !setupTimezone) {
+        alert('Please fill in all fields to schedule your setup call');
+        return;
+    }
+    
+    const subject = 'Meta Business Suite Setup Call Request - Client Portal';
+    const body = `Meta Business Suite Setup Call Request:
+
+Preferred Days: ${selectedDays.join(', ')}
+Best Time: ${setupTime}
+Phone Number: ${setupPhone}
+Time Zone: ${setupTimezone}
+
+Please schedule a setup call to help create Meta Business Suite account.`;
+
+    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailtoLink);
+};
+
+// ===== COPY TO CLIPBOARD FUNCTION =====
+window.copyRevisionToClipboard = function() {
+    const name = document.getElementById('revisionName').value;
+    const email = document.getElementById('revisionEmail').value;
+    const notes = document.getElementById('revisionNotes').value;
+    
+    if (!name || !email || !notes) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    const text = `Creative Revision Request:
+
+
+Client Name: ${name}
+Client Email: ${email}
+
+Revision Notes:
+${notes}`;
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Revision details copied to clipboard!');
+        }).catch(() => {
+            fallbackCopyToClipboard(text);
+        });
+    } else {
+        fallbackCopyToClipboard(text);
+    }
+};
+
+function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        alert('Revision details copied to clipboard!');
+    } catch (err) {
+        alert('Could not copy to clipboard. Please copy manually.');
+    }
+    document.body.removeChild(textArea);
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
-    line-height: 1.6;
-    color: #EEF4D9;
-    background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
-    min-height: 100vh;
-    position: relative;
-}
+// ===== WEBHOOK FUNCTION =====
+window.sendWebhook = function(data) {
+    if (!window.DLM_CONFIG.support.webhookUrl) return;
+    
+    fetch(window.DLM_CONFIG.support.webhookUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    }).catch(err => {
+        console.warn('Webhook failed:', err);
+    });
+};
 
-.portal-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    position: relative;
-    z-index: 1;
-}
+// ===== RESET PROGRESS FUNCTION =====
+window.resetProgress = function() {
+    if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+        localStorage.removeItem(window.STORAGE_KEY);
+        localStorage.removeItem('dlm_admin_login');
+        location.reload();
+    }
+};
 
-/* ===== HERO SECTION ===== */
-.hero {
-    text-align: center;
-    margin-bottom: 40px;
-    padding: 30px 20px;
-    background: linear-gradient(135deg, #05908C 0%, #85C7B3 100%);
-    color: #012E40;
-    border-radius: 14px;
-    box-shadow: 0 4px 20px rgba(5, 144, 140, 0.3);
-}
+// ===== SETUP ALL EVENT LISTENERS =====
+window.setupEventListeners = function() {
+    // SOW term selection
+    const sowRadios = document.querySelectorAll('input[name="sowTerm"]');
+    sowRadios.forEach(radio => {
+        radio.addEventListener('change', window.updateSOWButton);
+    });
 
-.hero h1 {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-    color: #012E40;
-}
+    // Meta setup options
+    const metaRadios = document.querySelectorAll('input[name="metaSetup"]');
+    metaRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Hide all forms first
+            document.getElementById('existingBusinessSuite').style.display = 'none';
+            document.getElementById('newBusinessSuite').style.display = 'none';
+            document.getElementById('unsureBusinessSuiteDiv').style.display = 'none';
+            
+            // Show appropriate form
+            if (this.value === 'yes') {
+                document.getElementById('existingBusinessSuite').style.display = 'block';
+            } else if (this.value === 'no') {
+                document.getElementById('newBusinessSuite').style.display = 'block';
+            } else if (this.value === 'unsure') {
+                document.getElementById('unsureBusinessSuiteDiv').style.display = 'block';
+            }
+        });
+    });
 
-.hero p {
-    font-size: 1.1rem;
-    opacity: 0.9;
-    margin-bottom: 25px;
-    max-width: 90ch;
-    margin-left: auto;
-    margin-right: auto;
-    color: #012E40;
-}
+    // Website access options
+    const websiteRadios = document.querySelectorAll('input[name="websiteAccess"]');
+    websiteRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Hide all forms first
+            document.getElementById('connectAdminForm').style.display = 'none';
+            document.getElementById('tempAccessForm').style.display = 'none';
+            
+            // Show appropriate form
+            if (this.value === 'connect') {
+                document.getElementById('connectAdminForm').style.display = 'block';
+            } else if (this.value === 'temporary') {
+                document.getElementById('tempAccessForm').style.display = 'block';
+            }
+        });
+    });
 
-/* ===== STEP STYLES ===== */
-.step {
-    background: #EEF4D9;
-    border-radius: 14px;
-    padding: 30px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(5, 144, 140, 0.2);
-    border: 2px solid #85C7B3;
-    transition: all 0.3s ease;
-}
+    // Platform selection handlers
+    const platformSelects = [
+        { select: 'websitePlatform', other: 'websitePlatformOther' },
+        { select: 'sitePlatform', other: 'sitePlatformOther' }
+    ];
+    
+    platformSelects.forEach(({ select, other }) => {
+        const selectElement = document.getElementById(select);
+        const otherInput = document.getElementById(other);
+        
+        if (selectElement && otherInput) {
+            selectElement.addEventListener('change', function() {
+                if (this.value === 'other') {
+                    otherInput.style.display = 'block';
+                    otherInput.required = true;
+                } else {
+                    otherInput.style.display = 'none';
+                    otherInput.required = false;
+                    otherInput.value = '';
+                }
+            });
+        }
+    });
 
-.step.locked {
-    opacity: 0.6;
-    pointer-events: none;
-    background: #EEF4D9;
-}
+    // Info button toggles
+    const infoButtons = [
+        { btn: 'brandKitInfoBtn', info: 'brandKitInfo' },
+        { btn: 'ga4InfoBtn', info: 'ga4Info' },
+        { btn: 'pixelInfoBtn', info: 'pixelInfo' }
+    ];
 
-.step.completed {
-    border-color: #F2A922;
-    background: #FBE9D1;
-    box-shadow: 0 4px 20px rgba(242, 169, 34, 0.3);
-}
+    infoButtons.forEach(({ btn, info }) => {
+        const button = document.getElementById(btn);
+        const infoDiv = document.getElementById(info);
+        
+        if (button && infoDiv) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const isVisible = infoDiv.style.display !== 'none';
+                infoDiv.style.display = isVisible ? 'none' : 'block';
+            });
+        }
+    });
 
-.step-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
-    gap: 15px;
-}
-
-.step h2 {
-    color: #012E40;
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.step-number {
-    background: #05908C;
-    color: #EEF4D9;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    flex-shrink: 0;
-}
-
-.step.completed .step-number {
-    background: #F2A922;
-    color: #012E40;
-}
-
-.step.locked .step-number {
-    background: #85C7B3;
-    color: #012E40;
-}
-
-.step-content {
-    margin-bottom: 25px;
-    color: #012E40;
-}
-
-.step-note {
-    background: #DFF5F3;
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    color: #012E40;
-    margin: 15px 0;
-    border-left: 3px solid #05908C;
-}
-
-/* ===== BUTTONS ===== */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: #05908C;
-    color: #EEF4D9;
-    text-decoration: none;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin: 5px 5px 5px 0;
-}
-
-.btn:hover {
-    background: #012E40;
-    transform: translateY(-1px);
-}
-
-.btn:focus {
-    outline: 2px solid #F2A922;
-    outline-offset: 2px;
-}
-
-.btn-secondary {
-    background: #F2A922;
-    color: #012E40;
-}
-
-.btn-secondary:hover {
-    background: #85C7B3;
-}
-
-.btn-outline {
-    background: transparent;
-    color: #05908C;
-    border: 2px solid #05908C;
-}
-
-.btn-outline:hover {
-    background: #05908C;
-    color: #EEF4D9;
-}
-
-.btn-small {
-    padding: 8px 16px;
-    font-size: 0.85rem;
-}
-
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* ===== FORM ELEMENTS ===== */
-.form-group {
-    margin: 15px 0;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    color: #012E40;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #85C7B3;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    transition: border-color 0.2s ease;
-    background: rgba(238, 244, 217, 0.9);
-    color: #012E40;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: #F2A922;
-    box-shadow: 0 0 0 3px rgba(242, 169, 34, 0.2);
-}
-
-.radio-group {
-    display: flex;
-    gap: 20px;
-    margin: 15px 0;
-    flex-wrap: wrap;
-}
-
-.radio-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #012E40;
-}
-
-.radio-item input[type="radio"] {
-    width: auto;
-    margin: 0;
-}
-
-.checkbox-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin: 20px 0;
-    cursor: pointer;
-    color: #012E40;
-}
-
-.checkbox-item input[type="checkbox"] {
-    width: auto;
-    margin: 0;
-    margin-top: 2px;
-}
-
-/* ===== SPECIAL SECTIONS ===== */
-.gallery-placeholder {
-    background: #F0F9F7;
-    border: 2px dashed #85C7B3;
-    border-radius: 8px;
-    padding: 40px 20px;
-    text-align: center;
-    margin: 20px 0;
-    color: #012E40;
-}
-
-.success-message {
-    background: linear-gradient(135deg, #F2A922 0%, #85C7B3 100%);
-    color: #012E40;
-    padding: 30px;
-    border-radius: 14px;
-    text-align: center;
-    margin: 20px 0;
-    box-shadow: 0 4px 20px rgba(242, 169, 34, 0.3);
-}
-
-.success-message h3 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-}
-
-.brand-kit-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 15px;
-}
-
-/* ===== ADMIN STYLES ===== */
-.admin-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #F2A922;
-    color: #012E40;
-    border: 2px solid #012E40;
-    padding: 12px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 700;
-    z-index: 100000;
-    box-shadow: 0 6px 20px rgba(242, 169, 34, 0.5);
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.admin-toggle:hover {
-    background: #85C7B3;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(133, 199, 179, 0.5);
-}
-
-.admin-toggle:active {
-    transform: translateY(0px);
-}
-
-.admin-panel {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    background: #012E40;
-    color: #EEF4D9;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    z-index: 99999;
-    min-width: 320px;
-    max-width: 400px;
-    border: 2px solid #05908C;
-    display: none;
-}
-
-.admin-panel h4 {
-    margin: 0 0 20px 0; 
-    font-size: 1.2rem;
-    color: #F2A922;
-    text-align: center;
-    border-bottom: 1px solid #05908C;
-    padding-bottom: 10px;
-}
-
-.admin-form input {
-    width: 100%;
-    margin-bottom: 12px;
-    padding: 12px;
-    border: 2px solid #85C7B3;
-    border-radius: 8px;
-    background: #EEF4D9;
-    color: #012E40;
-    font-size: 0.95rem;
-}
-
-.admin-form button {
-    width: 100%;
-    padding: 12px;
-    background: #F2A922;
-    color: #012E40;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    margin-bottom: 10px;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-}
-
-.admin-form button:hover {
-    background: #85C7B3;
-    transform: translateY(-1px);
-}
-
-.admin-form button.danger {
-    background: #ff6b6b;
-    color: white;
-}
-
-.admin-form button.danger:hover {
-    background: #ff5252;
-}
-
-.admin-form hr {
-    margin: 20px 0;
-    border: none;
-    border-top: 1px solid #85C7B3;
-}
-
-.admin-status {
-    font-size: 0.9rem;
-    margin-top: 15px;
-    padding: 10px;
-    border-radius: 6px;
-    text-align: center;
-    display: none;
-}
-
-.admin-status.success {
-    background: rgba(242, 169, 34, 0.2);
-    color: #F2A922;
-    border: 1px solid #F2A922;
-}
-
-.admin-status.error {
-    background: rgba(255, 107, 107, 0.2);
-    color: #ff6b6b;
-    border: 1px solid #ff6b6b;
-}
-
-/* ===== FOOTER ===== */
-.portal-footer {
-    text-align: center;
-    padding: 30px 20px;
-    margin-top: 40px;
-    border-top: 2px solid rgba(133, 199, 179, 0.3);
-    color: #EEF4D9;
-    font-size: 0.9rem;
-}
-
-.portal-footer p {
-    margin-bottom: 15px;
-    color: #EEF4D9;
-}
-
-.footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.footer-links a {
-    color: #F2A922;
-    text-decoration: none;
-}
-
-.footer-links a:hover {
-    text-decoration: underline;
-    color: #85C7B3;
-}
-
-.footer-links span {
-    color: #85C7B3;
-}
-
-/* ===== SUPPORT MODE ===== */
-.skip-step {
-    background: #F2A922;
-    color: #012E40;
-    font-size: 0.8rem;
-    padding: 4px 12px;
-    border-radius: 12px;
-    margin-left: 10px;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .portal-container {
-        padding: 15px;
+    // Revision form toggle
+    const revisionBtn = document.getElementById('revisionBtn');
+    const revisionForm = document.getElementById('revisionForm');
+    
+    if (revisionBtn && revisionForm) {
+        revisionBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const isVisible = revisionForm.style.display !== 'none';
+            revisionForm.style.display = isVisible ? 'none' : 'block';
+        });
     }
 
-    .hero {
-        padding: 25px 15px;
+    // Email and copy buttons
+    const emailAdminBtn = document.getElementById('emailAdminInfo');
+    if (emailAdminBtn) {
+        emailAdminBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.emailAdminDetails();
+        });
     }
 
-    .hero h1 {
-        font-size: 1.8rem;
+    const emailAccessBtn = document.getElementById('emailAccessInfo');
+    if (emailAccessBtn) {
+        emailAccessBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.emailAccessDetails();
+        });
     }
 
-    .step {
-        padding: 20px;
+    const emailRevisionBtn = document.getElementById('emailRevision');
+    if (emailRevisionBtn) {
+        emailRevisionBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.emailRevisionRequest();
+        });
     }
 
-    .step-header {
-        flex-direction: column;
-        align-items: flex-start;
+    const copyRevisionBtn = document.getElementById('copyRevision');
+    if (copyRevisionBtn) {
+        copyRevisionBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.copyRevisionToClipboard();
+        });
     }
 
-    .radio-group {
-        flex-direction: column;
-        gap: 10px;
+    // Reset progress
+    const resetBtn = document.getElementById('resetProgress');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.resetProgress();
+        });
     }
 
-    .footer-links {
-        flex-direction: column;
-        gap: 10px;
+    // Help buttons
+    const helpButtons = ['metaHelpBtn', 'checkHelpBtn'];
+    helpButtons.forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=Need Help with Meta Business Suite Setup`;
+                window.open(mailtoLink);
+            });
+        }
+    });
+
+    // Setup help button
+    const setupHelpBtn = document.getElementById('setupHelpBtn');
+    if (setupHelpBtn) {
+        setupHelpBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.emailSetupRequest();
+        });
     }
 
-    .brand-kit-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
+    // Approve button
+    const approveBtn = document.getElementById('approveBtn');
+    if (approveBtn) {
+        approveBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to approve these creatives for launch?')) {
+                window.markStepComplete(5);
+                alert('Creatives approved! Your campaign will launch within 24-48 hours.');
+            }
+        });
     }
+};
 
-    .admin-toggle {
-        top: 10px;
-        right: 10px;
-        padding: 8px 14px;
-        font-size: 0.85rem;
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Portal initializing...');
+    
+    // Load state first
+    window.loadState();
+    
+    // Initialize external links
+    document.getElementById('msaBtn').href = window.DLM_CONFIG.docuSign.msa;
+    document.getElementById('dpaBtn').href = window.DLM_CONFIG.docuSign.dpa;
+    document.getElementById('uploadBtn').href = window.DLM_CONFIG.uploads.driveFileRequestUrl;
+    
+    // Set Stripe URL
+    const stripeLink = window.portalState.stripePaymentLink || window.DLM_CONFIG.stripeUrl;
+    document.getElementById('stripeBtn').href = stripeLink;
+    
+    // Initialize SOW button
+    window.updateSOWButton();
+    
+    // Display config values
+    document.getElementById('metaEmailDisplay').textContent = window.DLM_CONFIG.support.opsEmail;
+    document.getElementById('contactEmail').textContent = window.DLM_CONFIG.support.opsEmail;
+    document.getElementById('contactPhone').textContent = window.DLM_CONFIG.support.opsPhone;
+    
+    // Initialize UI
+    window.updateStepStates();
+    
+    // Initialize creative gallery
+    if (window.portalState.creativeLink) {
+        window.updateCreativeGallery(window.portalState.creativeLink);
     }
+    
+    // Setup all event listeners
+    window.setupEventListeners();
+    
+    // Password field Enter key
+    document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            window.adminLogin();
+        }
+    });
+    
+    console.log('Portal initialization complete!');
+});
 
-    .admin-panel {
-        top: 60px;
-        right: 10px;
-        left: 10px;
-        min-width: auto;
-        max-width: none;
+// Close admin panel when clicking outside
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('adminPanel');
+    const toggle = document.getElementById('adminToggle');
+    
+    if (!panel.contains(e.target) && !toggle.contains(e.target)) {
+        panel.style.display = 'none';
     }
-}
-
-@media (max-width: 360px) {
-    .btn {
-        width: 100%;
-        justify-content: center;
-        margin: 5px 0;
-    }
-
-    .hero h1 {
-        font-size: 1.6rem;
-    }
-}
-
-/* ===== ACCESSIBILITY ===== */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-/* Focus styles */
-*:focus {
-    outline: 2px solid #F2A922;
-    outline-offset: 2px;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(242, 169, 34, 0.3);
-}
+});
