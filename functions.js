@@ -176,6 +176,30 @@ window.updateCreativeGallery = function(link) {
     }
 };
 
+// ===== PROGRESS BAR FUNCTIONS =====
+window.updateProgressBar = function() {
+    const completedSteps = Object.keys(window.portalState).filter(key => 
+        key !== 'admin' && key !== 'creativeLink' && key !== 'stripePaymentLink' && window.portalState[key]
+    ).length;
+    
+    const totalSteps = 5;
+    const percentage = Math.round((completedSteps / totalSteps) * 100);
+    
+    // Update progress bar fill
+    const progressFill = document.getElementById('progressFill');
+    progressFill.style.width = percentage + '%';
+    
+    // Update progress text
+    const progressText = document.getElementById('progressText');
+    progressText.textContent = `${completedSteps} of ${totalSteps} steps completed`;
+    
+    // Update percentage
+    const progressPercent = document.getElementById('progressPercent');
+    progressPercent.textContent = percentage + '%';
+    
+    return { completedSteps, totalSteps, percentage };
+};
+
 // ===== UTILITY FUNCTIONS =====
 window.loadState = function() {
     try {
@@ -204,7 +228,22 @@ window.updateStepStates = function() {
         
         stepElement.classList.toggle('completed', isCompleted);
         stepElement.classList.toggle('locked', !isUnlocked);
+        
+        // Update complete button text if step is completed
+        const completeBtn = stepElement.querySelector('.btn-complete');
+        if (completeBtn) {
+            if (isCompleted) {
+                completeBtn.textContent = `✓ Step ${i} Completed`;
+                completeBtn.disabled = true;
+            } else {
+                completeBtn.textContent = `Mark Step ${i} Complete`;
+                completeBtn.disabled = false;
+            }
+        }
     }
+    
+    // Update progress bar
+    window.updateProgressBar();
 };
 
 window.showSuccessMessage = function() {
@@ -220,13 +259,27 @@ window.markStepComplete = function(stepNum) {
     window.saveState();
     window.updateStepStates();
     
+    // Show completion feedback
+    const stepElement = document.getElementById(`step${stepNum}`);
+    const completeBtn = stepElement.querySelector('.btn-complete');
+    
+    // Add visual feedback
+    completeBtn.style.transform = 'scale(1.05)';
+    completeBtn.style.background = '#85C7B3';
+    
+    setTimeout(() => {
+        completeBtn.style.transform = '';
+    }, 200);
+    
     // Check if all steps are complete
     const allComplete = Object.keys(window.portalState).filter(key => 
         key !== 'admin' && key !== 'creativeLink' && key !== 'stripePaymentLink' && window.portalState[key]
     ).length === 5;
     
     if (allComplete) {
-        window.showSuccessMessage();
+        setTimeout(() => {
+            window.showSuccessMessage();
+        }, 500);
     }
     
     if (window.DLM_CONFIG.support.webhookUrl) {
