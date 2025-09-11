@@ -138,12 +138,39 @@ window.setStripeLink = function() {
     window.showAdminStatus('✓ Stripe link set successfully', 'success');
 };
 
-window.removeStripeLink = function() {
-    window.portalState.stripePaymentLink = null;
+// ===== GOOGLE DRIVE LINK MANAGEMENT =====
+window.setGoogleDriveLink = function() {
+    const link = document.getElementById('googleDriveLink').value.trim();
+    
+    if (!link) {
+        window.showAdminStatus('✗ Please enter a Google Drive link', 'error');
+        return;
+    }
+    
+    try {
+        new URL(link);
+    } catch {
+        window.showAdminStatus('✗ Please enter a valid URL', 'error');
+        return;
+    }
+    
+    window.portalState.googleDriveLink = link;
     window.saveState();
-    window.updateStripeButton(window.DLM_CONFIG.stripeUrl);
-    document.getElementById('stripePaymentLink').value = '';
-    window.showAdminStatus('✓ Stripe link removed (reset to default)', 'success');
+    window.updateUploadButton(link);
+    window.showAdminStatus('✓ Google Drive link set successfully', 'success');
+};
+
+window.removeGoogleDriveLink = function() {
+    window.portalState.googleDriveLink = null;
+    window.saveState();
+    window.updateUploadButton(window.DLM_CONFIG.uploads.driveFileRequestUrl);
+    document.getElementById('googleDriveLink').value = '';
+    window.showAdminStatus('✓ Google Drive link reset to default', 'success');
+};
+
+window.updateUploadButton = function(link) {
+    const uploadBtn = document.getElementById('uploadBtn');
+    uploadBtn.href = link;
 };
 
 window.updateStripeButton = function(link) {
