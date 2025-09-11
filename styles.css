@@ -429,10 +429,12 @@ body {
     border-radius: 15px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     z-index: 99999;
-    min-width: 320px;
-    max-width: 400px;
+    min-width: 350px;
+    max-width: 450px;
     border: 2px solid #05908C;
     display: none;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .admin-panel h4 {
@@ -442,6 +444,17 @@ body {
     text-align: center;
     border-bottom: 1px solid #05908C;
     padding-bottom: 10px;
+}
+
+.admin-section {
+    margin-bottom: 20px;
+}
+
+.admin-section h5 {
+    color: #85C7B3;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    font-weight: 600;
 }
 
 .admin-form input {
