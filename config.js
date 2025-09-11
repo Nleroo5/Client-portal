@@ -10,8 +10,17 @@ window.DLM_CONFIG = {
         sow12: "https://na4.docusign.net/Member/PowerFormSigning.aspx?PowerFormId=7894201c-9ab2-4d7e-8126-18094731fd82&env=na4&acct=ab9821cd-da5d-4091-8f74-e8602b87929d&v=2"
     },
 
-    // Payment Settings
-    stripeUrl: "https://stripe-payment-link",
+    // Payment Settings - NEW STRUCTURE
+    stripeLinks: {
+        sow6: {
+            monthly: "https://stripe-6-month-monthly-payment-link",
+            upfront: "https://stripe-6-month-upfront-5percent-discount-link"
+        },
+        sow12: {
+            monthly: "https://stripe-12-month-monthly-payment-link",
+            upfront: "https://stripe-12-month-upfront-5percent-discount-link"
+        }
+    },
 
     // File Upload Settings  
     uploads: {
@@ -38,7 +47,7 @@ window.DLM_CONFIG = {
     }
 };
 
-// Storage and State Settings
+// Storage and State Settings - UPDATED
 window.STORAGE_KEY = 'dlm_portal_v1';
 window.portalState = {
     "1": false,
@@ -48,6 +57,16 @@ window.portalState = {
     "5": false,
     "admin": {},
     "creativeLink": null,
-    "stripePaymentLink": null,
-    "googleDriveLink": null  // NEW: Store custom Google Drive link
+    "googleDriveLink": null,
+    // NEW: Store custom Stripe links for each SOW/payment combination
+    "stripeLinks": {
+        "sow6": {
+            "monthly": null,
+            "upfront": null
+        },
+        "sow12": {
+            "monthly": null,
+            "upfront": null
+        }
+    }
 };
