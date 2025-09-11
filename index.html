@@ -10,30 +10,48 @@
     <!-- Admin Toggle Button -->
     <button class="admin-toggle" id="adminToggle" onclick="window.toggleAdminPanel()">ADMIN</button>
 
-    <!-- Admin Panel -->
-    <div class="admin-panel" id="adminPanel">
-        <h4>Admin Control Panel</h4>
-        <div class="admin-form">
-            <div id="adminLogin">
-                <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="new-password">
-                <button id="loginBtn" onclick="window.adminLogin()">Login</button>
-            </div>
-            
-            <div id="adminControls" style="display: none;">
+<!-- Admin Panel -->
+<div class="admin-panel" id="adminPanel">
+    <h4>Admin Control Panel</h4>
+    <div class="admin-form">
+        <div id="adminLogin">
+            <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="new-password">
+            <button id="loginBtn" onclick="window.adminLogin()">Login</button>
+        </div>
+        
+        <div id="adminControls" style="display: none;">
+            <!-- Creative Link Section -->
+            <div class="admin-section">
+                <h5>Creative Preview Link</h5>
                 <input type="url" id="creativeLink" placeholder="Creative Preview Link (Google Drive, etc.)">
                 <button id="setCreativeLink" onclick="window.setCreativeLink()">Set Creative Link</button>
                 <button id="removeCreativeLink" class="danger" onclick="window.removeCreativeLink()">Remove Creative Link</button>
-                
-                <hr>
-                
+            </div>
+            
+            <hr>
+            
+            <!-- Google Drive Upload Link Section -->
+            <div class="admin-section">
+                <h5>Brand Kit Upload Link</h5>
+                <input type="url" id="googleDriveLink" placeholder="Google Drive Upload/Folder Link">
+                <button id="setGoogleDriveLink" onclick="window.setGoogleDriveLink()">Set Upload Link</button>
+                <button id="removeGoogleDriveLink" class="danger" onclick="window.removeGoogleDriveLink()">Reset to Default</button>
+            </div>
+            
+            <hr>
+            
+            <!-- Stripe Payment Link Section -->
+            <div class="admin-section">
+                <h5>Payment Link</h5>
                 <input type="url" id="stripePaymentLink" placeholder="Stripe Payment/Invoice Link">
                 <button id="setStripeLink" onclick="window.setStripeLink()">Set Stripe Link</button>
                 <button id="removeStripeLink" class="danger" onclick="window.removeStripeLink()">Remove Stripe Link</button>
             </div>
-            
-            <div id="adminStatus" class="admin-status"></div>
         </div>
+        
+        <div id="adminStatus" class="admin-status"></div>
     </div>
+</div>
 
     <div class="portal-container">
         <!-- Hero Section -->
