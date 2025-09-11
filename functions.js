@@ -27,6 +27,12 @@ window.toggleAdminPanel = function() {
             if (existingStripeLink) {
                 document.getElementById('stripePaymentLink').value = existingStripeLink;
             }
+            
+            // Load existing Google Drive link
+            const existingGoogleDriveLink = window.portalState.googleDriveLink;
+            if (existingGoogleDriveLink) {
+                document.getElementById('googleDriveLink').value = existingGoogleDriveLink;
+            }
         } else {
             document.getElementById('adminControls').style.display = 'none';
             document.getElementById('adminLogin').style.display = 'block';
@@ -70,6 +76,12 @@ window.adminLogin = function() {
             document.getElementById('stripePaymentLink').value = existingStripeLink;
         }
         
+        // Load existing Google Drive link
+        const existingGoogleDriveLink = window.portalState.googleDriveLink;
+        if (existingGoogleDriveLink) {
+            document.getElementById('googleDriveLink').value = existingGoogleDriveLink;
+        }
+        
         window.showAdminStatus('✓ Admin logged in', 'success');
     } else {
         window.showAdminStatus('✗ Invalid password', 'error');
@@ -88,6 +100,7 @@ window.showAdminStatus = function(message, type) {
     }, 3000);
 };
 
+// ===== CREATIVE LINK MANAGEMENT =====
 window.setCreativeLink = function() {
     const link = document.getElementById('creativeLink').value.trim();
     
@@ -117,6 +130,7 @@ window.removeCreativeLink = function() {
     window.showAdminStatus('✓ Creative link removed', 'success');
 };
 
+// ===== STRIPE LINK MANAGEMENT =====
 window.setStripeLink = function() {
     const link = document.getElementById('stripePaymentLink').value.trim();
     
@@ -136,6 +150,14 @@ window.setStripeLink = function() {
     window.saveState();
     window.updateStripeButton(link);
     window.showAdminStatus('✓ Stripe link set successfully', 'success');
+};
+
+window.removeStripeLink = function() {
+    window.portalState.stripePaymentLink = null;
+    window.saveState();
+    window.updateStripeButton(window.DLM_CONFIG.stripeUrl);
+    document.getElementById('stripePaymentLink').value = '';
+    window.showAdminStatus('✓ Stripe link removed (reset to default)', 'success');
 };
 
 // ===== GOOGLE DRIVE LINK MANAGEMENT =====
@@ -168,6 +190,7 @@ window.removeGoogleDriveLink = function() {
     window.showAdminStatus('✓ Google Drive link reset to default', 'success');
 };
 
+// ===== BUTTON UPDATE FUNCTIONS =====
 window.updateUploadButton = function(link) {
     const uploadBtn = document.getElementById('uploadBtn');
     uploadBtn.href = link;
@@ -206,7 +229,7 @@ window.updateCreativeGallery = function(link) {
 // ===== PROGRESS BAR FUNCTIONS =====
 window.updateProgressBar = function() {
     const completedSteps = Object.keys(window.portalState).filter(key => 
-        key !== 'admin' && key !== 'creativeLink' && key !== 'stripePaymentLink' && window.portalState[key]
+        key !== 'admin' && key !== 'creativeLink' && key !== 'stripePaymentLink' && key !== 'googleDriveLink' && window.portalState[key]
     ).length;
     
     const totalSteps = 5;
@@ -300,7 +323,7 @@ window.markStepComplete = function(stepNum) {
     
     // Check if all steps are complete
     const allComplete = Object.keys(window.portalState).filter(key => 
-        key !== 'admin' && key !== 'creativeLink' && key !== 'stripePaymentLink' && window.portalState[key]
+        key !== 'admin' && key !== 'creativeLink' && key !== 'stripePaymentLink' && key !== 'googleDriveLink' && window.portalState[key]
     ).length === 5;
     
     if (allComplete) {
@@ -703,9 +726,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize external links
     document.getElementById('msaBtn').href = window.DLM_CONFIG.docuSign.msa;
     document.getElementById('dpaBtn').href = window.DLM_CONFIG.docuSign.dpa;
-    document.getElementById('uploadBtn').href = window.DLM_CONFIG.uploads.driveFileRequestUrl;
     
-    // Set Stripe URL
+    // Set Google Drive Upload URL (custom or default)
+    const googleDriveLink = window.portalState.googleDriveLink || window.DLM_CONFIG.uploads.driveFileRequestUrl;
+    document.getElementById('uploadBtn').href = googleDriveLink;
+    
+    // Set Stripe URL (custom or default)
     const stripeLink = window.portalState.stripePaymentLink || window.DLM_CONFIG.stripeUrl;
     document.getElementById('stripeBtn').href = stripeLink;
     
