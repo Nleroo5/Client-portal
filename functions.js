@@ -16,23 +16,7 @@ window.toggleAdminPanel = function() {
         if (window.isAdminLoggedIn()) {
             document.getElementById('adminControls').style.display = 'block';
             document.getElementById('adminLogin').style.display = 'none';
-            
-            // Load existing links
-            const existingCreativeLink = window.portalState.creativeLink;
-            if (existingCreativeLink) {
-                document.getElementById('creativeLink').value = existingCreativeLink;
-            }
-            
-            const existingStripeLink = window.portalState.stripePaymentLink;
-            if (existingStripeLink) {
-                document.getElementById('stripePaymentLink').value = existingStripeLink;
-            }
-            
-            // Load existing Google Drive link
-            const existingGoogleDriveLink = window.portalState.googleDriveLink;
-            if (existingGoogleDriveLink) {
-                document.getElementById('googleDriveLink').value = existingGoogleDriveLink;
-            }
+            window.loadAdminLinks();
         } else {
             document.getElementById('adminControls').style.display = 'none';
             document.getElementById('adminLogin').style.display = 'block';
@@ -65,27 +49,40 @@ window.adminLogin = function() {
         document.getElementById('adminControls').style.display = 'block';
         document.getElementById('adminLogin').style.display = 'none';
         
-        // Load existing links
-        const existingCreativeLink = window.portalState.creativeLink;
-        if (existingCreativeLink) {
-            document.getElementById('creativeLink').value = existingCreativeLink;
-        }
-        
-        const existingStripeLink = window.portalState.stripePaymentLink;
-        if (existingStripeLink) {
-            document.getElementById('stripePaymentLink').value = existingStripeLink;
-        }
-        
-        // Load existing Google Drive link
-        const existingGoogleDriveLink = window.portalState.googleDriveLink;
-        if (existingGoogleDriveLink) {
-            document.getElementById('googleDriveLink').value = existingGoogleDriveLink;
-        }
-        
+        window.loadAdminLinks();
         window.showAdminStatus('✓ Admin logged in', 'success');
     } else {
         window.showAdminStatus('✗ Invalid password', 'error');
         document.getElementById('adminPassword').value = '';
+    }
+};
+
+window.loadAdminLinks = function() {
+    // Load creative link
+    const existingCreativeLink = window.portalState.creativeLink;
+    if (existingCreativeLink) {
+        document.getElementById('creativeLink').value = existingCreativeLink;
+    }
+    
+    // Load Google Drive link
+    const existingGoogleDriveLink = window.portalState.googleDriveLink;
+    if (existingGoogleDriveLink) {
+        document.getElementById('googleDriveLink').value = existingGoogleDriveLink;
+    }
+    
+    // Load Stripe links
+    const stripeLinks = window.portalState.stripeLinks;
+    if (stripeLinks.sow6.monthly) {
+        document.getElementById('stripe6Monthly').value = stripeLinks.sow6.monthly;
+    }
+    if (stripeLinks.sow6.upfront) {
+        document.getElementById('stripe6Upfront').value = stripeLinks.sow6.upfront;
+    }
+    if (stripeLinks.sow12.monthly) {
+        document.getElementById('stripe12Monthly').value = stripeLinks.sow12.monthly;
+    }
+    if (stripeLinks.sow12.upfront) {
+        document.getElementById('stripe12Upfront').value = stripeLinks.sow12.upfront;
     }
 };
 
@@ -130,36 +127,6 @@ window.removeCreativeLink = function() {
     window.showAdminStatus('✓ Creative link removed', 'success');
 };
 
-// ===== STRIPE LINK MANAGEMENT =====
-window.setStripeLink = function() {
-    const link = document.getElementById('stripePaymentLink').value.trim();
-    
-    if (!link) {
-        window.showAdminStatus('✗ Please enter a Stripe link', 'error');
-        return;
-    }
-    
-    try {
-        new URL(link);
-    } catch {
-        window.showAdminStatus('✗ Please enter a valid URL', 'error');
-        return;
-    }
-    
-    window.portalState.stripePaymentLink = link;
-    window.saveState();
-    window.updateStripeButton(link);
-    window.showAdminStatus('✓ Stripe link set successfully', 'success');
-};
-
-window.removeStripeLink = function() {
-    window.portalState.stripePaymentLink = null;
-    window.saveState();
-    window.updateStripeButton(window.DLM_CONFIG.stripeUrl);
-    document.getElementById('stripePaymentLink').value = '';
-    window.showAdminStatus('✓ Stripe link removed (reset to default)', 'success');
-};
-
 // ===== GOOGLE DRIVE LINK MANAGEMENT =====
 window.setGoogleDriveLink = function() {
     const link = document.getElementById('googleDriveLink').value.trim();
@@ -190,15 +157,86 @@ window.removeGoogleDriveLink = function() {
     window.showAdminStatus('✓ Google Drive link reset to default', 'success');
 };
 
+// ===== STRIPE LINK MANAGEMENT (NEW) =====
+window.setStripeLink = function(sowTerm, paymentType) {
+    const inputId = `stripe${sowTerm === 'sow6' ? '6' : '12'}${paymentType === 'monthly' ? 'Monthly' : 'Upfront'}`;
+    const link = document.getElementById(inputId).value.trim();
+    
+    if (!link) {
+        window.showAdminStatus(`✗ Please enter a ${sowTerm} ${paymentType} link`, 'error');
+        return;
+    }
+    
+    try {
+        new URL(link);
+    } catch {
+        window.showAdminStatus('✗ Please enter a valid URL', 'error');
+        return;
+    }
+    
+    window.portalState.stripeLinks[sowTerm][paymentType] = link;
+    window.saveState();
+    window.updatePaymentButton();
+    window.showAdminStatus(`✓ ${sowTerm} ${paymentType} link set successfully`, 'success');
+};
+
+window.removeStripeLink = function(sowTerm, paymentType) {
+    const inputId = `stripe${sowTerm === 'sow6' ? '6' : '12'}${paymentType === 'monthly' ? 'Monthly' : 'Upfront'}`;
+    
+    window.portalState.stripeLinks[sowTerm][paymentType] = null;
+    window.saveState();
+    document.getElementById(inputId).value = '';
+    window.updatePaymentButton();
+    window.showAdminStatus(`✓ ${sowTerm} ${paymentType} link reset to default`, 'success');
+};
+
+// ===== PAYMENT SYSTEM FUNCTIONS =====
+window.getCurrentSOWTerm = function() {
+    const sow12Radio = document.getElementById('sow12');
+    return (sow12Radio && sow12Radio.checked) ? 'sow12' : 'sow6';
+};
+
+window.getCurrentPaymentType = function() {
+    const upfrontRadio = document.getElementById('paymentUpfront');
+    return (upfrontRadio && upfrontRadio.checked) ? 'upfront' : 'monthly';
+};
+
+window.updatePaymentOptions = function() {
+    const sowTerm = window.getCurrentSOWTerm();
+    const termText = sowTerm === 'sow12' ? '12-Month' : '6-Month';
+    
+    // Update the payment term display
+    document.getElementById('paymentTermText').textContent = termText;
+    
+    // Update the payment button
+    window.updatePaymentButton();
+};
+
+window.updatePaymentButton = function() {
+    const sowTerm = window.getCurrentSOWTerm();
+    const paymentType = window.getCurrentPaymentType();
+    const stripeBtn = document.getElementById('stripeBtn');
+    
+    // Get the appropriate link (custom or default)
+    let paymentLink;
+    const customLink = window.portalState.stripeLinks[sowTerm][paymentType];
+    if (customLink) {
+        paymentLink = customLink;
+    } else {
+        paymentLink = window.DLM_CONFIG.stripeLinks[sowTerm][paymentType];
+    }
+    
+    // Update button text
+    const termText = sowTerm === 'sow12' ? '12-Month' : '6-Month';
+    const typeText = paymentType === 'upfront' ? 'Upfront Payment (5% Discount)' : 'Monthly Payment';
+    stripeBtn.textContent = `Set Up ${typeText}`;
+    stripeBtn.href = paymentLink;
+};
+
 // ===== BUTTON UPDATE FUNCTIONS =====
 window.updateUploadButton = function(link) {
     const uploadBtn = document.getElementById('uploadBtn');
     uploadBtn.href = link;
-};
-
-window.updateStripeButton = function(link) {
-    const stripeBtn = document.getElementById('stripeBtn');
-    stripeBtn.href = link;
 };
 
 window.updateCreativeGallery = function(link) {
@@ -229,7 +267,7 @@ window.updateCreativeGallery = function(link) {
 // ===== PROGRESS BAR FUNCTIONS =====
 window.updateProgressBar = function() {
     const completedSteps = Object.keys(window.portalState).filter(key => 
-        key !== 'admin' && key !== 'creativeLink' && key !== 'stripePaymentLink' && key !== 'googleDriveLink' && window.portalState[key]
+        key !== 'admin' && key !== 'creativeLink' && key !== 'stripeLinks' && key !== 'googleDriveLink' && window.portalState[key]
     ).length;
     
     const totalSteps = 5;
@@ -255,7 +293,17 @@ window.loadState = function() {
     try {
         const saved = localStorage.getItem(window.STORAGE_KEY);
         if (saved) {
-            window.portalState = { ...window.portalState, ...JSON.parse(saved) };
+            const savedState = JSON.parse(saved);
+            // Merge with default state to ensure new properties exist
+            window.portalState = { 
+                ...window.portalState, 
+                ...savedState,
+                // Ensure stripeLinks structure exists
+                stripeLinks: {
+                    ...window.portalState.stripeLinks,
+                    ...savedState.stripeLinks
+                }
+            };
         }
     } catch (e) {
         console.warn('Could not load portal state:', e);
@@ -323,7 +371,7 @@ window.markStepComplete = function(stepNum) {
     
     // Check if all steps are complete
     const allComplete = Object.keys(window.portalState).filter(key => 
-        key !== 'admin' && key !== 'creativeLink' && key !== 'stripePaymentLink' && key !== 'googleDriveLink' && window.portalState[key]
+        key !== 'admin' && key !== 'creativeLink' && key !== 'stripeLinks' && key !== 'googleDriveLink' && window.portalState[key]
     ).length === 5;
     
     if (allComplete) {
@@ -354,6 +402,9 @@ window.updateSOWButton = function() {
         sowBtn.textContent = 'Sign SOW (6-month)';
         sowBtn.href = window.DLM_CONFIG.docuSign.sow6;
     }
+    
+    // Update payment options when SOW term changes
+    window.updatePaymentOptions();
 };
 
 // ===== EMAIL FUNCTIONS =====
@@ -546,6 +597,12 @@ window.setupEventListeners = function() {
         radio.addEventListener('change', window.updateSOWButton);
     });
 
+    // Payment type selection
+    const paymentRadios = document.querySelectorAll('input[name="paymentType"]');
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', window.updatePaymentButton);
+    });
+
     // Meta setup options
     const metaRadios = document.querySelectorAll('input[name="metaSetup"]');
     metaRadios.forEach(radio => {
@@ -731,12 +788,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const googleDriveLink = window.portalState.googleDriveLink || window.DLM_CONFIG.uploads.driveFileRequestUrl;
     document.getElementById('uploadBtn').href = googleDriveLink;
     
-    // Set Stripe URL (custom or default)
-    const stripeLink = window.portalState.stripePaymentLink || window.DLM_CONFIG.stripeUrl;
-    document.getElementById('stripeBtn').href = stripeLink;
-    
-    // Initialize SOW button
+    // Initialize SOW button and payment options
     window.updateSOWButton();
+    window.updatePaymentOptions();
     
     // Display config values
     document.getElementById('metaEmailDisplay').textContent = window.DLM_CONFIG.support.opsEmail;
