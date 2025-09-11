@@ -48,5 +48,6 @@ window.portalState = {
     "5": false,
     "admin": {},
     "creativeLink": null,
-    "stripePaymentLink": null
+    "stripePaymentLink": null,
+    "googleDriveLink": null  // NEW: Store custom Google Drive link
 };
