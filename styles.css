@@ -96,6 +96,32 @@ body {
     color: #F2A922;
 }
 
+/* ===== PAYMENT OPTIONS STYLES ===== */
+.payment-term-display {
+    background: #DFF5F3;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 3px solid #05908C;
+}
+
+.payment-term-display h4 {
+    margin: 0;
+    color: #012E40;
+    font-weight: 600;
+}
+
+.discount-tag {
+    background: #F2A922;
+    color: #012E40;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 8px;
+    display: inline-block;
+}
+
 /* ===== STEP STYLES ===== */
 .step {
     background: #EEF4D9;
@@ -334,11 +360,35 @@ body {
     align-items: center;
     gap: 8px;
     color: #012E40;
+    background: rgba(238, 244, 217, 0.5);
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-bottom: 10px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.radio-item:hover {
+    background: rgba(133, 199, 179, 0.2);
+    border-color: #85C7B3;
 }
 
 .radio-item input[type="radio"] {
     width: auto;
     margin: 0;
+}
+
+.radio-item input[type="radio"]:checked {
+    accent-color: #F2A922;
+}
+
+.radio-item:has(input[type="radio"]:checked) {
+    background: rgba(242, 169, 34, 0.2);
+    border-color: #F2A922;
+    font-weight: 600;
 }
 
 .checkbox-item {
@@ -354,6 +404,15 @@ body {
     width: auto;
     margin: 0;
     margin-top: 2px;
+}
+
+/* Payment button dynamic text */
+#stripeBtn {
+    font-size: 1rem;
+    padding: 14px 24px;
+    min-width: 250px;
+    text-align: center;
+    justify-content: center;
 }
 
 /* ===== SPECIAL SECTIONS ===== */
@@ -523,6 +582,64 @@ body {
     border: 1px solid #ff6b6b;
 }
 
+/* ===== ADMIN PAYMENT LINKS STYLES ===== */
+.payment-links-group {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(133, 199, 179, 0.1);
+    border-radius: 8px;
+    border: 1px solid #85C7B3;
+}
+
+.payment-links-group h6 {
+    color: #F2A922;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.payment-link-row {
+    margin-bottom: 15px;
+}
+
+.payment-link-row label {
+    display: block;
+    color: #85C7B3;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.payment-link-row input {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 10px;
+    border: 1px solid #85C7B3;
+    border-radius: 6px;
+    background: rgba(238, 244, 217, 0.9);
+    color: #012E40;
+    font-size: 0.85rem;
+}
+
+.button-row {
+    display: flex;
+    gap: 8px;
+}
+
+.button-row button {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    margin-bottom: 0;
+}
+
+.button-row button.small {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+}
+
 /* ===== FOOTER ===== */
 .portal-footer {
     text-align: center;
@@ -597,6 +714,11 @@ body {
         gap: 10px;
     }
 
+    .radio-item {
+        min-width: auto;
+        flex: none;
+    }
+
     .footer-links {
         flex-direction: column;
         gap: 10px;
@@ -634,6 +756,31 @@ body {
         width: 100%;
         justify-content: center;
     }
+
+    .payment-links-group {
+        padding: 12px;
+    }
+    
+    .button-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    #stripeBtn {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .payment-term-display {
+        padding: 12px 16px;
+    }
+
+    .discount-tag {
+        display: block;
+        margin-left: 0;
+        margin-top: 5px;
+        width: fit-content;
+    }
 }
 
 @media (max-width: 360px) {
@@ -645,6 +792,10 @@ body {
 
     .hero h1 {
         font-size: 1.6rem;
+    }
+
+    .radio-item {
+        padding: 10px 12px;
     }
 }
 
@@ -672,4 +823,33 @@ select:focus,
 textarea:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(242, 169, 34, 0.3);
+}
+
+/* Enhanced focus for radio buttons in payment options */
+.radio-item:focus-within {
+    outline: 2px solid #F2A922;
+    outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+.radio-item,
+.btn,
+.admin-toggle,
+.progress-fill {
+    transition: all 0.2s ease;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .step {
+        border-width: 3px;
+    }
+    
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .radio-item {
+        border-width: 2px;
+    }
 }
