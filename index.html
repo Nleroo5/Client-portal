@@ -10,48 +10,87 @@
     <!-- Admin Toggle Button -->
     <button class="admin-toggle" id="adminToggle" onclick="window.toggleAdminPanel()">ADMIN</button>
 
-<!-- Admin Panel -->
-<div class="admin-panel" id="adminPanel">
-    <h4>Admin Control Panel</h4>
-    <div class="admin-form">
-        <div id="adminLogin">
-            <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="new-password">
-            <button id="loginBtn" onclick="window.adminLogin()">Login</button>
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+        <h4>Admin Control Panel</h4>
+        <div class="admin-form">
+            <div id="adminLogin">
+                <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="new-password">
+                <button id="loginBtn" onclick="window.adminLogin()">Login</button>
+            </div>
+            
+            <div id="adminControls" style="display: none;">
+                <!-- Creative Link Section -->
+                <div class="admin-section">
+                    <h5>Creative Preview Link</h5>
+                    <input type="url" id="creativeLink" placeholder="Creative Preview Link (Google Drive, etc.)">
+                    <button id="setCreativeLink" onclick="window.setCreativeLink()">Set Creative Link</button>
+                    <button id="removeCreativeLink" class="danger" onclick="window.removeCreativeLink()">Remove Creative Link</button>
+                </div>
+                
+                <hr>
+                
+                <!-- Google Drive Upload Link Section -->
+                <div class="admin-section">
+                    <h5>Brand Kit Upload Link</h5>
+                    <input type="url" id="googleDriveLink" placeholder="Google Drive Upload/Folder Link">
+                    <button id="setGoogleDriveLink" onclick="window.setGoogleDriveLink()">Set Upload Link</button>
+                    <button id="removeGoogleDriveLink" class="danger" onclick="window.removeGoogleDriveLink()">Reset to Default</button>
+                </div>
+                
+                <hr>
+                
+                <!-- Stripe Payment Links Section -->
+                <div class="admin-section">
+                    <h5>Payment Links</h5>
+                    
+                    <!-- 6-Month Payment Links -->
+                    <div class="payment-links-group">
+                        <h6>6-Month SOW:</h6>
+                        <div class="payment-link-row">
+                            <label>Monthly:</label>
+                            <input type="url" id="stripe6Monthly" placeholder="6-month monthly payment link">
+                            <div class="button-row">
+                                <button onclick="window.setStripeLink('sow6', 'monthly')">Set</button>
+                                <button class="danger small" onclick="window.removeStripeLink('sow6', 'monthly')">Reset</button>
+                            </div>
+                        </div>
+                        <div class="payment-link-row">
+                            <label>Upfront:</label>
+                            <input type="url" id="stripe6Upfront" placeholder="6-month upfront payment link">
+                            <div class="button-row">
+                                <button onclick="window.setStripeLink('sow6', 'upfront')">Set</button>
+                                <button class="danger small" onclick="window.removeStripeLink('sow6', 'upfront')">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 12-Month Payment Links -->
+                    <div class="payment-links-group">
+                        <h6>12-Month SOW:</h6>
+                        <div class="payment-link-row">
+                            <label>Monthly:</label>
+                            <input type="url" id="stripe12Monthly" placeholder="12-month monthly payment link">
+                            <div class="button-row">
+                                <button onclick="window.setStripeLink('sow12', 'monthly')">Set</button>
+                                <button class="danger small" onclick="window.removeStripeLink('sow12', 'monthly')">Reset</button>
+                            </div>
+                        </div>
+                        <div class="payment-link-row">
+                            <label>Upfront:</label>
+                            <input type="url" id="stripe12Upfront" placeholder="12-month upfront payment link">
+                            <div class="button-row">
+                                <button onclick="window.setStripeLink('sow12', 'upfront')">Set</button>
+                                <button class="danger small" onclick="window.removeStripeLink('sow12', 'upfront')">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="adminStatus" class="admin-status"></div>
         </div>
-        
-        <div id="adminControls" style="display: none;">
-            <!-- Creative Link Section -->
-            <div class="admin-section">
-                <h5>Creative Preview Link</h5>
-                <input type="url" id="creativeLink" placeholder="Creative Preview Link (Google Drive, etc.)">
-                <button id="setCreativeLink" onclick="window.setCreativeLink()">Set Creative Link</button>
-                <button id="removeCreativeLink" class="danger" onclick="window.removeCreativeLink()">Remove Creative Link</button>
-            </div>
-            
-            <hr>
-            
-            <!-- Google Drive Upload Link Section -->
-            <div class="admin-section">
-                <h5>Brand Kit Upload Link</h5>
-                <input type="url" id="googleDriveLink" placeholder="Google Drive Upload/Folder Link">
-                <button id="setGoogleDriveLink" onclick="window.setGoogleDriveLink()">Set Upload Link</button>
-                <button id="removeGoogleDriveLink" class="danger" onclick="window.removeGoogleDriveLink()">Reset to Default</button>
-            </div>
-            
-            <hr>
-            
-            <!-- Stripe Payment Link Section -->
-            <div class="admin-section">
-                <h5>Payment Link</h5>
-                <input type="url" id="stripePaymentLink" placeholder="Stripe Payment/Invoice Link">
-                <button id="setStripeLink" onclick="window.setStripeLink()">Set Stripe Link</button>
-                <button id="removeStripeLink" class="danger" onclick="window.removeStripeLink()">Remove Stripe Link</button>
-            </div>
-        </div>
-        
-        <div id="adminStatus" class="admin-status"></div>
     </div>
-</div>
 
     <div class="portal-container">
         <!-- Hero Section -->
@@ -124,8 +163,28 @@
                 <div class="step-number">2</div>
             </div>
             <div class="step-content">
+                <!-- Payment Term Display -->
+                <div class="payment-term-display" id="paymentTermDisplay">
+                    <h4 style="color: #012E40; margin-bottom: 15px;">
+                        <span id="paymentTermText">6-Month</span> Payment Options
+                    </h4>
+                </div>
+
+                <!-- Payment Options -->
+                <div class="radio-group" style="margin-bottom: 20px;">
+                    <div class="radio-item">
+                        <input type="radio" id="paymentMonthly" name="paymentType" value="monthly" checked>
+                        <label for="paymentMonthly">Pay Monthly</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="paymentUpfront" name="paymentType" value="upfront">
+                        <label for="paymentUpfront">Pay All Upfront <span class="discount-tag">(5% Discount)</span></label>
+                    </div>
+                </div>
+
+                <!-- Payment Button -->
                 <a href="#" class="btn" id="stripeBtn" data-dlm-event="open_stripe" target="_blank" rel="noopener">
-                    Set Up Payment Method
+                    Set Up Monthly Payment
                 </a>
             </div>
             <div class="step-actions">
@@ -243,6 +302,154 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="websiteUrl">Website URL *</label>
+                        <input type="url" id="websiteUrl" placeholder="https://yourwebsite.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginUrl">Login URL</label>
+                        <input type="url" id="loginUrl" placeholder="https://yourwebsite.com/wp-admin">
+                    </div>
+                    <div class="form-group">
+                        <label for="tempUsername">Admin Username *</label>
+                        <input type="text" id="tempUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tempPassword">Admin Password *</label>
+                        <input type="password" id="tempPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sitePlatform">Website Platform</label>
+                        <select id="sitePlatform">
+                            <option value="">Select platform</option>
+                            <option value="wordpress">WordPress</option>
+                            <option value="squarespace">Squarespace</option>
+                            <option value="wix">Wix</option>
+                            <option value="shopify">Shopify</option>
+                            <option value="webflow">Webflow</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <input type="text" id="sitePlatformOther" placeholder="Please specify..." style="display: none; margin-top: 10px; width: 100%; padding: 12px 16px; border: 2px solid #85C7B3; border-radius: 8px; background: #EEF4D9; color: #012E40;">
+                    </div>
+                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
+                        <strong>🔒 Secure:</strong> We'll install tracking and remove our access immediately. You can change the password afterward.
+                    </p>
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-small" id="emailAccessInfo">Send Access Details Securely</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px; background: #F0F9F7; padding: 15px; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap;">
+                        <h5 style="color: #012E40; margin: 0;">What We Install:</h5>
+                        <button class="btn btn-small btn-outline" id="ga4InfoBtn" style="font-size: 0.8rem; padding: 4px 12px;">
+                            What is GA4?
+                        </button>
+                        <button class="btn btn-small btn-outline" id="pixelInfoBtn" style="font-size: 0.8rem; padding: 4px 12px;">
+                            What is Meta Pixel?
+                        </button>
+                    </div>
+                    
+                    <!-- GA4 Explanation (hidden initially) -->
+                    <div id="ga4Info" style="display: none; background: #DFF5F3; padding: 15px; border-radius: 6px; margin: 10px 0; border: 1px solid #05908C;">
+                        <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Google Analytics 4 (GA4):</h6>
+                        <p style="color: #012E40; margin: 0; font-size: 0.9rem; line-height: 1.5;">
+                            GA4 tracks how people find and use your website. It shows us which ads bring the most visitors, what pages they look at, and what actions they take (like calling your office or filling out forms). This helps us improve your ads to get better results. <strong>No personal health information is tracked.</strong>
+                        </p>
+                    </div>
+
+                    <!-- Meta Pixel Explanation (hidden initially) -->
+                    <div id="pixelInfo" style="display: none; background: #FBE9D1; padding: 15px; border-radius: 6px; margin: 10px 0; border: 1px solid #F2A922;">
+                        <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Meta Pixel (Facebook/Instagram):</h6>
+                        <p style="color: #012E40; margin: 0; font-size: 0.9rem; line-height: 1.5;">
+                            Meta Pixel tracks when people visit your website after seeing your Facebook or Instagram ads. It helps us find more people similar to your best customers and shows ads to people who visited your website but didn't book an appointment yet. <strong>No personal health information is tracked.</strong>
+                        </p>
+                    </div>
+
+                    <ul style="margin-left: 20px; color: #012E40; line-height: 1.6;">
+                        <li>✓ Google Analytics 4 (GA4) tracking code</li>
+                        <li>✓ Meta Pixel tracking code</li>
+                        <li>✓ Conversion tracking setup</li>
+                        <li>✓ Testing to ensure everything works</li>
+                    </ul>
+                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
+                        <strong>Timeline:</strong> Completed within 7 days of receiving access.
+                    </p>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-complete" onclick="window.markStepComplete(4)">Mark Step 4 Complete</button>
+            </div>
+        </div>
+
+        <!-- Step 5: Creative Approval -->
+        <div class="step locked" id="step5">
+            <div class="step-header">
+                <div>
+                    <h2>Creative Approval</h2>
+                    <div class="step-note">Your Launch Creative Bundle: 1 actor-led video, 1 animated video, 2 image ads.</div>
+                </div>
+                <div class="step-number">5</div>
+            </div>
+            <div class="step-content">
+                <div class="gallery-placeholder" id="galleryPlaceholder">
+                    <p>Creative previews will be shared via secure link</p>
+                    <p style="font-size: 0.9rem; color: #85C7B3; margin-top: 10px;">
+                        Links will be provided once creatives are ready for review
+                    </p>
+                </div>
+                <div style="margin: 20px 0;">
+                    <button class="btn" id="approveBtn" data-dlm-event="approve_launch">
+                        Approve to Launch
+                    </button>
+                    <button class="btn btn-outline" id="revisionBtn" data-dlm-event="request_revisions">
+                        Request Revisions
+                    </button>
+                </div>
+
+                <!-- Revision form (hidden initially) -->
+                <div id="revisionForm" style="display: none; background: #DFF5F3; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #85C7B3;">
+                    <h4 style="color: #012E40;">Request Revisions</h4>
+                    <div class="form-group">
+                        <label for="revisionName">Name *</label>
+                        <input type="text" id="revisionName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="revisionEmail">Email *</label>
+                        <input type="email" id="revisionEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="revisionNotes">Revision Notes *</label>
+                        <textarea id="revisionNotes" rows="4" placeholder="Please describe the changes you'd like to see..." required></textarea>
+                    </div>
+                    <div style="margin: 15px 0;">
+                        <button class="btn btn-small" id="copyRevision">Copy to Clipboard</button>
+                        <button class="btn btn-small btn-outline" id="emailRevision">Email Revisions</button>
+                    </div>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-complete" onclick="window.markStepComplete(5)">Mark Step 5 Complete</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="portal-footer">
+            <p>Drive Lead Media — We never process PHI. All analytics used solely to measure and improve advertising performance.</p>
+            <div class="footer-links">
+                <a href="#" id="resetProgress">Reset progress</a>
+                <span>•</span>
+                <span id="contactEmail">Nicolas@driveleadmedia.com</span>
+                <span>•</span>
+                <span id="contactPhone">(678) 650-6411</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load JavaScript Files -->
+    <script src="config.js"></script>
+    <script src="functions.js"></script>
+</body>
+</html>
                         <label for="setupTime">Best Time:</label>
                         <select id="setupTime">
                             <option value="">Select time range</option>
@@ -399,151 +606,3 @@
                 <div id="tempAccessForm" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
                     <h5 style="color: #012E40; margin-bottom: 10px;">Temporary Website Access:</h5>
                     <div class="form-group">
-                        <label for="websiteUrl">Website URL *</label>
-                        <input type="url" id="websiteUrl" placeholder="https://yourwebsite.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginUrl">Login URL</label>
-                        <input type="url" id="loginUrl" placeholder="https://yourwebsite.com/wp-admin">
-                    </div>
-                    <div class="form-group">
-                        <label for="tempUsername">Admin Username *</label>
-                        <input type="text" id="tempUsername" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tempPassword">Admin Password *</label>
-                        <input type="password" id="tempPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="sitePlatform">Website Platform</label>
-                        <select id="sitePlatform">
-                            <option value="">Select platform</option>
-                            <option value="wordpress">WordPress</option>
-                            <option value="squarespace">Squarespace</option>
-                            <option value="wix">Wix</option>
-                            <option value="shopify">Shopify</option>
-                            <option value="webflow">Webflow</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <input type="text" id="sitePlatformOther" placeholder="Please specify..." style="display: none; margin-top: 10px; width: 100%; padding: 12px 16px; border: 2px solid #85C7B3; border-radius: 8px; background: #EEF4D9; color: #012E40;">
-                    </div>
-                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
-                        <strong>🔒 Secure:</strong> We'll install tracking and remove our access immediately. You can change the password afterward.
-                    </p>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-small" id="emailAccessInfo">Send Access Details Securely</button>
-                    </div>
-                </div>
-
-                <div style="margin-top: 25px; background: #F0F9F7; padding: 15px; border-radius: 8px;">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap;">
-                        <h5 style="color: #012E40; margin: 0;">What We Install:</h5>
-                        <button class="btn btn-small btn-outline" id="ga4InfoBtn" style="font-size: 0.8rem; padding: 4px 12px;">
-                            What is GA4?
-                        </button>
-                        <button class="btn btn-small btn-outline" id="pixelInfoBtn" style="font-size: 0.8rem; padding: 4px 12px;">
-                            What is Meta Pixel?
-                        </button>
-                    </div>
-                    
-                    <!-- GA4 Explanation (hidden initially) -->
-                    <div id="ga4Info" style="display: none; background: #DFF5F3; padding: 15px; border-radius: 6px; margin: 10px 0; border: 1px solid #05908C;">
-                        <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Google Analytics 4 (GA4):</h6>
-                        <p style="color: #012E40; margin: 0; font-size: 0.9rem; line-height: 1.5;">
-                            GA4 tracks how people find and use your website. It shows us which ads bring the most visitors, what pages they look at, and what actions they take (like calling your office or filling out forms). This helps us improve your ads to get better results. <strong>No personal health information is tracked.</strong>
-                        </p>
-                    </div>
-
-                    <!-- Meta Pixel Explanation (hidden initially) -->
-                    <div id="pixelInfo" style="display: none; background: #FBE9D1; padding: 15px; border-radius: 6px; margin: 10px 0; border: 1px solid #F2A922;">
-                        <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Meta Pixel (Facebook/Instagram):</h6>
-                        <p style="color: #012E40; margin: 0; font-size: 0.9rem; line-height: 1.5;">
-                            Meta Pixel tracks when people visit your website after seeing your Facebook or Instagram ads. It helps us find more people similar to your best customers and shows ads to people who visited your website but didn't book an appointment yet. <strong>No personal health information is tracked.</strong>
-                        </p>
-                    </div>
-
-                    <ul style="margin-left: 20px; color: #012E40; line-height: 1.6;">
-                        <li>✓ Google Analytics 4 (GA4) tracking code</li>
-                        <li>✓ Meta Pixel tracking code</li>
-                        <li>✓ Conversion tracking setup</li>
-                        <li>✓ Testing to ensure everything works</li>
-                    </ul>
-                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
-                        <strong>Timeline:</strong> Completed within 7 days of receiving access.
-                    </p>
-                </div>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(4)">Mark Step 4 Complete</button>
-            </div>
-        </div>
-
-        <!-- Step 5: Creative Approval -->
-        <div class="step locked" id="step5">
-            <div class="step-header">
-                <div>
-                    <h2>Creative Approval</h2>
-                    <div class="step-note">Your Launch Creative Bundle: 1 actor-led video, 1 animated video, 2 image ads.</div>
-                </div>
-                <div class="step-number">5</div>
-            </div>
-            <div class="step-content">
-                <div class="gallery-placeholder" id="galleryPlaceholder">
-                    <p>Creative previews will be shared via secure link</p>
-                    <p style="font-size: 0.9rem; color: #85C7B3; margin-top: 10px;">
-                        Links will be provided once creatives are ready for review
-                    </p>
-                </div>
-                <div style="margin: 20px 0;">
-                    <button class="btn" id="approveBtn" data-dlm-event="approve_launch">
-                        Approve to Launch
-                    </button>
-                    <button class="btn btn-outline" id="revisionBtn" data-dlm-event="request_revisions">
-                        Request Revisions
-                    </button>
-                </div>
-
-                <!-- Revision form (hidden initially) -->
-                <div id="revisionForm" style="display: none; background: #DFF5F3; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #85C7B3;">
-                    <h4 style="color: #012E40;">Request Revisions</h4>
-                    <div class="form-group">
-                        <label for="revisionName">Name *</label>
-                        <input type="text" id="revisionName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="revisionEmail">Email *</label>
-                        <input type="email" id="revisionEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="revisionNotes">Revision Notes *</label>
-                        <textarea id="revisionNotes" rows="4" placeholder="Please describe the changes you'd like to see..." required></textarea>
-                    </div>
-                    <div style="margin: 15px 0;">
-                        <button class="btn btn-small" id="copyRevision">Copy to Clipboard</button>
-                        <button class="btn btn-small btn-outline" id="emailRevision">Email Revisions</button>
-                    </div>
-                </div>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(5)">Mark Step 5 Complete</button>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="portal-footer">
-            <p>Drive Lead Media — We never process PHI. All analytics used solely to measure and improve advertising performance.</p>
-            <div class="footer-links">
-                <a href="#" id="resetProgress">Reset progress</a>
-                <span>•</span>
-                <span id="contactEmail">Nicolas@driveleadmedia.com</span>
-                <span>•</span>
-                <span id="contactPhone">(678) 650-6411</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Load JavaScript Files -->
-    <script src="config.js"></script>
-    <script src="functions.js"></script>
-</body>
-</html>
