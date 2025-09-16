@@ -10,7 +10,7 @@ window.DLM_CONFIG = {
         sow12: "https://na4.docusign.net/Member/PowerFormSigning.aspx?PowerFormId=7894201c-9ab2-4d7e-8126-18094731fd82&env=na4&acct=ab9821cd-da5d-4091-8f74-e8602b87929d&v=2"
     },
 
-    // Payment Settings - NEW STRUCTURE
+    // Payment Settings - Enhanced Structure
     stripeLinks: {
         sow6: {
             monthly: "https://stripe-6-month-monthly-payment-link",
@@ -27,27 +27,37 @@ window.DLM_CONFIG = {
         driveFileRequestUrl: "https://drive.google.com/drive/folders/1jds7K6SdV6G_SwTyZZjxqjuftqIHiaPY?usp=sharing"
     },
 
-    // Tracking Settings
+    // Analytics & Tracking Settings
     tracking: {
         ga4MeasurementId: "G-XXXXXXX",
-        pixelId: "1234567890"
+        pixelId: "1234567890",
+        enableTracking: true
     },
 
     // Contact Information (CHANGE THESE AS NEEDED)
     support: {
         opsEmail: "Nicolas@driveleadmedia.com",
         opsPhone: "(678) 650-6411",
-        webhookUrl: ""
+        webhookUrl: "" // Optional webhook for notifications
     },
 
     // Admin Settings (CHANGE PASSWORD!)
     admin: {
         password: "dlm2024",
-        sessionTimeout: 30 * 60 * 1000  // 30 minutes
+        sessionTimeout: 30 * 60 * 1000,  // 30 minutes
+        enableAdvancedFeatures: true
+    },
+
+    // UI/UX Settings
+    ui: {
+        enableAnimations: true,
+        enableFireworks: true,
+        enableFloatingSidebar: true,
+        enableParticleEffects: true
     }
 };
 
-// Storage and State Settings - UPDATED
+// Storage and State Settings
 window.STORAGE_KEY = 'dlm_portal_v1';
 window.portalState = {
     "1": false,
@@ -58,7 +68,7 @@ window.portalState = {
     "admin": {},
     "creativeLink": null,
     "googleDriveLink": null,
-    // NEW: Store custom Stripe links for each SOW/payment combination
+    // Enhanced: Store custom Stripe links for each SOW/payment combination
     "stripeLinks": {
         "sow6": {
             "monthly": null,
