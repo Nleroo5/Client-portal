@@ -157,7 +157,7 @@ window.removeGoogleDriveLink = function() {
     window.showAdminStatus('✓ Google Drive link reset to default', 'success');
 };
 
-// ===== STRIPE LINK MANAGEMENT (NEW) =====
+// ===== STRIPE LINK MANAGEMENT (ENHANCED) =====
 window.setStripeLink = function(sowTerm, paymentType) {
     const inputId = `stripe${sowTerm === 'sow6' ? '6' : '12'}${paymentType === 'monthly' ? 'Monthly' : 'Upfront'}`;
     const link = document.getElementById(inputId).value.trim();
@@ -340,8 +340,11 @@ window.updateStepStates = function() {
         }
     }
 
-    // Update progress bar
+    // Update progress bar and sidebar
     window.updateProgressBar();
+    if (window.updateSidebar) {
+        window.updateSidebar();
+    }
 };
 
 window.showSuccessMessage = function() {
@@ -369,6 +372,13 @@ window.markStepComplete = function(stepNum) {
         completeBtn.style.transform = '';
     }, 200);
 
+    // Trigger animations if enabled
+    if (window.DLM_CONFIG.ui.enableAnimations) {
+        if (window.animateStepCompletion) {
+            window.animateStepCompletion(stepNum);
+        }
+    }
+
     // Check if all steps are complete
     const allComplete = Object.keys(window.portalState).filter(key => 
         key !== 'admin' && key !== 'creativeLink' && key !== 'stripeLinks' && key !== 'googleDriveLink' && window.portalState[key]
@@ -380,6 +390,7 @@ window.markStepComplete = function(stepNum) {
         }, 500);
     }
 
+    // Send webhook if configured
     if (window.DLM_CONFIG.support.webhookUrl) {
         window.sendWebhook({
             step: stepNum,
@@ -589,6 +600,350 @@ window.resetProgress = function() {
     }
 };
 
+// ===== ENHANCED ANIMATIONS SYSTEM =====
+let isFireworksActive = false;
+
+// ===== SIDEBAR MANAGEMENT =====
+window.initializeSidebar = function() {
+    const sidebarSteps = document.getElementById('sidebarSteps');
+    if (!sidebarSteps) return;
+    
+    const stepLabels = ['Agreements', 'Payment', 'Meta Setup', 'Tracking', 'Approval'];
+    
+    sidebarSteps.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = getStepClass(i);
+        stepDiv.textContent = i;
+        stepDiv.onclick = () => navigateToStep(i);
+        
+        const label = document.createElement('div');
+        label.className = 'step-label';
+        label.textContent = stepLabels[i - 1];
+        stepDiv.appendChild(label);
+        
+        sidebarSteps.appendChild(stepDiv);
+    }
+};
+
+function getStepClass(stepNum) {
+    if (window.portalState && window.portalState[stepNum.toString()]) return 'sidebar-step completed';
+    
+    // Check if step is currently active (unlocked)
+    const isUnlocked = stepNum === 1 || (window.portalState && window.portalState[(stepNum - 1).toString()]);
+    if (isUnlocked && (!window.portalState || !window.portalState[stepNum.toString()])) return 'sidebar-step active';
+    if (stepNum <= 5) return 'sidebar-step upcoming';
+    return 'sidebar-step locked';
+}
+
+window.updateSidebar = function() {
+    const sidebarSteps = document.querySelectorAll('.sidebar-step');
+    const currentStepDisplay = document.getElementById('currentStepDisplay');
+    
+    // Calculate current step based on progress
+    let activeStep = 1;
+    if (window.portalState) {
+        for (let i = 1; i <= 5; i++) {
+            if (!window.portalState[i.toString()]) {
+                activeStep = i;
+                break;
+            }
+            if (i === 5) activeStep = 5; // All complete
+        }
+    }
+    
+    if (currentStepDisplay) {
+        currentStepDisplay.textContent = activeStep;
+    }
+    
+    sidebarSteps.forEach((step, index) => {
+        step.className = getStepClass(index + 1);
+    });
+};
+
+function navigateToStep(stepNum) {
+    const isCompleted = window.portalState && window.portalState[stepNum.toString()];
+    const isUnlocked = stepNum === 1 || (window.portalState && window.portalState[(stepNum - 1).toString()]);
+    
+    if (isCompleted || isUnlocked) {
+        document.getElementById(`step${stepNum}`).scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+}
+
+// ===== STEP COMPLETION ANIMATION =====
+window.animateStepCompletion = function(stepNum) {
+    if (!window.DLM_CONFIG.ui.enableAnimations) return;
+    
+    const stepElement = document.getElementById(`step${stepNum}`);
+    const button = stepElement.querySelector('.btn-complete');
+    
+    // Button celebration animation
+    button.style.transform = 'scale(1.1)';
+    button.style.background = '#85C7B3';
+    
+    setTimeout(() => {
+        button.style.transform = '';
+    }, 300);
+    
+    // Mini celebration particles
+    if (window.DLM_CONFIG.ui.enableParticleEffects) {
+        createMiniCelebration(stepElement);
+    }
+};
+
+function createMiniCelebration(element) {
+    const rect = element.getBoundingClientRect();
+    
+    for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: #F2A922;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            left: ${rect.left + rect.width / 2}px;
+            top: ${rect.top + rect.height / 2}px;
+        `;
+        
+        document.body.appendChild(particle);
+        
+        const angle = (Math.PI * 2 * i) / 20;
+        const velocity = 50 + Math.random() * 50;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity - 50;
+        
+        animateParticle(particle, vx, vy);
+    }
+}
+
+function animateParticle(particle, vx, vy) {
+    let x = 0, y = 0;
+    const gravity = 2;
+    let opacity = 1;
+    
+    function update() {
+        vy += gravity;
+        x += vx * 0.02;
+        y += vy * 0.02;
+        opacity -= 0.02;
+        
+        particle.style.transform = `translate(${x}px, ${y}px)`;
+        particle.style.opacity = opacity;
+        
+        if (opacity > 0) {
+            requestAnimationFrame(update);
+        } else {
+            particle.remove();
+        }
+    }
+    
+    requestAnimationFrame(update);
+}
+
+// ===== FIREWORKS SYSTEM =====
+window.startFireworksShow = function() {
+    if (!window.DLM_CONFIG.ui.enableFireworks || isFireworksActive) return;
+    isFireworksActive = true;
+    
+    const canvas = document.getElementById('fireworksCanvas');
+    const overlay = document.getElementById('celebrationOverlay');
+    const message = document.getElementById('celebrationMessage');
+    const subtitle = document.getElementById('celebrationSubtitle');
+    
+    if (!canvas) return;
+    
+    // Setup canvas
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    
+    // Show overlay and canvas
+    overlay.classList.add('active');
+    canvas.classList.add('active');
+    
+    // Show message after delay
+    setTimeout(() => {
+        message.classList.add('show');
+        setTimeout(() => subtitle.classList.add('show'), 800);
+    }, 1000);
+    
+    // Start fireworks
+    const fireworks = [];
+    const particles = [];
+    
+    // Firework class
+    class Firework {
+        constructor(x, y, targetX, targetY, color) {
+            this.x = x;
+            this.y = y;
+            this.targetX = targetX;
+            this.targetY = targetY;
+            this.color = color;
+            this.trail = [];
+            this.speed = 3;
+            this.angle = Math.atan2(targetY - y, targetX - x);
+            this.vx = Math.cos(this.angle) * this.speed;
+            this.vy = Math.sin(this.angle) * this.speed;
+        }
+        
+        update() {
+            this.trail.push({ x: this.x, y: this.y });
+            if (this.trail.length > 10) this.trail.shift();
+            
+            this.x += this.vx;
+            this.y += this.vy;
+            
+            const distance = Math.sqrt((this.targetX - this.x) ** 2 + (this.targetY - this.y) ** 2);
+            
+            if (distance < 10) {
+                this.explode();
+                return false;
+            }
+            return true;
+        }
+        
+        explode() {
+            const particleCount = 30 + Math.random() * 20;
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle(this.targetX, this.targetY, this.color));
+            }
+        }
+        
+        draw(ctx) {
+            // Draw trail
+            this.trail.forEach((point, index) => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, (index / this.trail.length) * 3, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            });
+        }
+    }
+    
+    // Particle class
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.vx = (Math.random() - 0.5) * 8;
+            this.vy = (Math.random() - 0.5) * 8;
+            this.life = 1;
+            this.decay = Math.random() * 0.015 + 0.01;
+            this.size = Math.random() * 3 + 2;
+            this.gravity = 0.1;
+        }
+        
+        update() {
+            this.vx *= 0.99;
+            this.vy += this.gravity;
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= this.decay;
+            return this.life > 0;
+        }
+        
+        draw(ctx) {
+            ctx.save();
+            ctx.globalAlpha = this.life;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+    
+    // Brand colors for fireworks
+    const colors = ['#F2A922', '#05908C', '#85C7B3', '#EEF4D9'];
+    
+    // Launch fireworks
+    function launchFirework() {
+        const startX = Math.random() * canvas.width;
+        const startY = canvas.height;
+        const targetX = Math.random() * canvas.width;
+        const targetY = Math.random() * canvas.height * 0.6;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        fireworks.push(new Firework(startX, startY, targetX, targetY, color));
+    }
+    
+    // Animation loop
+    function animate() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Update and draw fireworks
+        for (let i = fireworks.length - 1; i >= 0; i--) {
+            if (!fireworks[i].update()) {
+                fireworks.splice(i, 1);
+            } else {
+                fireworks[i].draw(ctx);
+            }
+        }
+        
+        // Update and draw particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+            if (!particles[i].update()) {
+                particles.splice(i, 1);
+            } else {
+                particles[i].draw(ctx);
+            }
+        }
+        
+        if (isFireworksActive) {
+            requestAnimationFrame(animate);
+        }
+    }
+    
+    // Start animation
+    animate();
+    
+    // Launch fireworks at intervals
+    const launchInterval = setInterval(() => {
+        if (Math.random() < 0.7) launchFirework();
+    }, 300);
+    
+    // Launch multiple fireworks initially
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => launchFirework(), i * 200);
+    }
+    
+    // End celebration after 8 seconds
+    setTimeout(() => {
+        clearInterval(launchInterval);
+        
+        setTimeout(() => {
+            isFireworksActive = false;
+            canvas.classList.remove('active');
+            overlay.classList.remove('active');
+            message.classList.remove('show');
+            subtitle.classList.remove('show');
+        }, 2000);
+    }, 6000);
+};
+
+// ===== SCROLL MANAGEMENT =====
+function handleScroll() {
+    const scrollY = window.scrollY;
+    const sidebar = document.getElementById('floatingSidebar');
+    
+    if (!sidebar) return;
+    
+    // Show/hide sidebar based on scroll
+    if (scrollY > 100) {
+        sidebar.classList.add('visible');
+    } else {
+        sidebar.classList.remove('visible');
+    }
+}
+
 // ===== SETUP ALL EVENT LISTENERS =====
 window.setupEventListeners = function() {
     // SOW term selection
@@ -738,19 +1093,6 @@ window.setupEventListeners = function() {
         });
     }
 
-    // Help buttons
-    const helpButtons = ['metaHelpBtn', 'checkHelpBtn'];
-    helpButtons.forEach(btnId => {
-        const btn = document.getElementById(btnId);
-        if (btn) {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=Need Help with Meta Business Suite Setup`;
-                window.open(mailtoLink);
-            });
-        }
-    });
-
     // Setup help button
     const setupHelpBtn = document.getElementById('setupHelpBtn');
     if (setupHelpBtn) {
@@ -760,17 +1102,49 @@ window.setupEventListeners = function() {
         });
     }
 
-    // Approve button
+    // Approve button with fireworks
     const approveBtn = document.getElementById('approveBtn');
     if (approveBtn) {
         approveBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            if (confirm('Are you sure you want to approve these creatives for launch?')) {
+            this.classList.add('celebrating');
+            
+            if (window.DLM_CONFIG.ui.enableFireworks) {
+                window.startFireworksShow();
+                // Complete step after fireworks
+                setTimeout(() => {
+                    window.markStepComplete(5);
+                }, 3000);
+            } else {
+                // Complete step immediately if fireworks disabled
                 window.markStepComplete(5);
-                alert('Creatives approved! Your campaign will launch within 24-48 hours.');
             }
         });
     }
+
+    // Password field Enter key
+    const adminPassword = document.getElementById('adminPassword');
+    if (adminPassword) {
+        adminPassword.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                window.adminLogin();
+            }
+        });
+    }
+
+    // Scroll listener for sidebar
+    if (window.DLM_CONFIG.ui.enableFloatingSidebar) {
+        window.addEventListener('scroll', handleScroll);
+    }
+
+    // Handle window resize for canvas
+    window.addEventListener('resize', () => {
+        const canvas = document.getElementById('fireworksCanvas');
+        if (canvas) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+    });
 };
 
 // ===== INITIALIZATION =====
@@ -805,15 +1179,26 @@ document.addEventListener('DOMContentLoaded', function() {
         window.updateCreativeGallery(window.portalState.creativeLink);
     }
 
+    // Initialize animations if enabled
+    if (window.DLM_CONFIG.ui.enableAnimations) {
+        window.initializeSidebar();
+        window.updateSidebar();
+        
+        // Sidebar hover effects
+        const sidebar = document.getElementById('floatingSidebar');
+        if (sidebar) {
+            sidebar.addEventListener('mouseenter', () => {
+                sidebar.classList.add('expanded');
+            });
+            
+            sidebar.addEventListener('mouseleave', () => {
+                sidebar.classList.remove('expanded');
+            });
+        }
+    }
+
     // Setup all event listeners
     window.setupEventListeners();
-
-    // Password field Enter key
-    document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            window.adminLogin();
-        }
-    });
 
     console.log('Portal initialization complete!');
 });
@@ -823,261 +1208,7 @@ document.addEventListener('click', function(e) {
     const panel = document.getElementById('adminPanel');
     const toggle = document.getElementById('adminToggle');
 
-    if (!panel.contains(e.target) && !toggle.contains(e.target)) {
+    if (panel && toggle && !panel.contains(e.target) && !toggle.contains(e.target)) {
         panel.style.display = 'none';
     }
 });
-// ===== ENHANCED ANIMATIONS FUNCTIONS =====
-// Add these functions to your existing functions.js
-
-// Override the existing markStepComplete function to include animations
-const originalMarkStepComplete = window.markStepComplete;
-window.markStepComplete = function(stepNum) {
-    // Call the original function
-    originalMarkStepComplete(stepNum);
-    
-    // Update the animated sidebar
-    if (window.updateAnimatedSidebar) {
-        window.updateAnimatedSidebar();
-    }
-    
-    // Add step completion animation
-    animateStepCompletion(stepNum);
-};
-
-// Sidebar management functions
-window.initializeAnimatedSidebar = function() {
-    const sidebarSteps = document.getElementById('sidebarSteps');
-    if (!sidebarSteps) return;
-    
-    const stepLabels = ['Agreements', 'Payment', 'Meta Setup', 'Tracking', 'Approval'];
-    
-    sidebarSteps.innerHTML = '';
-    for (let i = 1; i <= 5; i++) {
-        const stepDiv = document.createElement('div');
-        stepDiv.className = getAnimatedStepClass(i);
-        stepDiv.textContent = i;
-        stepDiv.onclick = () => navigateToStep(i);
-        
-        const label = document.createElement('div');
-        label.className = 'step-label';
-        label.textContent = stepLabels[i - 1];
-        stepDiv.appendChild(label);
-        
-        sidebarSteps.appendChild(stepDiv);
-    }
-};
-
-window.updateAnimatedSidebar = function() {
-    const sidebarSteps = document.querySelectorAll('.sidebar-step');
-    const currentStepDisplay = document.getElementById('currentStepDisplay');
-    
-    if (currentStepDisplay) {
-        // Get current step from progress
-        const progressResult = window.updateProgressBar();
-        const currentStep = Math.min(progressResult.completedSteps + 1, 5);
-        currentStepDisplay.textContent = currentStep;
-    }
-    
-    sidebarSteps.forEach((step, index) => {
-        step.className = 'sidebar-step ' + getAnimatedStepClass(index + 1);
-    });
-};
-
-function getAnimatedStepClass(stepNum) {
-    const isCompleted = window.portalState[stepNum.toString()];
-    const isUnlocked = stepNum === 1 || window.portalState[(stepNum - 1).toString()];
-    
-    if (isCompleted) return 'completed';
-    if (isUnlocked) return 'active';
-    if (stepNum <= 5) return 'upcoming';
-    return 'locked';
-}
-
-function navigateToStep(stepNum) {
-    const isCompleted = window.portalState[stepNum.toString()];
-    const isUnlocked = stepNum === 1 || window.portalState[(stepNum - 1).toString()];
-    
-    if (isCompleted || isUnlocked) {
-        document.getElementById(`step${stepNum}`).scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-        });
-    }
-}
-
-function animateStepCompletion(stepNum) {
-    const stepElement = document.getElementById(`step${stepNum}`);
-    const button = stepElement.querySelector('.btn-complete');
-    
-    // Button celebration animation
-    button.style.transform = 'scale(1.1)';
-    button.style.background = '#85C7B3';
-    
-    setTimeout(() => {
-        button.style.transform = '';
-    }, 300);
-    
-    // Mini celebration particles
-    createMiniCelebration(stepElement);
-}
-
-function createMiniCelebration(element) {
-    const rect = element.getBoundingClientRect();
-    
-    for (let i = 0; i < 20; i++) {
-        const particle = document.createElement('div');
-        particle.style.cssText = `
-            position: fixed;
-            width: 4px;
-            height: 4px;
-            background: #F2A922;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1000;
-            left: ${rect.left + rect.width / 2}px;
-            top: ${rect.top + rect.height / 2}px;
-        `;
-        
-        document.body.appendChild(particle);
-        
-        const angle = (Math.PI * 2 * i) / 20;
-        const velocity = 50 + Math.random() * 50;
-        const vx = Math.cos(angle) * velocity;
-        const vy = Math.sin(angle) * velocity - 50;
-        
-        animateParticle(particle, vx, vy);
-    }
-}
-
-function animateParticle(particle, vx, vy) {
-    let x = 0, y = 0;
-    const gravity = 2;
-    let opacity = 1;
-    
-    function update() {
-        vy += gravity;
-        x += vx * 0.02;
-        y += vy * 0.02;
-        opacity -= 0.02;
-        
-        particle.style.transform = `translate(${x}px, ${y}px)`;
-        particle.style.opacity = opacity;
-        
-        if (opacity > 0) {
-            requestAnimationFrame(update);
-        } else {
-            particle.remove();
-        }
-    }
-    
-    requestAnimationFrame(update);
-}
-
-// Fireworks system
-function startFireworksShow() {
-    const canvas = document.getElementById('fireworksCanvas');
-    const overlay = document.getElementById('celebrationOverlay');
-    const message = document.getElementById('celebrationMessage');
-    const subtitle = document.getElementById('celebrationSubtitle');
-    
-    if (!canvas) return;
-    
-    // Setup canvas
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const ctx = canvas.getContext('2d');
-    
-    // Show overlay and canvas
-    overlay.classList.add('active');
-    canvas.classList.add('active');
-    
-    // Show message after delay
-    setTimeout(() => {
-        message.classList.add('show');
-        setTimeout(() => subtitle.classList.add('show'), 800);
-    }, 1000);
-    
-    // Fireworks implementation (simplified)
-    const colors = ['#F2A922', '#05908C', '#85C7B3'];
-    let animationId;
-    
-    function animate() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Simple firework effect
-        for (let i = 0; i < 5; i++) {
-            const x = Math.random() * canvas.width;
-            const y = Math.random() * canvas.height * 0.6;
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            
-            ctx.beginPath();
-            ctx.arc(x, y, Math.random() * 10 + 5, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-        }
-        
-        animationId = requestAnimationFrame(animate);
-    }
-    
-    animate();
-    
-    // End celebration after 6 seconds
-    setTimeout(() => {
-        cancelAnimationFrame(animationId);
-        canvas.classList.remove('active');
-        overlay.classList.remove('active');
-        message.classList.remove('show');
-        subtitle.classList.remove('show');
-    }, 6000);
-}
-
-// Scroll management
-function handleAnimatedScroll() {
-    const scrollY = window.scrollY;
-    const sidebar = document.getElementById('floatingSidebar');
-    
-    if (!sidebar) return;
-    
-    if (scrollY > 100) {
-        sidebar.classList.add('visible');
-    } else {
-        sidebar.classList.remove('visible');
-    }
-    
-    // Expand sidebar on hover
-    sidebar.addEventListener('mouseenter', () => {
-        sidebar.classList.add('expanded');
-    });
-    
-    sidebar.addEventListener('mouseleave', () => {
-        sidebar.classList.remove('expanded');
-    });
-}
-
-// Initialize animations
-function initializeAnimations() {
-    window.initializeAnimatedSidebar();
-    window.updateAnimatedSidebar();
-    
-    // Add scroll listener
-    window.addEventListener('scroll', handleAnimatedScroll);
-    
-    // Override approve button
-    const approveBtn = document.getElementById('approveBtn');
-    if (approveBtn) {
-        approveBtn.onclick = function(e) {
-            e.preventDefault();
-            startFireworksShow();
-            setTimeout(() => window.markStepComplete(5), 3000);
-        };
-    }
-}
-
-// Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeAnimations);
-} else {
-    initializeAnimations();
-}
