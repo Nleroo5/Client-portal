@@ -1,1083 +1,856 @@
-// ===== DRIVE LEAD MEDIA PORTAL FUNCTIONS =====
-// All the JavaScript functionality for the portal
+/* ===== DRIVE LEAD MEDIA PORTAL STYLES ===== */
+/* Edit this file to change colors, fonts, and design */
 
-// ===== ADMIN FUNCTIONS =====
-window.toggleAdminPanel = function() {
-    console.log('Admin panel toggle clicked!');
-    const panel = document.getElementById('adminPanel');
-    const isVisible = panel.style.display !== 'none';
-    
-    if (isVisible) {
-        panel.style.display = 'none';
-    } else {
-        panel.style.display = 'block';
-        
-        // Check if already logged in
-        if (window.isAdminLoggedIn()) {
-            document.getElementById('adminControls').style.display = 'block';
-            document.getElementById('adminLogin').style.display = 'none';
-            window.loadAdminLinks();
-        } else {
-            document.getElementById('adminControls').style.display = 'none';
-            document.getElementById('adminLogin').style.display = 'block';
-            document.getElementById('adminPassword').value = '';
-        }
-    }
-};
-
-window.isAdminLoggedIn = function() {
-    const loginTime = localStorage.getItem('dlm_admin_login');
-    if (!loginTime) return false;
-    
-    const now = Date.now();
-    const elapsed = now - parseInt(loginTime);
-    
-    if (elapsed > window.DLM_CONFIG.admin.sessionTimeout) {
-        localStorage.removeItem('dlm_admin_login');
-        return false;
-    }
-    
-    return true;
-};
-
-window.adminLogin = function() {
-    console.log('Admin login attempted');
-    const password = document.getElementById('adminPassword').value;
-    
-    if (password === window.DLM_CONFIG.admin.password) {
-        localStorage.setItem('dlm_admin_login', Date.now().toString());
-        document.getElementById('adminControls').style.display = 'block';
-        document.getElementById('adminLogin').style.display = 'none';
-        
-        window.loadAdminLinks();
-        window.showAdminStatus('✓ Admin logged in', 'success');
-    } else {
-        window.showAdminStatus('✗ Invalid password', 'error');
-        document.getElementById('adminPassword').value = '';
-    }
-};
-
-window.loadAdminLinks = function() {
-    // Load creative link
-    const existingCreativeLink = window.portalState.creativeLink;
-    if (existingCreativeLink) {
-        document.getElementById('creativeLink').value = existingCreativeLink;
-    }
-    
-    // Load Google Drive link
-    const existingGoogleDriveLink = window.portalState.googleDriveLink;
-    if (existingGoogleDriveLink) {
-        document.getElementById('googleDriveLink').value = existingGoogleDriveLink;
-    }
-    
-    // Load Stripe links
-    const stripeLinks = window.portalState.stripeLinks;
-    if (stripeLinks.sow6.monthly) {
-        document.getElementById('stripe6Monthly').value = stripeLinks.sow6.monthly;
-    }
-    if (stripeLinks.sow6.upfront) {
-        document.getElementById('stripe6Upfront').value = stripeLinks.sow6.upfront;
-    }
-    if (stripeLinks.sow12.monthly) {
-        document.getElementById('stripe12Monthly').value = stripeLinks.sow12.monthly;
-    }
-    if (stripeLinks.sow12.upfront) {
-        document.getElementById('stripe12Upfront').value = stripeLinks.sow12.upfront;
-    }
-};
-
-window.showAdminStatus = function(message, type) {
-    const status = document.getElementById('adminStatus');
-    status.textContent = message;
-    status.className = `admin-status ${type}`;
-    status.style.display = 'block';
-    
-    setTimeout(() => {
-        status.style.display = 'none';
-    }, 3000);
-};
-
-// ===== CREATIVE LINK MANAGEMENT =====
-window.setCreativeLink = function() {
-    const link = document.getElementById('creativeLink').value.trim();
-    
-    if (!link) {
-        window.showAdminStatus('✗ Please enter a link', 'error');
-        return;
-    }
-    
-    try {
-        new URL(link);
-    } catch {
-        window.showAdminStatus('✗ Please enter a valid URL', 'error');
-        return;
-    }
-    
-    window.portalState.creativeLink = link;
-    window.saveState();
-    window.updateCreativeGallery(link);
-    window.showAdminStatus('✓ Creative link set successfully', 'success');
-};
-
-window.removeCreativeLink = function() {
-    window.portalState.creativeLink = null;
-    window.saveState();
-    window.updateCreativeGallery(null);
-    document.getElementById('creativeLink').value = '';
-    window.showAdminStatus('✓ Creative link removed', 'success');
-};
-
-// ===== GOOGLE DRIVE LINK MANAGEMENT =====
-window.setGoogleDriveLink = function() {
-    const link = document.getElementById('googleDriveLink').value.trim();
-    
-    if (!link) {
-        window.showAdminStatus('✗ Please enter a Google Drive link', 'error');
-        return;
-    }
-    
-    try {
-        new URL(link);
-    } catch {
-        window.showAdminStatus('✗ Please enter a valid URL', 'error');
-        return;
-    }
-    
-    window.portalState.googleDriveLink = link;
-    window.saveState();
-    window.updateUploadButton(link);
-    window.showAdminStatus('✓ Google Drive link set successfully', 'success');
-};
-
-window.removeGoogleDriveLink = function() {
-    window.portalState.googleDriveLink = null;
-    window.saveState();
-    window.updateUploadButton(window.DLM_CONFIG.uploads.driveFileRequestUrl);
-    document.getElementById('googleDriveLink').value = '';
-    window.showAdminStatus('✓ Google Drive link reset to default', 'success');
-};
-
-// ===== STRIPE LINK MANAGEMENT (NEW) =====
-window.setStripeLink = function(sowTerm, paymentType) {
-    const inputId = `stripe${sowTerm === 'sow6' ? '6' : '12'}${paymentType === 'monthly' ? 'Monthly' : 'Upfront'}`;
-    const link = document.getElementById(inputId).value.trim();
-    
-    if (!link) {
-        window.showAdminStatus(`✗ Please enter a ${sowTerm} ${paymentType} link`, 'error');
-        return;
-    }
-    
-    try {
-        new URL(link);
-    } catch {
-        window.showAdminStatus('✗ Please enter a valid URL', 'error');
-        return;
-    }
-    
-    window.portalState.stripeLinks[sowTerm][paymentType] = link;
-    window.saveState();
-    window.updatePaymentButton();
-    window.showAdminStatus(`✓ ${sowTerm} ${paymentType} link set successfully`, 'success');
-};
-
-window.removeStripeLink = function(sowTerm, paymentType) {
-    const inputId = `stripe${sowTerm === 'sow6' ? '6' : '12'}${paymentType === 'monthly' ? 'Monthly' : 'Upfront'}`;
-    
-    window.portalState.stripeLinks[sowTerm][paymentType] = null;
-    window.saveState();
-    document.getElementById(inputId).value = '';
-    window.updatePaymentButton();
-    window.showAdminStatus(`✓ ${sowTerm} ${paymentType} link reset to default`, 'success');
-};
-
-// ===== PAYMENT SYSTEM FUNCTIONS =====
-window.getCurrentSOWTerm = function() {
-    const sow12Radio = document.getElementById('sow12');
-    return (sow12Radio && sow12Radio.checked) ? 'sow12' : 'sow6';
-};
-
-window.getCurrentPaymentType = function() {
-    const upfrontRadio = document.getElementById('paymentUpfront');
-    return (upfrontRadio && upfrontRadio.checked) ? 'upfront' : 'monthly';
-};
-
-window.updatePaymentOptions = function() {
-    const sowTerm = window.getCurrentSOWTerm();
-    const termText = sowTerm === 'sow12' ? '12-Month' : '6-Month';
-    
-    // Update the payment term display
-    document.getElementById('paymentTermText').textContent = termText;
-    
-    // Update the payment button
-    window.updatePaymentButton();
-};
-
-window.updatePaymentButton = function() {
-    const sowTerm = window.getCurrentSOWTerm();
-    const paymentType = window.getCurrentPaymentType();
-    const stripeBtn = document.getElementById('stripeBtn');
-    
-    // Get the appropriate link (custom or default)
-    let paymentLink;
-    const customLink = window.portalState.stripeLinks[sowTerm][paymentType];
-    if (customLink) {
-        paymentLink = customLink;
-    } else {
-        paymentLink = window.DLM_CONFIG.stripeLinks[sowTerm][paymentType];
-    }
-    
-    // Update button text
-    const termText = sowTerm === 'sow12' ? '12-Month' : '6-Month';
-    const typeText = paymentType === 'upfront' ? 'Upfront Payment (5% Discount)' : 'Monthly Payment';
-    stripeBtn.textContent = `Set Up ${typeText}`;
-    stripeBtn.href = paymentLink;
-};
-
-// ===== BUTTON UPDATE FUNCTIONS =====
-window.updateUploadButton = function(link) {
-    const uploadBtn = document.getElementById('uploadBtn');
-    uploadBtn.href = link;
-};
-
-window.updateCreativeGallery = function(link) {
-    const gallery = document.getElementById('galleryPlaceholder');
-    
-    if (link) {
-        gallery.innerHTML = `
-            <div style="text-align: center;">
-                <p style="color: #012E40; margin-bottom: 15px; font-weight: 600;">🎨 Your Creative Previews Are Ready!</p>
-                <a href="${link}" class="btn" target="_blank" rel="noopener" style="margin-bottom: 15px;">
-                    View Creative Previews
-                </a>
-                <p style="font-size: 0.9rem; color: #85C7B3;">
-                    Review all creatives, then return here to approve or request changes
-                </p>
-            </div>
-        `;
-    } else {
-        gallery.innerHTML = `
-            <p>Creative previews will be shared via secure link</p>
-            <p style="font-size: 0.9rem; color: #85C7B3; margin-top: 10px;">
-                Links will be provided once creatives are ready for review
-            </p>
-        `;
-    }
-};
-
-// ===== PROGRESS BAR FUNCTIONS =====
-window.updateProgressBar = function() {
-    const completedSteps = Object.keys(window.portalState).filter(key => 
-        key !== 'admin' && key !== 'creativeLink' && key !== 'stripeLinks' && key !== 'googleDriveLink' && window.portalState[key]
-    ).length;
-    
-    const totalSteps = 5;
-    const percentage = Math.round((completedSteps / totalSteps) * 100);
-    
-    // Update progress bar fill
-    const progressFill = document.getElementById('progressFill');
-    progressFill.style.width = percentage + '%';
-    
-    // Update progress text
-    const progressText = document.getElementById('progressText');
-    progressText.textContent = `${completedSteps} of ${totalSteps} steps completed`;
-    
-    // Update percentage
-    const progressPercent = document.getElementById('progressPercent');
-    progressPercent.textContent = percentage + '%';
-    
-    return { completedSteps, totalSteps, percentage };
-};
-
-// ===== UTILITY FUNCTIONS =====
-window.loadState = function() {
-    try {
-        const saved = localStorage.getItem(window.STORAGE_KEY);
-        if (saved) {
-            const savedState = JSON.parse(saved);
-            // Merge with default state to ensure new properties exist
-            window.portalState = { 
-                ...window.portalState, 
-                ...savedState,
-                // Ensure stripeLinks structure exists
-                stripeLinks: {
-                    ...window.portalState.stripeLinks,
-                    ...savedState.stripeLinks
-                }
-            };
-        }
-    } catch (e) {
-        console.warn('Could not load portal state:', e);
-    }
-};
-
-window.saveState = function() {
-    try {
-        localStorage.setItem(window.STORAGE_KEY, JSON.stringify(window.portalState));
-    } catch (e) {
-        console.warn('Could not save portal state:', e);
-    }
-};
-
-window.updateStepStates = function() {
-    for (let i = 1; i <= 5; i++) {
-        const stepElement = document.getElementById(`step${i}`);
-        const isCompleted = window.portalState[i.toString()];
-        const isUnlocked = i === 1 || window.portalState[(i - 1).toString()];
-        
-        stepElement.classList.toggle('completed', isCompleted);
-        stepElement.classList.toggle('locked', !isUnlocked);
-        
-        // Update complete button text if step is completed
-        const completeBtn = stepElement.querySelector('.btn-complete');
-        if (completeBtn) {
-            if (isCompleted) {
-                completeBtn.textContent = `✓ Step ${i} Completed`;
-                completeBtn.disabled = true;
-            } else {
-                completeBtn.textContent = `Mark Step ${i} Complete`;
-                completeBtn.disabled = false;
-            }
-        }
-    }
-    
-    // Update progress bar
-    window.updateProgressBar();
-};
-
-window.showSuccessMessage = function() {
-    document.getElementById('successMessage').style.display = 'block';
-    document.getElementById('successMessage').scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center' 
-    });
-};
-
-window.markStepComplete = function(stepNum) {
-    window.portalState[stepNum.toString()] = true;
-    window.saveState();
-    window.updateStepStates();
-    
-    // Show completion feedback
-    const stepElement = document.getElementById(`step${stepNum}`);
-    const completeBtn = stepElement.querySelector('.btn-complete');
-    
-    // Add visual feedback
-    completeBtn.style.transform = 'scale(1.05)';
-    completeBtn.style.background = '#85C7B3';
-    
-    setTimeout(() => {
-        completeBtn.style.transform = '';
-    }, 200);
-    
-    // Check if all steps are complete
-    const allComplete = Object.keys(window.portalState).filter(key => 
-        key !== 'admin' && key !== 'creativeLink' && key !== 'stripeLinks' && key !== 'googleDriveLink' && window.portalState[key]
-    ).length === 5;
-    
-    if (allComplete) {
-        setTimeout(() => {
-            window.showSuccessMessage();
-        }, 500);
-    }
-    
-    if (window.DLM_CONFIG.support.webhookUrl) {
-        window.sendWebhook({
-            step: stepNum,
-            completedAt: new Date().toISOString(),
-            action: 'step_completed'
-        });
-    }
-};
-
-// ===== SOW BUTTON UPDATE FUNCTION =====
-window.updateSOWButton = function() {
-    const sow6Radio = document.getElementById('sow6');
-    const sow12Radio = document.getElementById('sow12');
-    const sowBtn = document.getElementById('sowBtn');
-    
-    if (sow12Radio && sow12Radio.checked) {
-        sowBtn.textContent = 'Sign SOW (12-month)';
-        sowBtn.href = window.DLM_CONFIG.docuSign.sow12;
-    } else {
-        sowBtn.textContent = 'Sign SOW (6-month)';
-        sowBtn.href = window.DLM_CONFIG.docuSign.sow6;
-    }
-    
-    // Update payment options when SOW term changes
-    window.updatePaymentOptions();
-};
-
-// ===== EMAIL FUNCTIONS =====
-window.emailAdminDetails = function() {
-    const adminName = document.getElementById('adminName').value;
-    const adminEmail = document.getElementById('adminEmail').value;
-    const adminPhone = document.getElementById('adminPhone').value;
-    const platform = document.getElementById('websitePlatform').value;
-    const platformOther = document.getElementById('websitePlatformOther').value;
-    
-    if (!adminEmail) {
-        alert('Please enter admin email address');
-        return;
-    }
-    
-    const platformText = platform === 'other' ? platformOther : platform;
-    const subject = 'Website Admin Contact Details - Client Portal';
-    const body = `Website Admin Contact Details:
-
-
-Name: ${adminName || 'Not provided'}
-Email: ${adminEmail}
-Phone: ${adminPhone || 'Not provided'}
-Platform: ${platformText || 'Not specified'}
-
-Please contact them to coordinate tracking installation.`;
-
-    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink);
-};
-
-window.emailAccessDetails = function() {
-    const websiteUrl = document.getElementById('websiteUrl').value;
-    const loginUrl = document.getElementById('loginUrl').value;
-    const username = document.getElementById('tempUsername').value;
-    const password = document.getElementById('tempPassword').value;
-    const platform = document.getElementById('sitePlatform').value;
-    const platformOther = document.getElementById('sitePlatformOther').value;
-    
-    if (!websiteUrl || !username || !password) {
-        alert('Please fill in all required fields');
-        return;
-    }
-    
-    const platformText = platform === 'other' ? platformOther : platform;
-    const subject = 'Temporary Website Access Details - Client Portal';
-    const body = `Temporary Website Access Details:
-
-
-Website URL: ${websiteUrl}
-Login URL: ${loginUrl || 'Not provided'}
-Username: ${username}
-Password: ${password}
-Platform: ${platformText || 'Not specified'}
-
-Please install tracking and remove access when complete.`;
-
-    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink);
-};
-
-window.emailRevisionRequest = function() {
-    const name = document.getElementById('revisionName').value;
-    const email = document.getElementById('revisionEmail').value;
-    const notes = document.getElementById('revisionNotes').value;
-    
-    if (!name || !email || !notes) {
-        alert('Please fill in all required fields');
-        return;
-    }
-    
-    const subject = 'Creative Revision Request - Client Portal';
-    const body = `Creative Revision Request:
-
-
-Client Name: ${name}
-Client Email: ${email}
-
-Revision Notes:
-${notes}`;
-
-    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink);
-};
-
-window.emailSetupRequest = function() {
-    // Get selected days
-    const selectedDays = [];
-    document.querySelectorAll('input[name="setupDays"]:checked').forEach(checkbox => {
-        selectedDays.push(checkbox.value);
-    });
-    
-    const setupTime = document.getElementById('setupTime').value;
-    const setupPhone = document.getElementById('setupPhone').value;
-    const setupTimezone = document.getElementById('setupTimezone').value;
-    
-    if (selectedDays.length === 0 || !setupTime || !setupPhone || !setupTimezone) {
-        alert('Please fill in all fields to schedule your setup call');
-        return;
-    }
-    
-    const subject = 'Meta Business Suite Setup Call Request - Client Portal';
-    const body = `Meta Business Suite Setup Call Request:
-
-Preferred Days: ${selectedDays.join(', ')}
-Best Time: ${setupTime}
-Phone Number: ${setupPhone}
-Time Zone: ${setupTimezone}
-
-Please schedule a setup call to help create Meta Business Suite account.`;
-
-    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink);
-};
-
-// ===== COPY TO CLIPBOARD FUNCTION =====
-window.copyRevisionToClipboard = function() {
-    const name = document.getElementById('revisionName').value;
-    const email = document.getElementById('revisionEmail').value;
-    const notes = document.getElementById('revisionNotes').value;
-    
-    if (!name || !email || !notes) {
-        alert('Please fill in all required fields');
-        return;
-    }
-    
-    const text = `Creative Revision Request:
-
-
-Client Name: ${name}
-Client Email: ${email}
-
-Revision Notes:
-${notes}`;
-
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Revision details copied to clipboard!');
-        }).catch(() => {
-            fallbackCopyToClipboard(text);
-        });
-    } else {
-        fallbackCopyToClipboard(text);
-    }
-};
-
-function fallbackCopyToClipboard(text) {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-    try {
-        document.execCommand('copy');
-        alert('Revision details copied to clipboard!');
-    } catch (err) {
-        alert('Could not copy to clipboard. Please copy manually.');
-    }
-    document.body.removeChild(textArea);
+/* ===== BASE STYLES ===== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-// ===== WEBHOOK FUNCTION =====
-window.sendWebhook = function(data) {
-    if (!window.DLM_CONFIG.support.webhookUrl) return;
-    
-    fetch(window.DLM_CONFIG.support.webhookUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    }).catch(err => {
-        console.warn('Webhook failed:', err);
-    });
-};
-
-// ===== RESET PROGRESS FUNCTION =====
-window.resetProgress = function() {
-    if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
-        localStorage.removeItem(window.STORAGE_KEY);
-        localStorage.removeItem('dlm_admin_login');
-        location.reload();
-    }
-};
-
-// ===== SETUP ALL EVENT LISTENERS =====
-window.setupEventListeners = function() {
-    // SOW term selection
-    const sowRadios = document.querySelectorAll('input[name="sowTerm"]');
-    sowRadios.forEach(radio => {
-        radio.addEventListener('change', window.updateSOWButton);
-    });
-
-    // Payment type selection
-    const paymentRadios = document.querySelectorAll('input[name="paymentType"]');
-    paymentRadios.forEach(radio => {
-        radio.addEventListener('change', window.updatePaymentButton);
-    });
-
-    // Meta setup options
-    const metaRadios = document.querySelectorAll('input[name="metaSetup"]');
-    metaRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            // Hide all forms first
-            document.getElementById('existingBusinessSuite').style.display = 'none';
-            document.getElementById('newBusinessSuite').style.display = 'none';
-            document.getElementById('unsureBusinessSuiteDiv').style.display = 'none';
-            
-            // Show appropriate form
-            if (this.value === 'yes') {
-                document.getElementById('existingBusinessSuite').style.display = 'block';
-            } else if (this.value === 'no') {
-                document.getElementById('newBusinessSuite').style.display = 'block';
-            } else if (this.value === 'unsure') {
-                document.getElementById('unsureBusinessSuiteDiv').style.display = 'block';
-            }
-        });
-    });
-
-    // Website access options
-    const websiteRadios = document.querySelectorAll('input[name="websiteAccess"]');
-    websiteRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            // Hide all forms first
-            document.getElementById('connectAdminForm').style.display = 'none';
-            document.getElementById('tempAccessForm').style.display = 'none';
-            
-            // Show appropriate form
-            if (this.value === 'connect') {
-                document.getElementById('connectAdminForm').style.display = 'block';
-            } else if (this.value === 'temporary') {
-                document.getElementById('tempAccessForm').style.display = 'block';
-            }
-        });
-    });
-
-    // Platform selection handlers
-    const platformSelects = [
-        { select: 'websitePlatform', other: 'websitePlatformOther' },
-        { select: 'sitePlatform', other: 'sitePlatformOther' }
-    ];
-    
-    platformSelects.forEach(({ select, other }) => {
-        const selectElement = document.getElementById(select);
-        const otherInput = document.getElementById(other);
-        
-        if (selectElement && otherInput) {
-            selectElement.addEventListener('change', function() {
-                if (this.value === 'other') {
-                    otherInput.style.display = 'block';
-                    otherInput.required = true;
-                } else {
-                    otherInput.style.display = 'none';
-                    otherInput.required = false;
-                    otherInput.value = '';
-                }
-            });
-        }
-    });
-
-    // Info button toggles
-    const infoButtons = [
-        { btn: 'brandKitInfoBtn', info: 'brandKitInfo' },
-        { btn: 'ga4InfoBtn', info: 'ga4Info' },
-        { btn: 'pixelInfoBtn', info: 'pixelInfo' }
-    ];
-
-    infoButtons.forEach(({ btn, info }) => {
-        const button = document.getElementById(btn);
-        const infoDiv = document.getElementById(info);
-        
-        if (button && infoDiv) {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const isVisible = infoDiv.style.display !== 'none';
-                infoDiv.style.display = isVisible ? 'none' : 'block';
-            });
-        }
-    });
-
-    // Revision form toggle
-    const revisionBtn = document.getElementById('revisionBtn');
-    const revisionForm = document.getElementById('revisionForm');
-    
-    if (revisionBtn && revisionForm) {
-        revisionBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const isVisible = revisionForm.style.display !== 'none';
-            revisionForm.style.display = isVisible ? 'none' : 'block';
-        });
-    }
-
-    // Email and copy buttons
-    const emailAdminBtn = document.getElementById('emailAdminInfo');
-    if (emailAdminBtn) {
-        emailAdminBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.emailAdminDetails();
-        });
-    }
-
-    const emailAccessBtn = document.getElementById('emailAccessInfo');
-    if (emailAccessBtn) {
-        emailAccessBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.emailAccessDetails();
-        });
-    }
-
-    const emailRevisionBtn = document.getElementById('emailRevision');
-    if (emailRevisionBtn) {
-        emailRevisionBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.emailRevisionRequest();
-        });
-    }
-
-    const copyRevisionBtn = document.getElementById('copyRevision');
-    if (copyRevisionBtn) {
-        copyRevisionBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.copyRevisionToClipboard();
-        });
-    }
-
-    // Reset progress
-    const resetBtn = document.getElementById('resetProgress');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.resetProgress();
-        });
-    }
-
-    // Help buttons
-    const helpButtons = ['metaHelpBtn', 'checkHelpBtn'];
-    helpButtons.forEach(btnId => {
-        const btn = document.getElementById(btnId);
-        if (btn) {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=Need Help with Meta Business Suite Setup`;
-                window.open(mailtoLink);
-            });
-        }
-    });
-
-    // Setup help button
-    const setupHelpBtn = document.getElementById('setupHelpBtn');
-    if (setupHelpBtn) {
-        setupHelpBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.emailSetupRequest();
-        });
-    }
-
-    // Approve button
-    const approveBtn = document.getElementById('approveBtn');
-    if (approveBtn) {
-        approveBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Are you sure you want to approve these creatives for launch?')) {
-                window.markStepComplete(5);
-                alert('Creatives approved! Your campaign will launch within 24-48 hours.');
-            }
-        });
-    }
-};
-
-// ===== INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Portal initializing...');
-    
-    // Load state first
-    window.loadState();
-    
-    // Initialize external links
-    document.getElementById('msaBtn').href = window.DLM_CONFIG.docuSign.msa;
-    document.getElementById('dpaBtn').href = window.DLM_CONFIG.docuSign.dpa;
-    
-    // Set Google Drive Upload URL (custom or default)
-    const googleDriveLink = window.portalState.googleDriveLink || window.DLM_CONFIG.uploads.driveFileRequestUrl;
-    document.getElementById('uploadBtn').href = googleDriveLink;
-    
-    // Initialize SOW button and payment options
-    window.updateSOWButton();
-    window.updatePaymentOptions();
-    
-    // Display config values
-    document.getElementById('metaEmailDisplay').textContent = window.DLM_CONFIG.support.opsEmail;
-    document.getElementById('contactEmail').textContent = window.DLM_CONFIG.support.opsEmail;
-    document.getElementById('contactPhone').textContent = window.DLM_CONFIG.support.opsPhone;
-    
-    // Initialize UI
-    window.updateStepStates();
-    
-    // Initialize creative gallery
-    if (window.portalState.creativeLink) {
-        window.updateCreativeGallery(window.portalState.creativeLink);
-    }
-    
-    // Setup all event listeners
-    window.setupEventListeners();
-    
-    // Password field Enter key
-    document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            window.adminLogin();
-        }
-    });
-    
-    console.log('Portal initialization complete!');
-});
-
-// Close admin panel when clicking outside
-document.addEventListener('click', function(e) {
-    const panel = document.getElementById('adminPanel');
-    const toggle = document.getElementById('adminToggle');
-    
-    if (!panel.contains(e.target) && !toggle.contains(e.target)) {
-        panel.style.display = 'none';
-    }
-});
-// ===== ENHANCED ANIMATIONS FUNCTIONS =====
-// Add these functions to your existing functions.js
-
-// Override the existing markStepComplete function to include animations
-const originalMarkStepComplete = window.markStepComplete;
-window.markStepComplete = function(stepNum) {
-    // Call the original function
-    originalMarkStepComplete(stepNum);
-    
-    // Update the animated sidebar
-    if (window.updateAnimatedSidebar) {
-        window.updateAnimatedSidebar();
-    }
-    
-    // Add step completion animation
-    animateStepCompletion(stepNum);
-};
-
-// Sidebar management functions
-window.initializeAnimatedSidebar = function() {
-    const sidebarSteps = document.getElementById('sidebarSteps');
-    if (!sidebarSteps) return;
-    
-    const stepLabels = ['Agreements', 'Payment', 'Meta Setup', 'Tracking', 'Approval'];
-    
-    sidebarSteps.innerHTML = '';
-    for (let i = 1; i <= 5; i++) {
-        const stepDiv = document.createElement('div');
-        stepDiv.className = getAnimatedStepClass(i);
-        stepDiv.textContent = i;
-        stepDiv.onclick = () => navigateToStep(i);
-        
-        const label = document.createElement('div');
-        label.className = 'step-label';
-        label.textContent = stepLabels[i - 1];
-        stepDiv.appendChild(label);
-        
-        sidebarSteps.appendChild(stepDiv);
-    }
-};
-
-window.updateAnimatedSidebar = function() {
-    const sidebarSteps = document.querySelectorAll('.sidebar-step');
-    const currentStepDisplay = document.getElementById('currentStepDisplay');
-    
-    if (currentStepDisplay) {
-        // Get current step from progress
-        const progressResult = window.updateProgressBar();
-        const currentStep = Math.min(progressResult.completedSteps + 1, 5);
-        currentStepDisplay.textContent = currentStep;
-    }
-    
-    sidebarSteps.forEach((step, index) => {
-        step.className = 'sidebar-step ' + getAnimatedStepClass(index + 1);
-    });
-};
-
-function getAnimatedStepClass(stepNum) {
-    const isCompleted = window.portalState[stepNum.toString()];
-    const isUnlocked = stepNum === 1 || window.portalState[(stepNum - 1).toString()];
-    
-    if (isCompleted) return 'completed';
-    if (isUnlocked) return 'active';
-    if (stepNum <= 5) return 'upcoming';
-    return 'locked';
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.6;
+    color: #EEF4D9;
+    background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+    min-height: 100vh;
+    position: relative;
 }
 
-function navigateToStep(stepNum) {
-    const isCompleted = window.portalState[stepNum.toString()];
-    const isUnlocked = stepNum === 1 || window.portalState[(stepNum - 1).toString()];
+.portal-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== HERO SECTION ===== */
+.hero {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px 20px;
+    background: linear-gradient(135deg, #05908C 0%, #85C7B3 100%);
+    color: #012E40;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(5, 144, 140, 0.3);
+}
+
+.hero h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #012E40;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 25px;
+    max-width: 90ch;
+    margin-left: auto;
+    margin-right: auto;
+    color: #012E40;
+}
+
+/* ===== PROGRESS BAR STYLES ===== */
+.progress-container {
+    margin-top: 25px;
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(1, 46, 64, 0.3);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #F2A922 0%, #85C7B3 100%);
+    border-radius: 20px;
+    transition: width 0.6s ease;
+    width: 0%;
+    box-shadow: 0 2px 8px rgba(242, 169, 34, 0.3);
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #012E40;
+    font-weight: 600;
+}
+
+#progressPercent {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #F2A922;
+}
+
+/* ===== PAYMENT OPTIONS STYLES ===== */
+.payment-term-display {
+    background: #DFF5F3;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 3px solid #05908C;
+}
+
+.payment-term-display h4 {
+    margin: 0;
+    color: #012E40;
+    font-weight: 600;
+}
+
+.discount-tag {
+    background: #F2A922;
+    color: #012E40;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 8px;
+    display: inline-block;
+}
+
+/* ===== STEP STYLES ===== */
+.step {
+    background: #EEF4D9;
+    border-radius: 14px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(5, 144, 140, 0.2);
+    border: 2px solid #85C7B3;
+    transition: all 0.3s ease;
+    scroll-margin-top: 20px;
+}
+
+.step.locked {
+    opacity: 0.6;
+    pointer-events: none;
+    background: #EEF4D9;
+}
+
+.step.completed {
+    border-color: #F2A922;
+    background: #FBE9D1;
+    box-shadow: 0 4px 20px rgba(242, 169, 34, 0.3);
+}
+
+.step-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    gap: 15px;
+}
+
+.step h2 {
+    color: #012E40;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.step-number {
+    background: #05908C;
+    color: #EEF4D9;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.step.completed .step-number {
+    background: #F2A922;
+    color: #012E40;
+}
+
+.step.locked .step-number {
+    background: #85C7B3;
+    color: #012E40;
+}
+
+.step-content {
+    margin-bottom: 25px;
+    color: #012E40;
+}
+
+.step-note {
+    background: #DFF5F3;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #012E40;
+    margin: 15px 0;
+    border-left: 3px solid #05908C;
+}
+
+/* ===== STEP ACTIONS ===== */
+.step-actions {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid rgba(133, 199, 179, 0.3);
+    text-align: center;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #05908C;
+    color: #EEF4D9;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 5px 5px 5px 0;
+}
+
+.btn:hover {
+    background: #012E40;
+    transform: translateY(-1px);
+}
+
+.btn:focus {
+    outline: 2px solid #F2A922;
+    outline-offset: 2px;
+}
+
+.btn-secondary {
+    background: #F2A922;
+    color: #012E40;
+}
+
+.btn-secondary:hover {
+    background: #85C7B3;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #05908C;
+    border: 2px solid #05908C;
+}
+
+.btn-outline:hover {
+    background: #05908C;
+    color: #EEF4D9;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ===== COMPLETE BUTTON STYLES ===== */
+.btn-complete {
+    background: linear-gradient(135deg, #F2A922 0%, #85C7B3 100%);
+    color: #012E40;
+    font-weight: 700;
+    padding: 14px 28px;
+    font-size: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(242, 169, 34, 0.3);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-complete:hover {
+    background: linear-gradient(135deg, #85C7B3 0%, #F2A922 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(242, 169, 34, 0.4);
+}
+
+.btn-complete:active {
+    transform: translateY(0);
+}
+
+.btn-complete::before {
+    content: '✓ ';
+    font-weight: 900;
+    margin-right: 5px;
+}
+
+/* Complete button when step is already completed */
+.step.completed .btn-complete {
+    background: #85C7B3;
+    color: #012E40;
+    opacity: 0.7;
+    cursor: default;
+}
+
+.step.completed .btn-complete:hover {
+    background: #85C7B3;
+    transform: none;
+    box-shadow: 0 4px 15px rgba(133, 199, 179, 0.3);
+}
+
+.step.completed .btn-complete::before {
+    content: '✓ ';
+    color: #012E40;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.form-group {
+    margin: 15px 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #012E40;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #85C7B3;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+    background: rgba(238, 244, 217, 0.9);
+    color: #012E40;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #F2A922;
+    box-shadow: 0 0 0 3px rgba(242, 169, 34, 0.2);
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    margin: 15px 0;
+    flex-wrap: wrap;
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #012E40;
+    background: rgba(238, 244, 217, 0.5);
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-bottom: 10px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.radio-item:hover {
+    background: rgba(133, 199, 179, 0.2);
+    border-color: #85C7B3;
+}
+
+.radio-item input[type="radio"] {
+    width: auto;
+    margin: 0;
+}
+
+.radio-item input[type="radio"]:checked {
+    accent-color: #F2A922;
+}
+
+.radio-item:has(input[type="radio"]:checked) {
+    background: rgba(242, 169, 34, 0.2);
+    border-color: #F2A922;
+    font-weight: 600;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 20px 0;
+    cursor: pointer;
+    color: #012E40;
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    margin-top: 2px;
+}
+
+/* Payment button dynamic text */
+#stripeBtn {
+    font-size: 1rem;
+    padding: 14px 24px;
+    min-width: 250px;
+    text-align: center;
+    justify-content: center;
+}
+
+/* ===== SPECIAL SECTIONS ===== */
+.gallery-placeholder {
+    background: #F0F9F7;
+    border: 2px dashed #85C7B3;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    margin: 20px 0;
+    color: #012E40;
+}
+
+.success-message {
+    background: linear-gradient(135deg, #F2A922 0%, #85C7B3 100%);
+    color: #012E40;
+    padding: 30px;
+    border-radius: 14px;
+    text-align: center;
+    margin: 20px 0;
+    box-shadow: 0 4px 20px rgba(242, 169, 34, 0.3);
+}
+
+.success-message h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.brand-kit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+/* ===== ADMIN STYLES ===== */
+.admin-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #F2A922;
+    color: #012E40;
+    border: 2px solid #012E40;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+    z-index: 100000;
+    box-shadow: 0 6px 20px rgba(242, 169, 34, 0.5);
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-toggle:hover {
+    background: #85C7B3;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(133, 199, 179, 0.5);
+}
+
+.admin-toggle:active {
+    transform: translateY(0px);
+}
+
+.admin-panel {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: #012E40;
+    color: #EEF4D9;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 99999;
+    min-width: 350px;
+    max-width: 450px;
+    border: 2px solid #05908C;
+    display: none;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.admin-panel h4 {
+    margin: 0 0 20px 0; 
+    font-size: 1.2rem;
+    color: #F2A922;
+    text-align: center;
+    border-bottom: 1px solid #05908C;
+    padding-bottom: 10px;
+}
+
+.admin-section {
+    margin-bottom: 20px;
+}
+
+.admin-section h5 {
+    color: #85C7B3;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.admin-form input {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 2px solid #85C7B3;
+    border-radius: 8px;
+    background: #EEF4D9;
+    color: #012E40;
+    font-size: 0.95rem;
+}
+
+.admin-form button {
+    width: 100%;
+    padding: 12px;
+    background: #F2A922;
+    color: #012E40;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.admin-form button:hover {
+    background: #85C7B3;
+    transform: translateY(-1px);
+}
+
+.admin-form button.danger {
+    background: #ff6b6b;
+    color: white;
+}
+
+.admin-form button.danger:hover {
+    background: #ff5252;
+}
+
+.admin-form hr {
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid #85C7B3;
+}
+
+.admin-status {
+    font-size: 0.9rem;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    display: none;
+}
+
+.admin-status.success {
+    background: rgba(242, 169, 34, 0.2);
+    color: #F2A922;
+    border: 1px solid #F2A922;
+}
+
+.admin-status.error {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+}
+
+/* ===== ADMIN PAYMENT LINKS STYLES ===== */
+.payment-links-group {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(133, 199, 179, 0.1);
+    border-radius: 8px;
+    border: 1px solid #85C7B3;
+}
+
+.payment-links-group h6 {
+    color: #F2A922;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.payment-link-row {
+    margin-bottom: 15px;
+}
+
+.payment-link-row label {
+    display: block;
+    color: #85C7B3;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.payment-link-row input {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 10px;
+    border: 1px solid #85C7B3;
+    border-radius: 6px;
+    background: rgba(238, 244, 217, 0.9);
+    color: #012E40;
+    font-size: 0.85rem;
+}
+
+.button-row {
+    display: flex;
+    gap: 8px;
+}
+
+.button-row button {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    margin-bottom: 0;
+}
+
+.button-row button.small {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+}
+
+/* ===== FOOTER ===== */
+.portal-footer {
+    text-align: center;
+    padding: 30px 20px;
+    margin-top: 40px;
+    border-top: 2px solid rgba(133, 199, 179, 0.3);
+    color: #EEF4D9;
+    font-size: 0.9rem;
+}
+
+.portal-footer p {
+    margin-bottom: 15px;
+    color: #EEF4D9;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: #F2A922;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+    color: #85C7B3;
+}
+
+.footer-links span {
+    color: #85C7B3;
+}
+
+/* ===== SUPPORT MODE ===== */
+.skip-step {
+    background: #F2A922;
+    color: #012E40;
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin-left: 10px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .portal-container {
+        padding: 15px;
+    }
+
+    .hero {
+        padding: 25px 15px;
+    }
+
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+
+    .step {
+        padding: 20px;
+    }
+
+    .step-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .radio-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .radio-item {
+        min-width: auto;
+        flex: none;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .brand-kit-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .admin-toggle {
+        top: 10px;
+        right: 10px;
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+
+    .admin-panel {
+        top: 60px;
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+        max-width: none;
+    }
+
+    .progress-text {
+        font-size: 0.8rem;
+    }
+
+    #progressPercent {
+        font-size: 1rem;
+    }
+
+    .btn-complete {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .payment-links-group {
+        padding: 12px;
+    }
     
-    if (isCompleted || isUnlocked) {
-        document.getElementById(`step${stepNum}`).scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-        });
+    .button-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    #stripeBtn {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .payment-term-display {
+        padding: 12px 16px;
+    }
+
+    .discount-tag {
+        display: block;
+        margin-left: 0;
+        margin-top: 5px;
+        width: fit-content;
     }
 }
 
-function animateStepCompletion(stepNum) {
-    const stepElement = document.getElementById(`step${stepNum}`);
-    const button = stepElement.querySelector('.btn-complete');
-    
-    // Button celebration animation
-    button.style.transform = 'scale(1.1)';
-    button.style.background = '#85C7B3';
-    
-    setTimeout(() => {
-        button.style.transform = '';
-    }, 300);
-    
-    // Mini celebration particles
-    createMiniCelebration(stepElement);
-}
+@media (max-width: 360px) {
+    .btn {
+        width: 100%;
+        justify-content: center;
+        margin: 5px 0;
+    }
 
-function createMiniCelebration(element) {
-    const rect = element.getBoundingClientRect();
-    
-    for (let i = 0; i < 20; i++) {
-        const particle = document.createElement('div');
-        particle.style.cssText = `
-            position: fixed;
-            width: 4px;
-            height: 4px;
-            background: #F2A922;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1000;
-            left: ${rect.left + rect.width / 2}px;
-            top: ${rect.top + rect.height / 2}px;
-        `;
-        
-        document.body.appendChild(particle);
-        
-        const angle = (Math.PI * 2 * i) / 20;
-        const velocity = 50 + Math.random() * 50;
-        const vx = Math.cos(angle) * velocity;
-        const vy = Math.sin(angle) * velocity - 50;
-        
-        animateParticle(particle, vx, vy);
+    .hero h1 {
+        font-size: 1.6rem;
+    }
+
+    .radio-item {
+        padding: 10px 12px;
     }
 }
 
-function animateParticle(particle, vx, vy) {
-    let x = 0, y = 0;
-    const gravity = 2;
-    let opacity = 1;
-    
-    function update() {
-        vy += gravity;
-        x += vx * 0.02;
-        y += vy * 0.02;
-        opacity -= 0.02;
-        
-        particle.style.transform = `translate(${x}px, ${y}px)`;
-        particle.style.opacity = opacity;
-        
-        if (opacity > 0) {
-            requestAnimationFrame(update);
-        } else {
-            particle.remove();
-        }
-    }
-    
-    requestAnimationFrame(update);
+/* ===== ACCESSIBILITY ===== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
-// Fireworks system
-function startFireworksShow() {
-    const canvas = document.getElementById('fireworksCanvas');
-    const overlay = document.getElementById('celebrationOverlay');
-    const message = document.getElementById('celebrationMessage');
-    const subtitle = document.getElementById('celebrationSubtitle');
-    
-    if (!canvas) return;
-    
-    // Setup canvas
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const ctx = canvas.getContext('2d');
-    
-    // Show overlay and canvas
-    overlay.classList.add('active');
-    canvas.classList.add('active');
-    
-    // Show message after delay
-    setTimeout(() => {
-        message.classList.add('show');
-        setTimeout(() => subtitle.classList.add('show'), 800);
-    }, 1000);
-    
-    // Fireworks implementation (simplified)
-    const colors = ['#F2A922', '#05908C', '#85C7B3'];
-    let animationId;
-    
-    function animate() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Simple firework effect
-        for (let i = 0; i < 5; i++) {
-            const x = Math.random() * canvas.width;
-            const y = Math.random() * canvas.height * 0.6;
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            
-            ctx.beginPath();
-            ctx.arc(x, y, Math.random() * 10 + 5, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-        }
-        
-        animationId = requestAnimationFrame(animate);
-    }
-    
-    animate();
-    
-    // End celebration after 6 seconds
-    setTimeout(() => {
-        cancelAnimationFrame(animationId);
-        canvas.classList.remove('active');
-        overlay.classList.remove('active');
-        message.classList.remove('show');
-        subtitle.classList.remove('show');
-    }, 6000);
+/* Focus styles */
+*:focus {
+    outline: 2px solid #F2A922;
+    outline-offset: 2px;
 }
 
-// Scroll management
-function handleAnimatedScroll() {
-    const scrollY = window.scrollY;
-    const sidebar = document.getElementById('floatingSidebar');
-    
-    if (!sidebar) return;
-    
-    if (scrollY > 100) {
-        sidebar.classList.add('visible');
-    } else {
-        sidebar.classList.remove('visible');
-    }
-    
-    // Expand sidebar on hover
-    sidebar.addEventListener('mouseenter', () => {
-        sidebar.classList.add('expanded');
-    });
-    
-    sidebar.addEventListener('mouseleave', () => {
-        sidebar.classList.remove('expanded');
-    });
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(242, 169, 34, 0.3);
 }
 
-// Initialize animations
-function initializeAnimations() {
-    window.initializeAnimatedSidebar();
-    window.updateAnimatedSidebar();
-    
-    // Add scroll listener
-    window.addEventListener('scroll', handleAnimatedScroll);
-    
-    // Override approve button
-    const approveBtn = document.getElementById('approveBtn');
-    if (approveBtn) {
-        approveBtn.onclick = function(e) {
-            e.preventDefault();
-            startFireworksShow();
-            setTimeout(() => window.markStepComplete(5), 3000);
-        };
-    }
+/* Enhanced focus for radio buttons in payment options */
+.radio-item:focus-within {
+    outline: 2px solid #F2A922;
+    outline-offset: 2px;
 }
 
-// Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeAnimations);
-} else {
-    initializeAnimations();
+/* Smooth transitions for all interactive elements */
+.radio-item,
+.btn,
+.admin-toggle,
+.progress-fill {
+    transition: all 0.2s ease;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .step {
+        border-width: 3px;
+    }
+    
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .radio-item {
+        border-width: 2px;
+    }
 }
