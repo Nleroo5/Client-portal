@@ -5,6 +5,263 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Launch Portal - Drive Lead Media</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ===== FLOATING SIDEBAR ANIMATIONS ===== */
+        .floating-sidebar {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(1, 46, 64, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid #05908C;
+            border-radius: 20px;
+            padding: 20px 15px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-50%) translateX(100px);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            min-width: 80px;
+        }
+
+        .floating-sidebar.visible {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .floating-sidebar.expanded {
+            min-width: 160px;
+        }
+
+        .progress-overview {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #F2A922;
+        }
+
+        .progress-overview .current-step {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(242, 169, 34, 0.5);
+        }
+
+        .progress-overview .total-steps {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .sidebar-step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            font-size: 0.9rem;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .sidebar-step.completed {
+            background: linear-gradient(135deg, #85C7B3, #05908C);
+            color: #012E40;
+            box-shadow: 0 0 15px rgba(133, 199, 179, 0.6);
+            animation: completedPulse 2s infinite;
+        }
+
+        .sidebar-step.active {
+            background: linear-gradient(135deg, #F2A922, #85C7B3);
+            color: #012E40;
+            box-shadow: 0 0 20px rgba(242, 169, 34, 0.8);
+            animation: activePulse 1.5s infinite;
+            transform: scale(1.1);
+        }
+
+        .sidebar-step.upcoming {
+            background: rgba(85, 199, 179, 0.3);
+            color: #85C7B3;
+            border-color: #85C7B3;
+        }
+
+        .sidebar-step.locked {
+            background: rgba(85, 199, 179, 0.1);
+            color: rgba(85, 199, 179, 0.5);
+            cursor: not-allowed;
+        }
+
+        .sidebar-step:hover:not(.locked) {
+            transform: scale(1.2);
+            box-shadow: 0 0 25px rgba(242, 169, 34, 0.5);
+        }
+
+        .step-label {
+            position: absolute;
+            right: 60px;
+            background: rgba(1, 46, 64, 0.9);
+            color: #EEF4D9;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .floating-sidebar.expanded .step-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        @keyframes completedPulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(133, 199, 179, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(133, 199, 179, 0.9); }
+        }
+
+        @keyframes activePulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(242, 169, 34, 0.8); }
+            50% { box-shadow: 0 0 35px rgba(242, 169, 34, 1); }
+        }
+
+        /* ===== FIREWORKS & CELEBRATION ===== */
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #fireworksCanvas.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .celebration-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 9998;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .celebration-overlay.active {
+            opacity: 1;
+        }
+
+        .celebration-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #F2A922;
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(242, 169, 34, 0.8);
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5);
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .celebration-message.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .celebration-subtitle {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            color: #85C7B3;
+            opacity: 0;
+            transition: opacity 0.6s ease 0.3s;
+        }
+
+        .celebration-subtitle.show {
+            opacity: 1;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, #F2A922 0%, #05908C 100%);
+            color: #EEF4D9;
+            font-size: 1.1rem;
+            padding: 16px 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-approve:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(242, 169, 34, 0.6);
+        }
+
+        .btn-approve.celebrating {
+            animation: celebrateButton 0.5s ease;
+        }
+
+        @keyframes celebrateButton {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* ===== MOBILE RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .floating-sidebar {
+                right: 10px;
+                min-width: 60px;
+                padding: 15px 10px;
+            }
+
+            .floating-sidebar.expanded {
+                min-width: 140px;
+            }
+
+            .celebration-message {
+                font-size: 2rem;
+                padding: 0 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .floating-sidebar {
+                display: none;
+            }
+
+            .celebration-message {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* ===== REDUCED MOTION ===== */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Admin Toggle Button -->
@@ -395,659 +652,3 @@
                                 </ul>
                             </div>
                         </div>
-                        <div style="background: #DFF5F3; padding: 15px; border-radius: 6px; border-left: 3px solid #05908C;">
-                            <p style="color: #012E40; margin: 0; font-size: 0.9rem;">
-                                <strong>💡 Don't have all of these?</strong> No worries! Upload whatever you have. Even just a logo PNG and your main brand colors will help us create ads that match your brand perfectly.
-                            </p>
-                        </div>
-                    </div>
-
-                    <p style="color: #012E40; margin-bottom: 15px;">Upload your logos, brand guidelines, fonts, and any existing creative assets so we can create ads that perfectly match your brand.</p>
-                    <a href="#" class="btn btn-outline" id="uploadBtn" data-dlm-event="open_upload" target="_blank" rel="noopener">
-                        Upload Brand Assets
-                    </a>
-                </div>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(3)">Mark Step 3 Complete</button>
-            </div>
-        </div>
-
-        <!-- Step 4: Website Access for Tracking -->
-        <div class="step locked" id="step4">
-            <div class="step-header">
-                <div>
-                    <h2>Website Access for Tracking</h2>
-                    <div class="step-note">We install GA4 and Meta Pixel (no PHI). We handle all technical setup - you just provide access.</div>
-                </div>
-                <div class="step-number">4</div>
-            </div>
-            <div class="step-content">
-                <div style="margin-bottom: 25px;">
-                    <h4 style="color: #012E40; margin-bottom: 15px;">🖥️ Website Access Needed</h4>
-                    <p style="color: #012E40; margin-bottom: 15px;">Choose the easiest option for you:</p>
-                    
-                    <div class="radio-group">
-                        <div class="radio-item">
-                            <input type="radio" id="connectWebAdmin" name="websiteAccess" value="connect">
-                            <label for="connectWebAdmin">Connect us with your website admin/developer</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="tempAccess" name="websiteAccess" value="temporary">
-                            <label for="tempAccess">Grant us temporary website access</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Connect with website admin -->
-                <div id="connectAdminForm" style="display: none; background: #DFF5F3; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #85C7B3;">
-                    <h5 style="color: #012E40; margin-bottom: 10px;">Website Admin Contact:</h5>
-                    <div class="form-group">
-                        <label for="adminName">Admin/Developer Name</label>
-                        <input type="text" id="adminName">
-                    </div>
-                    <div class="form-group">
-                        <label for="adminEmail">Admin Email *</label>
-                        <input type="email" id="adminEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="adminPhone">Admin Phone (optional)</label>
-                        <input type="tel" id="adminPhone">
-                    </div>
-                    <div class="form-group">
-                        <label for="websitePlatform">Website Platform</label>
-                        <select id="websitePlatform">
-                            <option value="">Select platform</option>
-                            <option value="wordpress">WordPress</option>
-                            <option value="squarespace">Squarespace</option>
-                            <option value="wix">Wix</option>
-                            <option value="shopify">Shopify</option>
-                            <option value="webflow">Webflow</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <input type="text" id="websitePlatformOther" placeholder="Please specify..." style="display: none; margin-top: 10px; width: 100%; padding: 12px 16px; border: 2px solid #85C7B3; border-radius: 8px; background: #EEF4D9; color: #012E40;">
-                    </div>
-                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
-                        <strong>We'll contact them directly</strong> to coordinate tracking installation.
-                    </p>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-small" id="emailAdminInfo">Email Admin Details to Us</button>
-                    </div>
-                </div>
-
-                <!-- Temporary access form -->
-                <div id="tempAccessForm" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
-                    <h5 style="color: #012E40; margin-bottom: 10px;">Temporary Website Access:</h5>
-                    <div class="form-group">
-                        <label for="websiteUrl">Website URL *</label>
-                        <input type="url" id="websiteUrl" placeholder="https://yourwebsite.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginUrl">Login URL</label>
-                        <input type="url" id="loginUrl" placeholder="https://yourwebsite.com/wp-admin">
-                    </div>
-                    <div class="form-group">
-                        <label for="tempUsername">Admin Username *</label>
-                        <input type="text" id="tempUsername" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tempPassword">Admin Password *</label>
-                        <input type="password" id="tempPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="sitePlatform">Website Platform</label>
-                        <select id="sitePlatform">
-                            <option value="">Select platform</option>
-                            <option value="wordpress">WordPress</option>
-                            <option value="squarespace">Squarespace</option>
-                            <option value="wix">Wix</option>
-                            <option value="shopify">Shopify</option>
-                            <option value="webflow">Webflow</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <input type="text" id="sitePlatformOther" placeholder="Please specify..." style="display: none; margin-top: 10px; width: 100%; padding: 12px 16px; border: 2px solid #85C7B3; border-radius: 8px; background: #EEF4D9; color: #012E40;">
-                    </div>
-                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
-                        <strong>🔒 Secure:</strong> We'll install tracking and remove our access immediately. You can change the password afterward.
-                    </p>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-small" id="emailAccessInfo">Send Access Details Securely</button>
-                    </div>
-                </div>
-
-                <div style="margin-top: 25px; background: #F0F9F7; padding: 15px; border-radius: 8px;">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap;">
-                        <h5 style="color: #012E40; margin: 0;">What We Install:</h5>
-                        <button class="btn btn-small btn-outline" id="ga4InfoBtn" style="font-size: 0.8rem; padding: 4px 12px;">
-                            What is GA4?
-                        </button>
-                        <button class="btn btn-small btn-outline" id="pixelInfoBtn" style="font-size: 0.8rem; padding: 4px 12px;">
-                            What is Meta Pixel?
-                        </button>
-                    </div>
-                    
-                    <!-- GA4 Explanation (hidden initially) -->
-                    <div id="ga4Info" style="display: none; background: #DFF5F3; padding: 15px; border-radius: 6px; margin: 10px 0; border: 1px solid #05908C;">
-                        <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Google Analytics 4 (GA4):</h6>
-                        <p style="color: #012E40; margin: 0; font-size: 0.9rem; line-height: 1.5;">
-                            GA4 tracks how people find and use your website. It shows us which ads bring the most visitors, what pages they look at, and what actions they take (like calling your office or filling out forms). This helps us improve your ads to get better results. <strong>No personal health information is tracked.</strong>
-                        </p>
-                    </div>
-
-                    <!-- Meta Pixel Explanation (hidden initially) -->
-                    <div id="pixelInfo" style="display: none; background: #FBE9D1; padding: 15px; border-radius: 6px; margin: 10px 0; border: 1px solid #F2A922;">
-                        <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Meta Pixel (Facebook/Instagram):</h6>
-                        <p style="color: #012E40; margin: 0; font-size: 0.9rem; line-height: 1.5;">
-                            Meta Pixel tracks when people visit your website after seeing your Facebook or Instagram ads. It helps us find more people similar to your best customers and shows ads to people who visited your website but didn't book an appointment yet. <strong>No personal health information is tracked.</strong>
-                        </p>
-                    </div>
-
-                    <ul style="margin-left: 20px; color: #012E40; line-height: 1.6;">
-                        <li>✓ Google Analytics 4 (GA4) tracking code</li>
-                        <li>✓ Meta Pixel tracking code</li>
-                        <li>✓ Conversion tracking setup</li>
-                        <li>✓ Testing to ensure everything works</li>
-                    </ul>
-                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
-                        <strong>Timeline:</strong> Completed within 7 days of receiving access.
-                    </p>
-                </div>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(4)">Mark Step 4 Complete</button>
-            </div>
-        </div>
-
-        <!-- Step 5: Creative Approval -->
-        <div class="step locked" id="step5">
-            <div class="step-header">
-                <div>
-                    <h2>Creative Approval</h2>
-                    <div class="step-note">Your Launch Creative Bundle: 1 actor-led video, 1 animated video, 2 image ads.</div>
-                </div>
-                <div class="step-number">5</div>
-            </div>
-            <div class="step-content">
-                <div class="gallery-placeholder" id="galleryPlaceholder">
-                    <p>Creative previews will be shared via secure link</p>
-                    <p style="font-size: 0.9rem; color: #85C7B3; margin-top: 10px;">
-                        Links will be provided once creatives are ready for review
-                    </p>
-                </div>
-                <div style="margin: 20px 0;">
-                    <button class="btn btn-approve" id="approveBtn" data-dlm-event="approve_launch">
-                        🚀 Approve to Launch
-                    </button>
-                    <button class="btn btn-outline" id="revisionBtn" data-dlm-event="request_revisions">
-                        Request Revisions
-                    </button>
-                </div>
-
-                <!-- Revision form (hidden initially) -->
-                <div id="revisionForm" style="display: none; background: #DFF5F3; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #85C7B3;">
-                    <h4 style="color: #012E40;">Request Revisions</h4>
-                    <div class="form-group">
-                        <label for="revisionName">Name *</label>
-                        <input type="text" id="revisionName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="revisionEmail">Email *</label>
-                        <input type="email" id="revisionEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="revisionNotes">Revision Notes *</label>
-                        <textarea id="revisionNotes" rows="4" placeholder="Please describe the changes you'd like to see..." required></textarea>
-                    </div>
-                    <div style="margin: 15px 0;">
-                        <button class="btn btn-small" id="copyRevision">Copy to Clipboard</button>
-                        <button class="btn btn-small btn-outline" id="emailRevision">Email Revisions</button>
-                    </div>
-                </div>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(5)">Mark Step 5 Complete</button>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="portal-footer">
-            <p>Drive Lead Media — We never process PHI. All analytics used solely to measure and improve advertising performance.</p>
-            <div class="footer-links">
-                <a href="#" id="resetProgress">Reset progress</a>
-                <span>•</span>
-                <span id="contactEmail">Nicolas@driveleadmedia.com</span>
-                <span>•</span>
-                <span id="contactPhone">(678) 650-6411</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Load JavaScript Files -->
-    <script src="config.js"></script>
-    <script src="functions.js"></script>
-
-    <!-- Enhanced Animations Script -->
-    <script>
-        // ===== ENHANCED ANIMATIONS SYSTEM =====
-        let currentStep = 1;
-        let completedSteps = new Set();
-        let isFireworksActive = false;
-
-        // ===== SIDEBAR MANAGEMENT =====
-        function initializeSidebar() {
-            const sidebarSteps = document.getElementById('sidebarSteps');
-            const stepLabels = ['Agreements', 'Payment', 'Meta Setup', 'Tracking', 'Approval'];
-            
-            for (let i = 1; i <= 5; i++) {
-                const stepDiv = document.createElement('div');
-                stepDiv.className = getStepClass(i);
-                stepDiv.textContent = i;
-                stepDiv.onclick = () => navigateToStep(i);
-                
-                const label = document.createElement('div');
-                label.className = 'step-label';
-                label.textContent = stepLabels[i - 1];
-                stepDiv.appendChild(label);
-                
-                sidebarSteps.appendChild(stepDiv);
-            }
-        }
-
-        function getStepClass(stepNum) {
-            if (window.portalState && window.portalState[stepNum.toString()]) return 'sidebar-step completed';
-            
-            // Check if step is currently active (unlocked)
-            const isUnlocked = stepNum === 1 || (window.portalState && window.portalState[(stepNum - 1).toString()]);
-            if (isUnlocked && (!window.portalState || !window.portalState[stepNum.toString()])) return 'sidebar-step active';
-            if (stepNum <= 5) return 'sidebar-step upcoming';
-            return 'sidebar-step locked';
-        }
-
-        function updateSidebar() {
-            const sidebarSteps = document.querySelectorAll('.sidebar-step');
-            const currentStepDisplay = document.getElementById('currentStepDisplay');
-            
-            // Calculate current step based on progress
-            let activeStep = 1;
-            if (window.portalState) {
-                for (let i = 1; i <= 5; i++) {
-                    if (!window.portalState[i.toString()]) {
-                        activeStep = i;
-                        break;
-                    }
-                    if (i === 5) activeStep = 5; // All complete
-                }
-            }
-            
-            if (currentStepDisplay) {
-                currentStepDisplay.textContent = activeStep;
-            }
-            
-            sidebarSteps.forEach((step, index) => {
-                step.className = getStepClass(index + 1);
-            });
-        }
-
-        function navigateToStep(stepNum) {
-            const isCompleted = window.portalState && window.portalState[stepNum.toString()];
-            const isUnlocked = stepNum === 1 || (window.portalState && window.portalState[(stepNum - 1).toString()]);
-            
-            if (isCompleted || isUnlocked) {
-                document.getElementById(`step${stepNum}`).scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }
-        }
-
-        // ===== STEP COMPLETION ANIMATION =====
-        function animateStepCompletion(stepNum) {
-            const stepElement = document.getElementById(`step${stepNum}`);
-            const button = stepElement.querySelector('.btn-complete');
-            
-            // Button celebration animation
-            button.style.transform = 'scale(1.1)';
-            button.style.background = '#85C7B3';
-            
-            setTimeout(() => {
-                button.style.transform = '';
-            }, 300);
-            
-            // Mini celebration particles
-            createMiniCelebration(stepElement);
-        }
-
-        function createMiniCelebration(element) {
-            const rect = element.getBoundingClientRect();
-            
-            for (let i = 0; i < 20; i++) {
-                const particle = document.createElement('div');
-                particle.style.cssText = `
-                    position: fixed;
-                    width: 4px;
-                    height: 4px;
-                    background: #F2A922;
-                    border-radius: 50%;
-                    pointer-events: none;
-                    z-index: 1000;
-                    left: ${rect.left + rect.width / 2}px;
-                    top: ${rect.top + rect.height / 2}px;
-                `;
-                
-                document.body.appendChild(particle);
-                
-                const angle = (Math.PI * 2 * i) / 20;
-                const velocity = 50 + Math.random() * 50;
-                const vx = Math.cos(angle) * velocity;
-                const vy = Math.sin(angle) * velocity - 50;
-                
-                animateParticle(particle, vx, vy);
-            }
-        }
-
-        function animateParticle(particle, vx, vy) {
-            let x = 0, y = 0;
-            const gravity = 2;
-            let opacity = 1;
-            
-            function update() {
-                vy += gravity;
-                x += vx * 0.02;
-                y += vy * 0.02;
-                opacity -= 0.02;
-                
-                particle.style.transform = `translate(${x}px, ${y}px)`;
-                particle.style.opacity = opacity;
-                
-                if (opacity > 0) {
-                    requestAnimationFrame(update);
-                } else {
-                    particle.remove();
-                }
-            }
-            
-            requestAnimationFrame(update);
-        }
-
-        // ===== FIREWORKS SYSTEM =====
-        function startFireworksShow() {
-            if (isFireworksActive) return;
-            isFireworksActive = true;
-            
-            const canvas = document.getElementById('fireworksCanvas');
-            const overlay = document.getElementById('celebrationOverlay');
-            const message = document.getElementById('celebrationMessage');
-            const subtitle = document.getElementById('celebrationSubtitle');
-            
-            // Setup canvas
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            const ctx = canvas.getContext('2d');
-            
-            // Show overlay and canvas
-            overlay.classList.add('active');
-            canvas.classList.add('active');
-            
-            // Show message after delay
-            setTimeout(() => {
-                message.classList.add('show');
-                setTimeout(() => subtitle.classList.add('show'), 800);
-            }, 1000);
-            
-            // Start fireworks
-            const fireworks = [];
-            const particles = [];
-            
-            // Firework class
-            class Firework {
-                constructor(x, y, targetX, targetY, color) {
-                    this.x = x;
-                    this.y = y;
-                    this.targetX = targetX;
-                    this.targetY = targetY;
-                    this.color = color;
-                    this.trail = [];
-                    this.speed = 3;
-                    this.angle = Math.atan2(targetY - y, targetX - x);
-                    this.vx = Math.cos(this.angle) * this.speed;
-                    this.vy = Math.sin(this.angle) * this.speed;
-                }
-                
-                update() {
-                    this.trail.push({ x: this.x, y: this.y });
-                    if (this.trail.length > 10) this.trail.shift();
-                    
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    
-                    const distance = Math.sqrt((this.targetX - this.x) ** 2 + (this.targetY - this.y) ** 2);
-                    
-                    if (distance < 10) {
-                        this.explode();
-                        return false;
-                    }
-                    return true;
-                }
-                
-                explode() {
-                    const particleCount = 30 + Math.random() * 20;
-                    for (let i = 0; i < particleCount; i++) {
-                        particles.push(new Particle(this.targetX, this.targetY, this.color));
-                    }
-                }
-                
-                draw(ctx) {
-                    // Draw trail
-                    this.trail.forEach((point, index) => {
-                        ctx.beginPath();
-                        ctx.arc(point.x, point.y, (index / this.trail.length) * 3, 0, Math.PI * 2);
-                        ctx.fillStyle = this.color;
-                        ctx.fill();
-                    });
-                }
-            }
-            
-            // Particle class
-            class Particle {
-                constructor(x, y, color) {
-                    this.x = x;
-                    this.y = y;
-                    this.color = color;
-                    this.vx = (Math.random() - 0.5) * 8;
-                    this.vy = (Math.random() - 0.5) * 8;
-                    this.life = 1;
-                    this.decay = Math.random() * 0.015 + 0.01;
-                    this.size = Math.random() * 3 + 2;
-                    this.gravity = 0.1;
-                }
-                
-                update() {
-                    this.vx *= 0.99;
-                    this.vy += this.gravity;
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    this.life -= this.decay;
-                    return this.life > 0;
-                }
-                
-                draw(ctx) {
-                    ctx.save();
-                    ctx.globalAlpha = this.life;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = this.color;
-                    ctx.fill();
-                    ctx.restore();
-                }
-            }
-            
-            // Brand colors for fireworks
-            const colors = ['#F2A922', '#05908C', '#85C7B3', '#EEF4D9'];
-            
-            // Launch fireworks
-            function launchFirework() {
-                const startX = Math.random() * canvas.width;
-                const startY = canvas.height;
-                const targetX = Math.random() * canvas.width;
-                const targetY = Math.random() * canvas.height * 0.6;
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                fireworks.push(new Firework(startX, startY, targetX, targetY, color));
-            }
-            
-            // Animation loop
-            function animate() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Update and draw fireworks
-                for (let i = fireworks.length - 1; i >= 0; i--) {
-                    if (!fireworks[i].update()) {
-                        fireworks.splice(i, 1);
-                    } else {
-                        fireworks[i].draw(ctx);
-                    }
-                }
-                
-                // Update and draw particles
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    if (!particles[i].update()) {
-                        particles.splice(i, 1);
-                    } else {
-                        particles[i].draw(ctx);
-                    }
-                }
-                
-                if (isFireworksActive) {
-                    requestAnimationFrame(animate);
-                }
-            }
-            
-            // Start animation
-            animate();
-            
-            // Launch fireworks at intervals
-            const launchInterval = setInterval(() => {
-                if (Math.random() < 0.7) launchFirework();
-            }, 300);
-            
-            // Launch multiple fireworks initially
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => launchFirework(), i * 200);
-            }
-            
-            // End celebration after 8 seconds
-            setTimeout(() => {
-                clearInterval(launchInterval);
-                
-                setTimeout(() => {
-                    isFireworksActive = false;
-                    canvas.classList.remove('active');
-                    overlay.classList.remove('active');
-                    message.classList.remove('show');
-                    subtitle.classList.remove('show');
-                    
-                    // Complete the final step
-                    if (window.markStepComplete) {
-                        window.markStepComplete(5);
-                    }
-                    
-                }, 2000);
-            }, 6000);
-        }
-
-        // ===== SCROLL MANAGEMENT =====
-        function handleScroll() {
-            const scrollY = window.scrollY;
-            const sidebar = document.getElementById('floatingSidebar');
-            
-            if (!sidebar) return;
-            
-            // Show/hide sidebar based on scroll
-            if (scrollY > 100) {
-                sidebar.classList.add('visible');
-            } else {
-                sidebar.classList.remove('visible');
-            }
-        }
-
-        // ===== INTEGRATION WITH EXISTING SYSTEM =====
-        // Override the existing markStepComplete function to include animations
-        const originalMarkStepComplete = window.markStepComplete;
-        if (originalMarkStepComplete) {
-            window.markStepComplete = function(stepNum) {
-                // Call the original function
-                originalMarkStepComplete(stepNum);
-                
-                // Update the animated sidebar
-                updateSidebar();
-                
-                // Add step completion animation
-                animateStepCompletion(stepNum);
-            };
-        }
-
-        // ===== INITIALIZATION =====
-        function initializeAnimations() {
-            // Initialize sidebar
-            initializeSidebar();
-            updateSidebar();
-            
-            // Add scroll listener
-            window.addEventListener('scroll', handleScroll);
-            
-            // Sidebar hover effects
-            const sidebar = document.getElementById('floatingSidebar');
-            if (sidebar) {
-                sidebar.addEventListener('mouseenter', () => {
-                    sidebar.classList.add('expanded');
-                });
-                
-                sidebar.addEventListener('mouseleave', () => {
-                    sidebar.classList.remove('expanded');
-                });
-            }
-            
-            // Override approve button to trigger fireworks
-            const approveBtn = document.getElementById('approveBtn');
-            if (approveBtn) {
-                approveBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    this.classList.add('celebrating');
-                    startFireworksShow();
-                });
-            }
-            
-            // Handle window resize for canvas
-            window.addEventListener('resize', () => {
-                const canvas = document.getElementById('fireworksCanvas');
-                if (canvas) {
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                }
-            });
-            
-            console.log('🎆 Enhanced Portal Animations Loaded! 🎆');
-        }
-
-        // Auto-initialize when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                // Wait a bit for the original functions to load
-                setTimeout(initializeAnimations, 100);
-            });
-        } else {
-            setTimeout(initializeAnimations, 100);
-        }
-
-        // Update sidebar when portal state changes
-        const originalUpdateStepStates = window.updateStepStates;
-        if (originalUpdateStepStates) {
-            window.updateStepStates = function() {
-                originalUpdateStepStates();
-                updateSidebar();
-            };
-        }
-    </script>
-</body>
-</html>
