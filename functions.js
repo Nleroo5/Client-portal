@@ -827,3 +827,257 @@ document.addEventListener('click', function(e) {
         panel.style.display = 'none';
     }
 });
+// ===== ENHANCED ANIMATIONS FUNCTIONS =====
+// Add these functions to your existing functions.js
+
+// Override the existing markStepComplete function to include animations
+const originalMarkStepComplete = window.markStepComplete;
+window.markStepComplete = function(stepNum) {
+    // Call the original function
+    originalMarkStepComplete(stepNum);
+    
+    // Update the animated sidebar
+    if (window.updateAnimatedSidebar) {
+        window.updateAnimatedSidebar();
+    }
+    
+    // Add step completion animation
+    animateStepCompletion(stepNum);
+};
+
+// Sidebar management functions
+window.initializeAnimatedSidebar = function() {
+    const sidebarSteps = document.getElementById('sidebarSteps');
+    if (!sidebarSteps) return;
+    
+    const stepLabels = ['Agreements', 'Payment', 'Meta Setup', 'Tracking', 'Approval'];
+    
+    sidebarSteps.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = getAnimatedStepClass(i);
+        stepDiv.textContent = i;
+        stepDiv.onclick = () => navigateToStep(i);
+        
+        const label = document.createElement('div');
+        label.className = 'step-label';
+        label.textContent = stepLabels[i - 1];
+        stepDiv.appendChild(label);
+        
+        sidebarSteps.appendChild(stepDiv);
+    }
+};
+
+window.updateAnimatedSidebar = function() {
+    const sidebarSteps = document.querySelectorAll('.sidebar-step');
+    const currentStepDisplay = document.getElementById('currentStepDisplay');
+    
+    if (currentStepDisplay) {
+        // Get current step from progress
+        const progressResult = window.updateProgressBar();
+        const currentStep = Math.min(progressResult.completedSteps + 1, 5);
+        currentStepDisplay.textContent = currentStep;
+    }
+    
+    sidebarSteps.forEach((step, index) => {
+        step.className = 'sidebar-step ' + getAnimatedStepClass(index + 1);
+    });
+};
+
+function getAnimatedStepClass(stepNum) {
+    const isCompleted = window.portalState[stepNum.toString()];
+    const isUnlocked = stepNum === 1 || window.portalState[(stepNum - 1).toString()];
+    
+    if (isCompleted) return 'completed';
+    if (isUnlocked) return 'active';
+    if (stepNum <= 5) return 'upcoming';
+    return 'locked';
+}
+
+function navigateToStep(stepNum) {
+    const isCompleted = window.portalState[stepNum.toString()];
+    const isUnlocked = stepNum === 1 || window.portalState[(stepNum - 1).toString()];
+    
+    if (isCompleted || isUnlocked) {
+        document.getElementById(`step${stepNum}`).scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+}
+
+function animateStepCompletion(stepNum) {
+    const stepElement = document.getElementById(`step${stepNum}`);
+    const button = stepElement.querySelector('.btn-complete');
+    
+    // Button celebration animation
+    button.style.transform = 'scale(1.1)';
+    button.style.background = '#85C7B3';
+    
+    setTimeout(() => {
+        button.style.transform = '';
+    }, 300);
+    
+    // Mini celebration particles
+    createMiniCelebration(stepElement);
+}
+
+function createMiniCelebration(element) {
+    const rect = element.getBoundingClientRect();
+    
+    for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: #F2A922;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            left: ${rect.left + rect.width / 2}px;
+            top: ${rect.top + rect.height / 2}px;
+        `;
+        
+        document.body.appendChild(particle);
+        
+        const angle = (Math.PI * 2 * i) / 20;
+        const velocity = 50 + Math.random() * 50;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity - 50;
+        
+        animateParticle(particle, vx, vy);
+    }
+}
+
+function animateParticle(particle, vx, vy) {
+    let x = 0, y = 0;
+    const gravity = 2;
+    let opacity = 1;
+    
+    function update() {
+        vy += gravity;
+        x += vx * 0.02;
+        y += vy * 0.02;
+        opacity -= 0.02;
+        
+        particle.style.transform = `translate(${x}px, ${y}px)`;
+        particle.style.opacity = opacity;
+        
+        if (opacity > 0) {
+            requestAnimationFrame(update);
+        } else {
+            particle.remove();
+        }
+    }
+    
+    requestAnimationFrame(update);
+}
+
+// Fireworks system
+function startFireworksShow() {
+    const canvas = document.getElementById('fireworksCanvas');
+    const overlay = document.getElementById('celebrationOverlay');
+    const message = document.getElementById('celebrationMessage');
+    const subtitle = document.getElementById('celebrationSubtitle');
+    
+    if (!canvas) return;
+    
+    // Setup canvas
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    
+    // Show overlay and canvas
+    overlay.classList.add('active');
+    canvas.classList.add('active');
+    
+    // Show message after delay
+    setTimeout(() => {
+        message.classList.add('show');
+        setTimeout(() => subtitle.classList.add('show'), 800);
+    }, 1000);
+    
+    // Fireworks implementation (simplified)
+    const colors = ['#F2A922', '#05908C', '#85C7B3'];
+    let animationId;
+    
+    function animate() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Simple firework effect
+        for (let i = 0; i < 5; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height * 0.6;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            ctx.beginPath();
+            ctx.arc(x, y, Math.random() * 10 + 5, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+        
+        animationId = requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    // End celebration after 6 seconds
+    setTimeout(() => {
+        cancelAnimationFrame(animationId);
+        canvas.classList.remove('active');
+        overlay.classList.remove('active');
+        message.classList.remove('show');
+        subtitle.classList.remove('show');
+    }, 6000);
+}
+
+// Scroll management
+function handleAnimatedScroll() {
+    const scrollY = window.scrollY;
+    const sidebar = document.getElementById('floatingSidebar');
+    
+    if (!sidebar) return;
+    
+    if (scrollY > 100) {
+        sidebar.classList.add('visible');
+    } else {
+        sidebar.classList.remove('visible');
+    }
+    
+    // Expand sidebar on hover
+    sidebar.addEventListener('mouseenter', () => {
+        sidebar.classList.add('expanded');
+    });
+    
+    sidebar.addEventListener('mouseleave', () => {
+        sidebar.classList.remove('expanded');
+    });
+}
+
+// Initialize animations
+function initializeAnimations() {
+    window.initializeAnimatedSidebar();
+    window.updateAnimatedSidebar();
+    
+    // Add scroll listener
+    window.addEventListener('scroll', handleAnimatedScroll);
+    
+    // Override approve button
+    const approveBtn = document.getElementById('approveBtn');
+    if (approveBtn) {
+        approveBtn.onclick = function(e) {
+            e.preventDefault();
+            startFireworksShow();
+            setTimeout(() => window.markStepComplete(5), 3000);
+        };
+    }
+}
+
+// Auto-initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAnimations);
+} else {
+    initializeAnimations();
+}
