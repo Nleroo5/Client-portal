@@ -1,3 +1,223 @@
+/* ===== FLOATING SIDEBAR ===== */
+.floating-sidebar {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(1, 46, 64, 0.95);
+    backdrop-filter: blur(10px);
+    border: 2px solid #05908C;
+    border-radius: 20px;
+    padding: 20px 15px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-50%) translateX(100px);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    min-width: 80px;
+}
+
+.floating-sidebar.visible {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+.floating-sidebar.expanded {
+    min-width: 160px;
+}
+
+.progress-overview {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #F2A922;
+}
+
+.progress-overview .current-step {
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(242, 169, 34, 0.5);
+}
+
+.progress-overview .total-steps {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.sidebar-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.sidebar-step {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    font-size: 0.9rem;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.sidebar-step.completed {
+    background: linear-gradient(135deg, #85C7B3, #05908C);
+    color: #012E40;
+    box-shadow: 0 0 15px rgba(133, 199, 179, 0.6);
+    animation: completedPulse 2s infinite;
+}
+
+.sidebar-step.active {
+    background: linear-gradient(135deg, #F2A922, #85C7B3);
+    color: #012E40;
+    box-shadow: 0 0 20px rgba(242, 169, 34, 0.8);
+    animation: activePulse 1.5s infinite;
+    transform: scale(1.1);
+}
+
+.sidebar-step.upcoming {
+    background: rgba(85, 199, 179, 0.3);
+    color: #85C7B3;
+    border-color: #85C7B3;
+}
+
+.sidebar-step.locked {
+    background: rgba(85, 199, 179, 0.1);
+    color: rgba(85, 199, 179, 0.5);
+    cursor: not-allowed;
+}
+
+.sidebar-step:hover:not(.locked) {
+    transform: scale(1.2);
+    box-shadow: 0 0 25px rgba(242, 169, 34, 0.5);
+}
+
+.step-label {
+    position: absolute;
+    right: 60px;
+    background: rgba(1, 46, 64, 0.9);
+    color: #EEF4D9;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.floating-sidebar.expanded .step-label {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+@keyframes completedPulse {
+    0%, 100% { box-shadow: 0 0 15px rgba(133, 199, 179, 0.6); }
+    50% { box-shadow: 0 0 25px rgba(133, 199, 179, 0.9); }
+}
+
+@keyframes activePulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(242, 169, 34, 0.8); }
+    50% { box-shadow: 0 0 35px rgba(242, 169, 34, 1); }
+}
+
+/* ===== FIREWORKS CANVAS ===== */
+#fireworksCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#fireworksCanvas.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* ===== CELEBRATION OVERLAY ===== */
+.celebration-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 9998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.celebration-overlay.active {
+    opacity: 1;
+}
+
+.celebration-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #F2A922;
+    font-size: 3rem;
+    font-weight: bold;
+    text-shadow: 0 0 20px rgba(242, 169, 34, 0.8);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.celebration-message.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.celebration-subtitle {
+    font-size: 1.2rem;
+    margin-top: 20px;
+    color: #85C7B3;
+    opacity: 0;
+    transition: opacity 0.6s ease 0.3s;
+}
+
+.celebration-subtitle.show {
+    opacity: 1;
+}
+
+.btn-approve {
+    background: linear-gradient(135deg, #F2A922 0%, #05908C 100%);
+    color: #EEF4D9;
+    font-size: 1.1rem;
+    padding: 16px 32px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-approve:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(242, 169, 34, 0.6);
+}
+
+.btn-approve.celebrating {
+    animation: celebrateButton 0.5s ease;
+}
+
+@keyframes celebrateButton {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
 /* ===== DRIVE LEAD MEDIA PORTAL STYLES ===== */
 /* Edit this file to change colors, fonts, and design */
 
