@@ -206,7 +206,10 @@ window.updatePaymentOptions = function() {
     const termText = sowTerm === 'sow12' ? '12-Month' : '6-Month';
 
     // Update the payment term display
-    document.getElementById('paymentTermText').textContent = termText;
+    const paymentTermTextElement = document.getElementById('paymentTermText');
+    if (paymentTermTextElement) {
+        paymentTermTextElement.textContent = termText;
+    }
 
     // Update the payment button
     window.updatePaymentButton();
@@ -216,6 +219,8 @@ window.updatePaymentButton = function() {
     const sowTerm = window.getCurrentSOWTerm();
     const paymentType = window.getCurrentPaymentType();
     const stripeBtn = document.getElementById('stripeBtn');
+
+    if (!stripeBtn) return;
 
     // Get the appropriate link (custom or default)
     let paymentLink;
@@ -236,11 +241,15 @@ window.updatePaymentButton = function() {
 // ===== BUTTON UPDATE FUNCTIONS =====
 window.updateUploadButton = function(link) {
     const uploadBtn = document.getElementById('uploadBtn');
-    uploadBtn.href = link;
+    if (uploadBtn) {
+        uploadBtn.href = link;
+    }
 };
 
 window.updateCreativeGallery = function(link) {
     const gallery = document.getElementById('galleryPlaceholder');
+    
+    if (!gallery) return;
 
     if (link) {
         gallery.innerHTML = `
@@ -275,15 +284,21 @@ window.updateProgressBar = function() {
 
     // Update progress bar fill
     const progressFill = document.getElementById('progressFill');
-    progressFill.style.width = percentage + '%';
+    if (progressFill) {
+        progressFill.style.width = percentage + '%';
+    }
 
     // Update progress text
     const progressText = document.getElementById('progressText');
-    progressText.textContent = `${completedSteps} of ${totalSteps} steps completed`;
+    if (progressText) {
+        progressText.textContent = `${completedSteps} of ${totalSteps} steps completed`;
+    }
 
     // Update percentage
     const progressPercent = document.getElementById('progressPercent');
-    progressPercent.textContent = percentage + '%';
+    if (progressPercent) {
+        progressPercent.textContent = percentage + '%';
+    }
 
     return { completedSteps, totalSteps, percentage };
 };
@@ -321,6 +336,8 @@ window.saveState = function() {
 window.updateStepStates = function() {
     for (let i = 1; i <= 5; i++) {
         const stepElement = document.getElementById(`step${i}`);
+        if (!stepElement) continue;
+        
         const isCompleted = window.portalState[i.toString()];
         const isUnlocked = i === 1 || window.portalState[(i - 1).toString()];
 
@@ -348,11 +365,14 @@ window.updateStepStates = function() {
 };
 
 window.showSuccessMessage = function() {
-    document.getElementById('successMessage').style.display = 'block';
-    document.getElementById('successMessage').scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center' 
-    });
+    const successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+        successMessage.style.display = 'block';
+        successMessage.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+    }
 };
 
 window.markStepComplete = function(stepNum) {
@@ -362,15 +382,18 @@ window.markStepComplete = function(stepNum) {
 
     // Show completion feedback
     const stepElement = document.getElementById(`step${stepNum}`);
-    const completeBtn = stepElement.querySelector('.btn-complete');
+    if (stepElement) {
+        const completeBtn = stepElement.querySelector('.btn-complete');
+        if (completeBtn) {
+            // Add visual feedback
+            completeBtn.style.transform = 'scale(1.05)';
+            completeBtn.style.background = '#85C7B3';
 
-    // Add visual feedback
-    completeBtn.style.transform = 'scale(1.05)';
-    completeBtn.style.background = '#85C7B3';
-
-    setTimeout(() => {
-        completeBtn.style.transform = '';
-    }, 200);
+            setTimeout(() => {
+                completeBtn.style.transform = '';
+            }, 200);
+        }
+    }
 
     // Trigger animations if enabled
     if (window.DLM_CONFIG.ui.enableAnimations) {
@@ -405,6 +428,8 @@ window.updateSOWButton = function() {
     const sow6Radio = document.getElementById('sow6');
     const sow12Radio = document.getElementById('sow12');
     const sowBtn = document.getElementById('sowBtn');
+
+    if (!sowBtn) return;
 
     if (sow12Radio && sow12Radio.checked) {
         sowBtn.textContent = 'Sign SOW (12-month)';
@@ -666,10 +691,13 @@ function navigateToStep(stepNum) {
     const isUnlocked = stepNum === 1 || (window.portalState && window.portalState[(stepNum - 1).toString()]);
     
     if (isCompleted || isUnlocked) {
-        document.getElementById(`step${stepNum}`).scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-        });
+        const stepElement = document.getElementById(`step${stepNum}`);
+        if (stepElement) {
+            stepElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
     }
 }
 
@@ -678,15 +706,18 @@ window.animateStepCompletion = function(stepNum) {
     if (!window.DLM_CONFIG.ui.enableAnimations) return;
     
     const stepElement = document.getElementById(`step${stepNum}`);
+    if (!stepElement) return;
+    
     const button = stepElement.querySelector('.btn-complete');
-    
-    // Button celebration animation
-    button.style.transform = 'scale(1.1)';
-    button.style.background = '#85C7B3';
-    
-    setTimeout(() => {
-        button.style.transform = '';
-    }, 300);
+    if (button) {
+        // Button celebration animation
+        button.style.transform = 'scale(1.1)';
+        button.style.background = '#85C7B3';
+        
+        setTimeout(() => {
+            button.style.transform = '';
+        }, 300);
+    }
     
     // Mini celebration particles
     if (window.DLM_CONFIG.ui.enableParticleEffects) {
@@ -963,17 +994,21 @@ window.setupEventListeners = function() {
     metaRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             // Hide all forms first
-            document.getElementById('existingBusinessSuite').style.display = 'none';
-            document.getElementById('newBusinessSuite').style.display = 'none';
-            document.getElementById('unsureBusinessSuiteDiv').style.display = 'none';
+            const existingForm = document.getElementById('existingBusinessSuite');
+            const newForm = document.getElementById('newBusinessSuite');
+            const unsureForm = document.getElementById('unsureBusinessSuiteDiv');
+            
+            if (existingForm) existingForm.style.display = 'none';
+            if (newForm) newForm.style.display = 'none';
+            if (unsureForm) unsureForm.style.display = 'none';
 
             // Show appropriate form
-            if (this.value === 'yes') {
-                document.getElementById('existingBusinessSuite').style.display = 'block';
-            } else if (this.value === 'no') {
-                document.getElementById('newBusinessSuite').style.display = 'block';
-            } else if (this.value === 'unsure') {
-                document.getElementById('unsureBusinessSuiteDiv').style.display = 'block';
+            if (this.value === 'yes' && existingForm) {
+                existingForm.style.display = 'block';
+            } else if (this.value === 'no' && newForm) {
+                newForm.style.display = 'block';
+            } else if (this.value === 'unsure' && unsureForm) {
+                unsureForm.style.display = 'block';
             }
         });
     });
@@ -983,14 +1018,17 @@ window.setupEventListeners = function() {
     websiteRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             // Hide all forms first
-            document.getElementById('connectAdminForm').style.display = 'none';
-            document.getElementById('tempAccessForm').style.display = 'none';
+            const connectForm = document.getElementById('connectAdminForm');
+            const tempForm = document.getElementById('tempAccessForm');
+            
+            if (connectForm) connectForm.style.display = 'none';
+            if (tempForm) tempForm.style.display = 'none';
 
             // Show appropriate form
-            if (this.value === 'connect') {
-                document.getElementById('connectAdminForm').style.display = 'block';
-            } else if (this.value === 'temporary') {
-                document.getElementById('tempAccessForm').style.display = 'block';
+            if (this.value === 'connect' && connectForm) {
+                connectForm.style.display = 'block';
+            } else if (this.value === 'temporary' && tempForm) {
+                tempForm.style.display = 'block';
             }
         });
     });
@@ -1149,42 +1187,56 @@ window.setupEventListeners = function() {
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Portal initializing...');
+    console.log('🚀 Portal initializing...');
 
-    // Load state first
+    // ⭐ STEP 1: Load state FIRST
     window.loadState();
+    console.log('📁 State loaded:', window.portalState);
 
-    // Initialize external links
-    document.getElementById('msaBtn').href = window.DLM_CONFIG.docuSign.msa;
-    document.getElementById('dpaBtn').href = window.DLM_CONFIG.docuSign.dpa;
+    // ⭐ STEP 2: Initialize external links
+    const msaBtn = document.getElementById('msaBtn');
+    const dpaBtn = document.getElementById('dpaBtn');
+    
+    if (msaBtn) msaBtn.href = window.DLM_CONFIG.docuSign.msa;
+    if (dpaBtn) dpaBtn.href = window.DLM_CONFIG.docuSign.dpa;
 
     // Set Google Drive Upload URL (custom or default)
     const googleDriveLink = window.portalState.googleDriveLink || window.DLM_CONFIG.uploads.driveFileRequestUrl;
-    document.getElementById('uploadBtn').href = googleDriveLink;
+    const uploadBtn = document.getElementById('uploadBtn');
+    if (uploadBtn) uploadBtn.href = googleDriveLink;
 
-    // Initialize SOW button and payment options
+    // ⭐ STEP 3: Initialize UI components
     window.updateSOWButton();
     window.updatePaymentOptions();
 
-    // Display config values
-    document.getElementById('metaEmailDisplay').textContent = window.DLM_CONFIG.support.opsEmail;
-    document.getElementById('contactEmail').textContent = window.DLM_CONFIG.support.opsEmail;
-    document.getElementById('contactPhone').textContent = window.DLM_CONFIG.support.opsPhone;
-
-    // Initialize UI
+    // ⭐ STEP 4: Update step states AND progress bar
     window.updateStepStates();
+    
+    // ⭐ STEP 5: Force progress bar update (CRITICAL FIX!)
+    const progressResults = window.updateProgressBar();
+    console.log('📊 Progress bar updated:', progressResults);
 
-    // Initialize creative gallery
+    // Display config values
+    const metaEmailDisplay = document.getElementById('metaEmailDisplay');
+    const contactEmail = document.getElementById('contactEmail');
+    const contactPhone = document.getElementById('contactPhone');
+    
+    if (metaEmailDisplay) metaEmailDisplay.textContent = window.DLM_CONFIG.support.opsEmail;
+    if (contactEmail) contactEmail.textContent = window.DLM_CONFIG.support.opsEmail;
+    if (contactPhone) contactPhone.textContent = window.DLM_CONFIG.support.opsPhone;
+
+    // Initialize creative gallery if link exists
     if (window.portalState.creativeLink) {
         window.updateCreativeGallery(window.portalState.creativeLink);
     }
 
-    // Initialize animations if enabled
+    // ⭐ STEP 6: Initialize animations and sidebar if enabled
     if (window.DLM_CONFIG.ui.enableAnimations) {
+        console.log('🎨 Initializing animations...');
         window.initializeSidebar();
         window.updateSidebar();
         
-        // Sidebar hover effects
+        // Add sidebar hover effects
         const sidebar = document.getElementById('floatingSidebar');
         if (sidebar) {
             sidebar.addEventListener('mouseenter', () => {
@@ -1200,7 +1252,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup all event listeners
     window.setupEventListeners();
 
-    console.log('Portal initialization complete!');
+    console.log('✅ Portal initialization complete!');
+    console.log('🎯 Progress bar should now be working...');
+    
+    // ⭐ FINAL DEBUG: Log current progress state
+    setTimeout(() => {
+        const finalProgressResults = window.updateProgressBar();
+        console.log('🔍 Final progress check:', finalProgressResults);
+        
+        // Check if progress bar elements exist and have values
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const progressPercent = document.getElementById('progressPercent');
+        
+        console.log('🎛️ Progress bar elements:', {
+            progressFill: progressFill ? progressFill.style.width : 'NOT FOUND',
+            progressText: progressText ? progressText.textContent : 'NOT FOUND',
+            progressPercent: progressPercent ? progressPercent.textContent : 'NOT FOUND'
+        });
+    }, 100);
 });
 
 // Close admin panel when clicking outside
