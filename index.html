@@ -4,117 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Launch Portal - Drive Lead Media</title>
-    <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Young+Serif:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Admin Toggle Button -->
-    <button class="admin-toggle" id="adminToggle" onclick="window.toggleAdminPanel()">ADMIN</button>
-
-    <!-- Admin Panel -->
-    <div class="admin-panel" id="adminPanel">
-        <h4>Admin Control Panel</h4>
-        <div class="admin-form">
-            <div id="adminLogin">
-                <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="new-password">
-                <button id="loginBtn" onclick="window.adminLogin()">Login</button>
+    <!-- Floating Progress Sidebar -->
+    <div class="floating-progress-sidebar" id="floatingProgressSidebar">
+        <div class="sidebar-progress-header">
+            <div class="progress-percentage-circle">
+                <svg>
+                    <circle class="background" cx="25" cy="25" r="20"></circle>
+                    <circle class="progress" id="sidebarProgressCircle" cx="25" cy="25" r="20" 
+                            stroke-dasharray="126" stroke-dashoffset="126"></circle>
+                </svg>
+                <div class="progress-percentage-text" id="sidebarProgressPercent">0%</div>
             </div>
-
-            <div id="adminControls" style="display: none;">
-                <!-- Creative Link Section -->
-                <div class="admin-section">
-                    <h5>Creative Preview Link</h5>
-                    <input type="url" id="creativeLink" placeholder="Creative Preview Link (Google Drive, etc.)">
-                    <button id="setCreativeLink" onclick="window.setCreativeLink()">Set Creative Link</button>
-                    <button id="removeCreativeLink" class="danger" onclick="window.removeCreativeLink()">Remove Creative Link</button>
-                </div>
-
-                <hr>
-
-                <!-- Google Drive Upload Link Section -->
-                <div class="admin-section">
-                    <h5>Brand Kit Upload Link</h5>
-                    <input type="url" id="googleDriveLink" placeholder="Google Drive Upload/Folder Link">
-                    <button id="setGoogleDriveLink" onclick="window.setGoogleDriveLink()">Set Upload Link</button>
-                    <button id="removeGoogleDriveLink" class="danger" onclick="window.removeGoogleDriveLink()">Reset to Default</button>
-                </div>
-
-                <hr>
-
-                <!-- Stripe Payment Links Section -->
-                <div class="admin-section">
-                    <h5>Payment Links</h5>
-
-                    <!-- 6-Month Payment Links -->
-                    <div class="payment-links-group">
-                        <h6>6-Month SOW:</h6>
-                        <div class="payment-link-row">
-                            <label>Monthly:</label>
-                            <input type="url" id="stripe6Monthly" placeholder="6-month monthly payment link">
-                            <div class="button-row">
-                                <button onclick="window.setStripeLink('sow6', 'monthly')">Set</button>
-                                <button class="danger small" onclick="window.removeStripeLink('sow6', 'monthly')">Reset</button>
-                            </div>
-                        </div>
-                        <div class="payment-link-row">
-                            <label>Upfront:</label>
-                            <input type="url" id="stripe6Upfront" placeholder="6-month upfront payment link">
-                            <div class="button-row">
-                                <button onclick="window.setStripeLink('sow6', 'upfront')">Set</button>
-                                <button class="danger small" onclick="window.removeStripeLink('sow6', 'upfront')">Reset</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 12-Month Payment Links -->
-                    <div class="payment-links-group">
-                        <h6>12-Month SOW:</h6>
-                        <div class="payment-link-row">
-                            <label>Monthly:</label>
-                            <input type="url" id="stripe12Monthly" placeholder="12-month monthly payment link">
-                            <div class="button-row">
-                                <button onclick="window.setStripeLink('sow12', 'monthly')">Set</button>
-                                <button class="danger small" onclick="window.removeStripeLink('sow12', 'monthly')">Reset</button>
-                            </div>
-                        </div>
-                        <div class="payment-link-row">
-                            <label>Upfront:</label>
-                            <input type="url" id="stripe12Upfront" placeholder="12-month upfront payment link">
-                            <div class="button-row">
-                                <button onclick="window.setStripeLink('sow12', 'upfront')">Set</button>
-                                <button class="danger small" onclick="window.removeStripeLink('sow12', 'upfront')">Reset</button>
-                            </div>
-                        </div>
-                    </div>
+            <div class="progress-message" id="sidebarProgressMessage">Let's get started!</div>
+        </div>
+        <div class="sidebar-steps-track">
+            <div class="sidebar-step-item">
+                <div class="sidebar-step-bubble upcoming" id="sidebarBubble1">1</div>
+                <div class="sidebar-step-info">
+                    <div class="sidebar-step-label">Agreements</div>
                 </div>
             </div>
-
-            <div id="adminStatus" class="admin-status"></div>
-        </div>
-    </div>
-
-    <!-- Floating Sidebar -->
-    <div class="floating-sidebar" id="floatingSidebar">
-        <div class="progress-overview">
-            <div class="current-step" id="currentStepDisplay">1</div>
-            <div class="total-steps">of 5</div>
-        </div>
-        <div class="sidebar-steps" id="sidebarSteps">
-            <!-- Steps will be generated by JavaScript -->
-        </div>
-    </div>
-
-    <!-- Fireworks Canvas -->
-    <canvas id="fireworksCanvas"></canvas>
-
-    <!-- Celebration Overlay -->
-    <div class="celebration-overlay" id="celebrationOverlay">
-        <div class="celebration-message" id="celebrationMessage">
-            🎉 APPROVED FOR LAUNCH! 🎉
-            <div class="celebration-subtitle" id="celebrationSubtitle">
-                Your campaign will be live within 24-48 hours!
+            <div class="sidebar-step-item">
+                <div class="sidebar-step-bubble upcoming" id="sidebarBubble2">2</div>
+                <div class="sidebar-step-info">
+                    <div class="sidebar-step-label">Payment</div>
+                </div>
+            </div>
+            <div class="sidebar-step-item">
+                <div class="sidebar-step-bubble upcoming" id="sidebarBubble3">3</div>
+                <div class="sidebar-step-info">
+                    <div class="sidebar-step-label">Meta Setup</div>
+                </div>
+            </div>
+            <div class="sidebar-step-item">
+                <div class="sidebar-step-bubble upcoming" id="sidebarBubble4">4</div>
+                <div class="sidebar-step-info">
+                    <div class="sidebar-step-label">Tracking</div>
+                </div>
+            </div>
+            <div class="sidebar-step-item">
+                <div class="sidebar-step-bubble upcoming" id="sidebarBubble5">5</div>
+                <div class="sidebar-step-info">
+                    <div class="sidebar-step-label">Approval</div>
+                </div>
             </div>
         </div>
     </div>
@@ -124,8 +62,7 @@
         <div class="hero">
             <h1>Client Launch Portal</h1>
             <p>Complete each step. We'll handle the rest.</p>
-
-            <!-- Progress Bar -->
+            
             <div class="progress-container">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
@@ -137,7 +74,7 @@
             </div>
         </div>
 
-        <!-- Success Message (hidden initially) -->
+        <!-- Success Message -->
         <div class="success-message" id="successMessage" style="display: none;">
             <h3>🎉 Launch Complete!</h3>
             <p>All steps completed successfully. Your campaign will be live within 24-48 hours.</p>
@@ -154,25 +91,22 @@
             </div>
             <div class="step-content">
                 <div style="margin-bottom: 20px;">
-                    <a href="#" class="btn" id="msaBtn" data-dlm-event="open_msa" target="_blank" rel="noopener">
-                        Sign MSA
-                    </a>
-                    <a href="#" class="btn" id="dpaBtn" data-dlm-event="open_dpa" target="_blank" rel="noopener">
-                        Sign DPA
+                    <a href="#" class="btn" id="dpaBtn" target="_blank" rel="noopener">
+                        Sign DPA (Data Processing Agreement)
                     </a>
                 </div>
                 <div class="radio-group">
                     <div class="radio-item">
-                        <input type="radio" id="sow6" name="sowTerm" value="6" checked>
-                        <label for="sow6">6-month term</label>
+                        <input type="radio" id="service6" name="serviceTerm" value="6" checked>
+                        <label for="service6">6-month service agreement</label>
                     </div>
                     <div class="radio-item">
-                        <input type="radio" id="sow12" name="sowTerm" value="12">
-                        <label for="sow12">12-month term</label>
+                        <input type="radio" id="service12" name="serviceTerm" value="12">
+                        <label for="service12">12-month service agreement</label>
                     </div>
                 </div>
-                <a href="#" class="btn" id="sowBtn" data-dlm-event="open_sow" target="_blank" rel="noopener">
-                    Sign SOW (6-month)
+                <a href="#" class="btn" id="serviceBtn" target="_blank" rel="noopener">
+                    Sign Service Agreement (6-month)
                 </a>
             </div>
             <div class="step-actions">
@@ -190,14 +124,12 @@
                 <div class="step-number">2</div>
             </div>
             <div class="step-content">
-                <!-- Payment Term Display -->
-                <div class="payment-term-display" id="paymentTermDisplay">
-                    <h4 style="color: #012E40; margin-bottom: 15px;">
+                <div class="payment-term-display">
+                    <h4 style="color: #012E40; margin: 0;">
                         <span id="paymentTermText">6-Month</span> Payment Options
                     </h4>
                 </div>
-
-                <!-- Payment Options -->
+                
                 <div class="radio-group" style="margin-bottom: 20px;">
                     <div class="radio-item">
                         <input type="radio" id="paymentMonthly" name="paymentType" value="monthly" checked>
@@ -205,12 +137,11 @@
                     </div>
                     <div class="radio-item">
                         <input type="radio" id="paymentUpfront" name="paymentType" value="upfront">
-                        <label for="paymentUpfront">Pay All Upfront <span class="discount-tag">(5% Discount)</span></label>
+                        <label for="paymentUpfront">Pay All Upfront <span class="discount-tag">5% Discount</span></label>
                     </div>
                 </div>
-
-                <!-- Payment Button -->
-                <a href="#" class="btn" id="stripeBtn" data-dlm-event="open_stripe" target="_blank" rel="noopener">
+                
+                <a href="#" class="btn" id="stripeBtn" target="_blank" rel="noopener">
                     Set Up Monthly Payment
                 </a>
             </div>
@@ -228,271 +159,45 @@
                 <div class="step-number">3</div>
             </div>
             <div class="step-content">
-                <!-- Meta Business Suite Check -->
                 <div style="margin-bottom: 25px;">
                     <h4 style="color: #012E40; margin-bottom: 15px;">Meta Business Suite Setup</h4>
-                    <p style="color: #012E40; margin-bottom: 15px;">We need admin access to manage your ads and tracking. First, let us know your setup:</p>
-
-                    <div class="radio-group">
-                        <div class="radio-item">
-                            <input type="radio" id="hasBusinessSuite" name="metaSetup" value="yes">
-                            <label for="hasBusinessSuite">Yes, I have Meta Business Suite set up</label>
+                    <p style="color: #012E40; margin-bottom: 15px;">Let's handle this together - I'll walk you through the setup step-by-step.</p>
+                    
+                    <div style="background: #DFF5F3; padding: 25px; border-radius: 12px; border: 2px solid #85C7B3; text-align: center; max-width: 450px; margin: 0 auto;">
+                        <img src="https://www.driveleadmedia.com/s/IMG_1337.png" 
+                             alt="Nicolas - Drive Lead Media" 
+                             style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #05908C;">
+                        
+                        <h5 style="color: #012E40; margin-bottom: 10px;">Call Nicolas</h5>
+                        
+                        <div style="background: #05908C; color: #EEF4D9; padding: 12px 20px; border-radius: 8px; margin: 15px 0; font-size: 1.1rem; font-weight: 700;">
+                            <a href="tel:+16786506411" style="color: #EEF4D9; text-decoration: none;">
+                                (678) 650-6411
+                            </a>
                         </div>
-                        <div class="radio-item">
-                            <input type="radio" id="noBusinessSuite" name="metaSetup" value="no">
-                            <label for="noBusinessSuite">No, I don't have Meta Business Suite</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="unsureBusinessSuite" name="metaSetup" value="unsure">
-                            <label for="unsureBusinessSuite">I'm not sure</label>
+                        
+                        <div style="color: #012E40; font-size: 0.9rem; line-height: 1.5;">
+                            <p style="margin-bottom: 5px;"><strong>Available:</strong> 9am - 5pm, Mon-Sat</p>
+                            <p style="margin-bottom: 10px;"><strong>Call Duration:</strong> ~15 minutes</p>
+                            
+                            <div style="background: rgba(242, 169, 34, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #F2A922; margin-top: 10px;">
+                                <p style="margin: 0; font-size: 0.85rem;">
+                                    If I don't answer, shoot me a text or leave a voicemail - I'll get right back to you.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Instructions for existing Business Suite users -->
-                <div id="existingBusinessSuite" style="display: none; background: #DFF5F3; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #85C7B3;">
-                    <h5 style="color: #012E40; margin-bottom: 15px;">How to Grant Drive Lead Media Access to Your Meta Business Suite</h5>
-
-                    <div style="color: #012E40; line-height: 1.6;">
-                        <p style="margin-bottom: 12px;"><strong>Step 1: Open Meta Business Suite</strong><br>
-                        Go to business.facebook.com and log in with your Facebook account</p>
-
-                        <p style="margin-bottom: 12px;"><strong>Step 2: Access Business Settings</strong><br>
-                        Click "Business Settings" in the top menu</p>
-
-                        <p style="margin-bottom: 12px;"><strong>Step 3: Go to People Section</strong><br>
-                        In the left sidebar, click "Users" then click "People"</p>
-
-                        <p style="margin-bottom: 12px;"><strong>Step 4: Add New User</strong><br>
-                        Click the "Add" button</p>
-
-                        <p style="margin-bottom: 12px;"><strong>Step 5: Enter Our Email</strong><br>
-                        Type: <strong id="metaEmailDisplay">Nicolas@driveleadmedia.com</strong></p>
-
-                        <p style="margin-bottom: 12px;"><strong>Step 6: Grant Admin Access</strong><br>
-                        Select "Admin" role when prompted for permissions</p>
-
-                        <p style="margin-bottom: 12px;"><strong>Step 7: Send Invitation</strong><br>
-                        Click "Invite" to send the access request</p>
-
-                        <p style="margin-bottom: 15px;"><strong>That's it!</strong><br>
-                        We'll receive an email notification and accept the invitation. Once accepted, we can begin setting up and managing your advertising campaigns</p>
-                    </div>
-
-                    <div style="margin-top: 15px;">
-                        <a href="https://business.facebook.com" class="btn" target="_blank" rel="noopener">
-                            Open Meta Business Suite
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Instructions for users without Business Suite -->
-                <div id="newBusinessSuite" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
-                    <h5 style="color: #012E40; margin-bottom: 10px;">We'll Call at Your Convenience:</h5>
-                    <p style="color: #012E40; margin-bottom: 15px;">Meta Business Suite setup is easier when we do it together. Share your best days and times for a 10-15 minute setup call.</p>
-
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #012E40;">Preferred Days:</label>
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                            <label style="display: flex; align-items: center; gap: 5px; color: #012E40; font-weight: normal;">
-                                <input type="checkbox" id="setupMon" name="setupDays" value="Monday">
-                                Mon
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 5px; color: #012E40; font-weight: normal;">
-                                <input type="checkbox" id="setupTue" name="setupDays" value="Tuesday">
-                                Tue
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 5px; color: #012E40; font-weight: normal;">
-                                <input type="checkbox" id="setupWed" name="setupDays" value="Wednesday">
-                                Wed
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 5px; color: #012E40; font-weight: normal;">
-                                <input type="checkbox" id="setupThu" name="setupDays" value="Thursday">
-                                Thu
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 5px; color: #012E40; font-weight: normal;">
-                                <input type="checkbox" id="setupFri" name="setupDays" value="Friday">
-                                Fri
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 5px; color: #012E40; font-weight: normal;">
-                                <input type="checkbox" id="setupSat" name="setupDays" value="Saturday">
-                                Sat
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 5px; color: #012E40; font-weight: normal;">
-                                <input type="checkbox" id="setupSun" name="setupDays" value="Sunday">
-                                Sun
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="setupTime">Best Time:</label>
-                        <select id="setupTime">
-                            <option value="">Select time range</option>
-                            <option value="morning">Morning (9am-12pm)</option>
-                            <option value="afternoon">Afternoon (12pm-5pm)</option>
-                            <option value="evening">Evening (5pm-8pm)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="setupPhone">Phone Number:</label>
-                        <input type="tel" id="setupPhone" placeholder="(555) 123-4567">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="setupTimezone">Time Zone:</label>
-                        <select id="setupTimezone">
-                            <option value="">Select time zone</option>
-                            <option value="ET">Eastern Time (ET)</option>
-                            <option value="CT">Central Time (CT)</option>
-                            <option value="MT">Mountain Time (MT)</option>
-                            <option value="PT">Pacific Time (PT)</option>
-                        </select>
-                    </div>
-
-                    <button class="btn btn-secondary" id="setupHelpBtn">
-                        Schedule Setup Call
-                    </button>
-                </div>
-
-                <!-- Instructions for unsure users -->
-                <div id="unsureBusinessSuiteDiv" style="display: none; background: #F0F9F7; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #85C7B3;">
-                    <h5 style="color: #012E40; margin-bottom: 10px;">Let's Check Together:</h5>
-                    <p style="color: #012E40; margin-bottom: 15px;">Not sure if you have Meta Business Suite? We'll help you check and set up access in just a few minutes.</p>
-
-                    <div style="background: #DFF5F3; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 3px solid #05908C;">
-                        <h6 style="color: #012E40; margin-bottom: 10px; font-weight: 600;">Quick 30-Second Check:</h6>
-                        <ol style="color: #012E40; margin-left: 20px; line-height: 1.6; margin-bottom: 0;">
-                            <li>Go to <strong>business.facebook.com</strong></li>
-                            <li>Try logging in with your Facebook account</li>
-                            <li>If you see a business dashboard with your Facebook page listed → <strong>you have it! Select "Yes" above</strong></li>
-                            <li>If it asks you to "Create Account" or shows a setup screen → <strong>you don't have it yet! Select "No" above</strong></li>
-                        </ol>
-                    </div>
-
-                    <p style="color: #012E40; margin: 15px 0 0 0; font-size: 0.9rem; font-style: italic;">
-                        After checking, please go back and select either "Yes" or "No" above to continue with the appropriate setup.
-                    </p>
-                </div>
-
+                
                 <!-- Brand Kit Upload Section -->
                 <div style="margin: 30px 0 20px 0; border-top: 2px solid rgba(133, 199, 179, 0.3); padding-top: 25px;">
                     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
                         <h4 style="color: #012E40; margin: 0;">📁 Brand Kit Upload:</h4>
-                        <button class="btn btn-small btn-outline" id="ga4InfoBtn" style="font-size: 0.8rem; padding: 4px 12px;">
-                            What is GA4?
-                        </button>
-                        <button class="btn btn-small btn-outline" id="pixelInfoBtn" style="font-size: 0.8rem; padding: 4px 12px;">
-                            What is Meta Pixel?
-                        </button>
-                    </div>
-
-                    <!-- GA4 Explanation (hidden initially) -->
-                    <div id="ga4Info" style="display: none; background: #DFF5F3; padding: 15px; border-radius: 6px; margin: 10px 0; border: 1px solid #05908C;">
-                        <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Google Analytics 4 (GA4):</h6>
-                        <p style="color: #012E40; margin: 0; font-size: 0.9rem; line-height: 1.5;">
-                            GA4 tracks how people find and use your website. It shows us which ads bring the most visitors, what pages they look at, and what actions they take (like calling your office or filling out forms). This helps us improve your ads to get better results. <strong>No personal health information is tracked.</strong>
-                        </p>
-                    </div>
-
-                    <!-- Meta Pixel Explanation (hidden initially) -->
-                    <div id="pixelInfo" style="display: none; background: #FBE9D1; padding: 15px; border-radius: 6px; margin: 10px 0; border: 1px solid #F2A922;">
-                        <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Meta Pixel (Facebook/Instagram):</h6>
-                        <p style="color: #012E40; margin: 0; font-size: 0.9rem; line-height: 1.5;">
-                            Meta Pixel tracks when people visit your website after seeing your Facebook or Instagram ads. It helps us find more people similar to your best customers and shows ads to people who visited your website but didn't book an appointment yet. <strong>No personal health information is tracked.</strong>
-                        </p>
-                    </div>
-
-                    <ul style="margin-left: 20px; color: #012E40; line-height: 1.6;">
-                        <li>✓ Google Analytics 4 (GA4) tracking code</li>
-                        <li>✓ Meta Pixel tracking code</li>
-                        <li>✓ Conversion tracking setup</li>
-                        <li>✓ Testing to ensure everything works</li>
-                    </ul>
-                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
-                        <strong>Timeline:</strong> Completed within 7 days of receiving access.
-                    </p>
-                </div>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(4)">Mark Step 4 Complete</button>
-            </div>
-        </div>
-
-        <!-- Step 5: Creative Approval -->
-        <div class="step locked" id="step5">
-            <div class="step-header">
-                <div>
-                    <h2>Creative Approval</h2>
-                    <div class="step-note">Your Launch Creative Bundle: 1 actor-led video, 1 animated video, 2 image ads.</div>
-                </div>
-                <div class="step-number">5</div>
-            </div>
-            <div class="step-content">
-                <div class="gallery-placeholder" id="galleryPlaceholder">
-                    <p>Creative previews will be shared via secure link</p>
-                    <p style="font-size: 0.9rem; color: #85C7B3; margin-top: 10px;">
-                        Links will be provided once creatives are ready for review
-                    </p>
-                </div>
-                <div style="margin: 20px 0;">
-                    <button class="btn btn-approve" id="approveBtn" data-dlm-event="approve_launch">
-                        🚀 Approve to Launch
-                    </button>
-                    <button class="btn btn-outline" id="revisionBtn" data-dlm-event="request_revisions">
-                        Request Revisions
-                    </button>
-                </div>
-
-                <!-- Revision form (hidden initially) -->
-                <div id="revisionForm" style="display: none; background: #DFF5F3; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #85C7B3;">
-                    <h4 style="color: #012E40;">Request Revisions</h4>
-                    <div class="form-group">
-                        <label for="revisionName">Name *</label>
-                        <input type="text" id="revisionName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="revisionEmail">Email *</label>
-                        <input type="email" id="revisionEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="revisionNotes">Revision Notes *</label>
-                        <textarea id="revisionNotes" rows="4" placeholder="Please describe the changes you'd like to see..." required></textarea>
-                    </div>
-                    <div style="margin: 15px 0;">
-                        <button class="btn btn-small" id="copyRevision">Copy to Clipboard</button>
-                        <button class="btn btn-small btn-outline" id="emailRevision">Email Revisions</button>
-                    </div>
-                </div>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(5)">Mark Step 5 Complete</button>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="portal-footer">
-            <p>Drive Lead Media — We never process PHI. All analytics used solely to measure and improve advertising performance.</p>
-            <div class="footer-links">
-                <a href="#" id="resetProgress">Reset progress</a>
-                <span>•</span>
-                <span id="contactEmail">Nicolas@driveleadmedia.com</span>
-                <span>•</span>
-                <span id="contactPhone">(678) 650-6411</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Load JavaScript Files -->
-    <script src="config.js"></script>
-    <script src="functions.js"></script>
-</body>
-</html> btn-small btn-outline" id="brandKitInfoBtn" style="font-size: 0.8rem; padding: 4px 12px;">
+                        <button class="btn btn-small btn-outline" id="brandKitInfoBtn" style="font-size: 0.8rem; padding: 4px 12px;" onclick="window.toggleBrandKitInfo()">
                             What is a brand kit?
                         </button>
                     </div>
-
+                    
                     <!-- Brand Kit Explanation (hidden initially) -->
                     <div id="brandKitInfo" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
                         <h5 style="color: #012E40; margin-bottom: 10px;">Your Brand Kit Should Include:</h5>
@@ -522,9 +227,10 @@
                             </p>
                         </div>
                     </div>
-
+                    
                     <p style="color: #012E40; margin-bottom: 15px;">Upload your logos, brand guidelines, fonts, and any existing creative assets so we can create ads that perfectly match your brand.</p>
-                    <a href="#" class="btn btn-outline" id="uploadBtn" data-dlm-event="open_upload" target="_blank" rel="noopener">
+                    <a href="https://drive.google.com/drive/folders/1jds7K6SdV6G_SwTyZZjxqjuftqIHiaPY?usp=sharing" 
+                       class="btn btn-outline" id="uploadBtn" target="_blank" rel="noopener">
                         Upload Brand Assets
                     </a>
                 </div>
@@ -547,10 +253,10 @@
                 <div style="margin-bottom: 25px;">
                     <h4 style="color: #012E40; margin-bottom: 15px;">🖥️ Website Access Needed</h4>
                     <p style="color: #012E40; margin-bottom: 15px;">Choose the easiest option for you:</p>
-
+                    
                     <div class="radio-group">
                         <div class="radio-item">
-                            <input type="radio" id="connectWebAdmin" name="websiteAccess" value="connect">
+                            <input type="radio" id="connectWebAdmin" name="websiteAccess" value="connect" checked>
                             <label for="connectWebAdmin">Connect us with your website admin/developer</label>
                         </div>
                         <div class="radio-item">
@@ -561,7 +267,7 @@
                 </div>
 
                 <!-- Connect with website admin -->
-                <div id="connectAdminForm" style="display: none; background: #DFF5F3; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #85C7B3;">
+                <div id="connectAdminForm" style="background: #DFF5F3; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #85C7B3;">
                     <h5 style="color: #012E40; margin-bottom: 10px;">Website Admin Contact:</h5>
                     <div class="form-group">
                         <label for="adminName">Admin/Developer Name</label>
@@ -572,7 +278,7 @@
                         <input type="email" id="adminEmail" required>
                     </div>
                     <div class="form-group">
-                        <label for="adminPhone">Admin Phone (optional)</label>
+                        <label for="adminPhone">Admin Phone </label>
                         <input type="tel" id="adminPhone">
                     </div>
                     <div class="form-group">
@@ -586,17 +292,17 @@
                             <option value="webflow">Webflow</option>
                             <option value="other">Other</option>
                         </select>
-                        <input type="text" id="websitePlatformOther" placeholder="Please specify..." style="display: none; margin-top: 10px; width: 100%; padding: 12px 16px; border: 2px solid #85C7B3; border-radius: 8px; background: #EEF4D9; color: #012E40;">
+                        <input type="text" id="websitePlatformOther" placeholder="Please specify..." style="display: none; margin-top: 10px;">
                     </div>
                     <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
                         <strong>We'll contact them directly</strong> to coordinate tracking installation.
                     </p>
                     <div style="margin-top: 15px;">
-                        <button class="btn btn-small" id="emailAdminInfo">Email Admin Details to Us</button>
+                        <button class="btn btn-secondary btn-small" onclick="window.emailAdminDetails()">Email Admin Details to Us</button>
                     </div>
                 </div>
 
-                <!-- Temporary access form -->
+                <!-- Temporary access form (hidden by default) -->
                 <div id="tempAccessForm" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
                     <h5 style="color: #012E40; margin-bottom: 10px;">Temporary Website Access:</h5>
                     <div class="form-group">
@@ -626,17 +332,115 @@
                             <option value="webflow">Webflow</option>
                             <option value="other">Other</option>
                         </select>
-                        <input type="text" id="sitePlatformOther" placeholder="Please specify..." style="display: none; margin-top: 10px; width: 100%; padding: 12px 16px; border: 2px solid #85C7B3; border-radius: 8px; background: #EEF4D9; color: #012E40;">
+                        <input type="text" id="sitePlatformOther" placeholder="Please specify..." style="display: none; margin-top: 10px;">
                     </div>
                     <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
                         <strong>🔒 Secure:</strong> We'll install tracking and remove our access immediately. You can change the password afterward.
                     </p>
                     <div style="margin-top: 15px;">
-                        <button class="btn btn-small" id="emailAccessInfo">Send Access Details Securely</button>
+                        <button class="btn btn-secondary btn-small" onclick="window.emailAccessDetails()">Send Access Details Securely</button>
                     </div>
                 </div>
 
                 <div style="margin-top: 25px; background: #F0F9F7; padding: 15px; border-radius: 8px;">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px; flex-wrap: wrap;">
-                        <h5 style="color: #012E40; margin: 0;">What We Install:</h5>
-                        <button class="btn
+                    <div class="info-header">
+                        <h5>What We Install:</h5>
+                        <button class="btn-info" onclick="window.toggleGA4Info()">What is GA4?</button>
+                        <button class="btn-info" onclick="window.togglePixelInfo()">What is Meta Pixel?</button>
+                    </div>
+                    
+                    <!-- GA4 Explanation (hidden initially) -->
+                    <div id="ga4Info" class="info-box">
+                        <h6>Google Analytics 4 (GA4):</h6>
+                        <p>
+                            GA4 tracks how people find and use your website. It shows us which ads bring the most visitors, what pages they look at, and what actions they take (like calling your office or filling out forms). This helps us improve your ads to get better results. <strong>No personal health information is tracked.</strong>
+                        </p>
+                    </div>
+
+                    <!-- Meta Pixel Explanation (hidden initially) -->
+                    <div id="pixelInfo" class="info-box warning">
+                        <h6>Meta Pixel (Facebook/Instagram):</h6>
+                        <p>
+                            Meta Pixel tracks when people visit your website after seeing your Facebook or Instagram ads. It helps us find more people similar to your best customers and shows ads to people who visited your website but didn't book an appointment yet. <strong>No personal health information is tracked.</strong>
+                        </p>
+                    </div>
+
+                    <ul style="margin-left: 20px; color: #012E40; line-height: 1.6;">
+                        <li>✓ Google Analytics 4 (GA4) tracking code</li>
+                        <li>✓ Meta Pixel tracking code</li>
+                        <li>✓ Conversion tracking setup</li>
+                        <li>✓ Testing to ensure everything works</li>
+                    </ul>
+                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
+                        <strong>Timeline:</strong> Completed within 24-48 hours of receiving access.
+                    </p>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-complete" onclick="window.markStepComplete(4)">Mark Step 4 Complete</button>
+            </div>
+        </div>
+
+        <!-- Step 5: Creative Approval -->
+        <div class="step locked" id="step5">
+            <div class="step-header">
+                <div>
+                    <h2>Creative Approval</h2>
+                    <div class="step-note">Your Launch Bundle: 1 actor video, 1 animated video, 2 image ads.</div>
+                </div>
+                <div class="step-number">5</div>
+            </div>
+            <div class="step-content">
+                <div class="gallery-placeholder" id="galleryPlaceholder">
+                    <p>Creative previews will be shared via secure link</p>
+                    <p style="font-size: 0.9rem; color: #85C7B3; margin-top: 10px;">
+                        Links will be provided once creatives are ready for review
+                    </p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <button class="btn btn-secondary" onclick="window.approveCreatives()">
+                        🚀 Approve to Launch
+                    </button>
+                    <button class="btn btn-outline" onclick="window.requestRevisions()">
+                        Request Revisions
+                    </button>
+                </div>
+                
+                <!-- Revision Form (hidden) -->
+                <div id="revisionForm" style="display: none; background: #DFF5F3; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #85C7B3;">
+                    <h4 style="color: #012E40;">Request Revisions</h4>
+                    <div class="form-group">
+                        <label for="revisionNotes">Revision Notes</label>
+                        <textarea id="revisionNotes" rows="4" placeholder="Please describe the changes..."></textarea>
+                    </div>
+                    <button class="btn" onclick="window.submitRevisions()">Submit Revisions</button>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-complete" onclick="window.markStepComplete(5)">Mark Step 5 Complete</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="portal-footer">
+            <p>Drive Lead Media — We never process PHI. All analytics used solely for advertising performance.</p>
+            <div class="footer-links">
+                <span id="contactEmail">Nicolas@driveleadmedia.com</span>
+                <span>•</span>
+                <span id="contactPhone">(678) 650-6411</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Configuration -->
+    <script src="config.js"></script>
+    
+    <!-- Main Functions -->
+    <script src="functions.js"></script>
+</body>
+</html>
