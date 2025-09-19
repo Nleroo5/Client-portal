@@ -25,13 +25,21 @@
         }
     };
 
-    // Core Functions - FIREBASE VERSION
+    // Load state from Firebase
     async function loadState() {
         const urlParams = new URLSearchParams(window.location.search);
         const clientId = urlParams.get('c');
         
+        // Hide loading screen function
+        const hideLoading = () => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.display = 'none';
+            }
+        };
+        
         if (!clientId) {
-            document.body.innerHTML = '<div style="text-align:center; padding:50px; background:#EEF4D9; color:#012E40;"><h1>Invalid Access Link</h1><p>Please use the link provided by Drive Lead Media.</p></div>';
+            document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Invalid Access</h1><p style="font-size: 1.1rem;">Please use the link provided by Drive Lead Media.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
             return;
         }
         
@@ -39,15 +47,23 @@
             const doc = await db.collection('clients').doc(clientId).get();
             
             if (!doc.exists) {
-                document.body.innerHTML = '<div style="text-align:center; padding:50px; background:#EEF4D9; color:#012E40;"><h1>Portal Not Found</h1><p>Please contact Drive Lead Media for assistance.</p></div>';
+                document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Portal Not Found</h1><p style="font-size: 1.1rem;">Please contact Drive Lead Media for assistance.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
                 return;
             }
             
             const data = doc.data();
             
             if (!data.active) {
-                document.body.innerHTML = '<div style="text-align:center; padding:50px; background:#EEF4D9; color:#012E40;"><h1>Portal Inactive</h1><p>Please contact Drive Lead Media.</p></div>';
+                document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Portal Inactive</h1><p style="font-size: 1.1rem;">This portal is currently inactive. Please contact Drive Lead Media.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
                 return;
+            }
+            
+            // Load client name if available
+            if (data.clientName) {
+                const hero = document.querySelector('.hero h1');
+                if (hero) {
+                    hero.textContent = `Welcome, ${data.clientName}!`;
+                }
             }
             
             // Load progress
@@ -57,8 +73,9 @@
             portalState['4'] = data.step4Complete || false;
             portalState['5'] = data.step5Complete || false;
             
-            // Load custom links
+            // Load custom DocuSign links
             if (data.dpaLink) {
+                portalState.docuSignLinks.dpa = data.dpaLink;
                 const dpaBtn = document.getElementById('dpaBtn');
                 if (dpaBtn) dpaBtn.href = data.dpaLink;
             }
@@ -92,27 +109,32 @@
                 portalState.stripeLinks.service12.upfront = data.stripe12Upfront;
             }
             
+            // Load Google Drive link
             if (data.googleDriveLink) {
+                portalState.googleDriveLink = data.googleDriveLink;
                 const uploadBtn = document.getElementById('uploadBtn');
                 if (uploadBtn) uploadBtn.href = data.googleDriveLink;
             }
             
+            // Load creative link
             if (data.creativeLink) {
+                portalState.creativeLink = data.creativeLink;
                 updateCreativeGallery(data.creativeLink);
             }
             
             // Store client ID for saving
             window.currentClientId = clientId;
             
-            // Initialize after loading
-            updateServiceButton();
+            // Hide loading screen after successful load
+            hideLoading();
             
         } catch (error) {
             console.error('Error loading:', error);
-            document.body.innerHTML = '<div style="text-align:center; padding:50px; background:#EEF4D9; color:#012E40;"><h1>Loading Error</h1><p>Please refresh the page or contact support.</p></div>';
+            document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Loading Error</h1><p style="font-size: 1.1rem;">Please refresh the page or contact support.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
         }
     }
 
+    // Save state to Firebase
     async function saveState() {
         if (!window.currentClientId) return;
         
@@ -122,13 +144,15 @@
                 step2Complete: portalState['2'],
                 step3Complete: portalState['3'],
                 step4Complete: portalState['4'],
-                step5Complete: portalState['5']
+                step5Complete: portalState['5'],
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
             });
         } catch (error) {
             console.error('Error saving:', error);
         }
     }
 
+    // Update Progress Bar
     function updateProgressBar() {
         const completedSteps = Object.keys(portalState)
             .filter(key => !isNaN(key) && portalState[key]).length;
@@ -146,6 +170,7 @@
         return { completedSteps, percentage };
     }
 
+    // Update Floating Sidebar
     function updateFloatingSidebar() {
         const { completedSteps, percentage } = updateProgressBar();
         
@@ -187,6 +212,7 @@
         }
     }
 
+    // Update Step States
     function updateStepStates() {
         for (let i = 1; i <= 5; i++) {
             const step = document.getElementById(`step${i}`);
@@ -208,6 +234,7 @@
         updateFloatingSidebar();
     }
 
+    // Mark Step Complete
     function markStepComplete(stepNum) {
         portalState[stepNum.toString()] = true;
         saveState();
@@ -248,43 +275,23 @@
         }
     }
 
-    function updateCreativeGallery(link) {
-        const gallery = document.getElementById('galleryPlaceholder');
-        if (link) {
-            gallery.innerHTML = `
-                <p style="color: #012E40; margin-bottom: 15px; font-weight: 600;">
-                    🎨 Your Creative Previews Are Ready!
-                </p>
-                <a href="${link}" class="btn" target="_blank" rel="noopener">
-                    View Creative Previews
-                </a>
-            `;
-        } else {
-            gallery.innerHTML = `
-                <p>Creative previews will be shared via secure link</p>
-                <p style="font-size: 0.9rem; color: #85C7B3; margin-top: 10px;">
-                    Links will be provided once creatives are ready for review
-                </p>
-            `;
-        }
-    }
-
-    // Service Agreement and Payment Functions
+    // Update Service Button
     function updateServiceButton() {
         const service12 = document.getElementById('service12');
         const serviceBtn = document.getElementById('serviceBtn');
         if (service12 && serviceBtn) {
             if (service12.checked) {
                 serviceBtn.textContent = 'Sign Service Agreement (12-month)';
-                serviceBtn.href = (portalState.docuSignLinks?.service12) || DLM_CONFIG.docuSign.service12;
+                serviceBtn.href = portalState.docuSignLinks?.service12 || DLM_CONFIG.docuSign.service12;
             } else {
                 serviceBtn.textContent = 'Sign Service Agreement (6-month)';
-                serviceBtn.href = (portalState.docuSignLinks?.service6) || DLM_CONFIG.docuSign.service6;
+                serviceBtn.href = portalState.docuSignLinks?.service6 || DLM_CONFIG.docuSign.service6;
             }
             updatePaymentOptions();
         }
     }
 
+    // Update Payment Options
     function updatePaymentOptions() {
         const serviceTerm = document.getElementById('service12')?.checked ? 'service12' : 'service6';
         const termText = serviceTerm === 'service12' ? '12-Month' : '6-Month';
@@ -293,6 +300,7 @@
         updatePaymentButton();
     }
 
+    // Update Payment Button
     function updatePaymentButton() {
         const serviceTerm = document.getElementById('service12')?.checked ? 'service12' : 'service6';
         const paymentType = document.getElementById('paymentUpfront')?.checked ? 'upfront' : 'monthly';
@@ -314,26 +322,58 @@
         }
     }
 
-    // Step 3 Functions
+    // Update Creative Gallery
+    function updateCreativeGallery(link) {
+        const gallery = document.getElementById('galleryPlaceholder');
+        if (gallery) {
+            if (link) {
+                gallery.innerHTML = `
+                    <p style="color: #012E40; margin-bottom: 15px; font-weight: 600;">
+                        🎨 Your Creative Previews Are Ready!
+                    </p>
+                    <a href="${link}" class="btn" target="_blank" rel="noopener">
+                        View Creative Previews
+                    </a>
+                `;
+            } else {
+                gallery.innerHTML = `
+                    <p>Creative previews will be shared via secure link</p>
+                    <p style="font-size: 0.9rem; color: #85C7B3; margin-top: 10px;">
+                        Links will be provided once creatives are ready for review
+                    </p>
+                `;
+            }
+        }
+    }
+
+    // Toggle Brand Kit Info
     function toggleBrandKitInfo() {
         const infoBox = document.getElementById('brandKitInfo');
-        const isVisible = infoBox.style.display === 'block';
-        infoBox.style.display = isVisible ? 'none' : 'block';
+        if (infoBox) {
+            const isVisible = infoBox.style.display === 'block';
+            infoBox.style.display = isVisible ? 'none' : 'block';
+        }
     }
 
-    // Step 4 Functions
+    // Toggle GA4 Info
     function toggleGA4Info() {
         const infoBox = document.getElementById('ga4Info');
-        const isVisible = infoBox.style.display === 'block';
-        infoBox.style.display = isVisible ? 'none' : 'block';
+        if (infoBox) {
+            const isVisible = infoBox.style.display === 'block';
+            infoBox.style.display = isVisible ? 'none' : 'block';
+        }
     }
 
+    // Toggle Pixel Info
     function togglePixelInfo() {
         const infoBox = document.getElementById('pixelInfo');
-        const isVisible = infoBox.style.display === 'block';
-        infoBox.style.display = isVisible ? 'none' : 'block';
+        if (infoBox) {
+            const isVisible = infoBox.style.display === 'block';
+            infoBox.style.display = isVisible ? 'none' : 'block';
+        }
     }
 
+    // Email Admin Details
     function emailAdminDetails() {
         const adminName = document.getElementById('adminName').value;
         const adminEmail = document.getElementById('adminEmail').value;
@@ -358,6 +398,7 @@
         window.open(`mailto:${DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
     }
 
+    // Email Access Details
     function emailAccessDetails() {
         const websiteUrl = document.getElementById('websiteUrl').value;
         const loginUrl = document.getElementById('loginUrl').value;
@@ -384,7 +425,7 @@
         window.open(`mailto:${DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
     }
 
-    // Step 5 Functions
+    // Approve Creatives
     function approveCreatives() {
         if (confirm('Approve creatives for launch?')) {
             markStepComplete(5);
@@ -392,11 +433,15 @@
         }
     }
 
+    // Request Revisions
     function requestRevisions() {
         const form = document.getElementById('revisionForm');
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        if (form) {
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
     }
 
+    // Submit Revisions
     function submitRevisions() {
         const notes = document.getElementById('revisionNotes').value;
         if (!notes) {
@@ -408,34 +453,24 @@
     }
 
     // Initialize on DOM ready
-    document.addEventListener('DOMContentLoaded', function() {
-        loadState();
+    document.addEventListener('DOMContentLoaded', async function() {
+        await loadState();
         updateStepStates();
         
-        // Set DocuSign links (use custom if available, otherwise use default)
+        // Set default DocuSign DPA link if no custom link
         const dpaBtn = document.getElementById('dpaBtn');
-        
-        if (dpaBtn) {
-            dpaBtn.href = (portalState.docuSignLinks?.dpa) || DLM_CONFIG.docuSign.dpa;
+        if (dpaBtn && !portalState.docuSignLinks?.dpa) {
+            dpaBtn.href = DLM_CONFIG.docuSign.dpa;
         }
         
-        // Set contact info
-        document.getElementById('contactEmail').textContent = DLM_CONFIG.support.opsEmail;
-        document.getElementById('contactPhone').textContent = DLM_CONFIG.support.opsPhone;
-        
-        // Initialize Service Agreement and payment
+        // Initialize Service Agreement
         updateServiceButton();
         
-        // Load creative gallery
-        if (portalState.creativeLink) {
-            updateCreativeGallery(portalState.creativeLink);
-        }
-        
-        // Set Google Drive link if custom one exists
-        if (portalState.googleDriveLink) {
-            const uploadBtn = document.getElementById('uploadBtn');
-            if (uploadBtn) uploadBtn.href = portalState.googleDriveLink;
-        }
+        // Set contact info
+        const contactEmail = document.getElementById('contactEmail');
+        const contactPhone = document.getElementById('contactPhone');
+        if (contactEmail) contactEmail.textContent = DLM_CONFIG.support.opsEmail;
+        if (contactPhone) contactPhone.textContent = DLM_CONFIG.support.opsPhone;
         
         // Event listeners
         document.querySelectorAll('input[name="serviceTerm"]').forEach(radio => {
@@ -449,10 +484,10 @@
         // Step 4 website access event listeners
         document.querySelectorAll('input[name="websiteAccess"]').forEach(radio => {
             radio.addEventListener('change', function() {
-                document.getElementById('connectAdminForm').style.display = 
-                    this.value === 'connect' ? 'block' : 'none';
-                document.getElementById('tempAccessForm').style.display = 
-                    this.value === 'temporary' ? 'block' : 'none';
+                const connectForm = document.getElementById('connectAdminForm');
+                const tempForm = document.getElementById('tempAccessForm');
+                if (connectForm) connectForm.style.display = this.value === 'connect' ? 'block' : 'none';
+                if (tempForm) tempForm.style.display = this.value === 'temporary' ? 'block' : 'none';
             });
         });
         
@@ -475,10 +510,10 @@
             }
         });
         
-        console.log('✓ Portal initialized successfully');
+        console.log('✓ Portal initialized successfully with Firebase');
     });
 
-    // Expose all functions globally
+    // Expose functions globally
     window.markStepComplete = markStepComplete;
     window.toggleBrandKitInfo = toggleBrandKitInfo;
     window.toggleGA4Info = toggleGA4Info;
