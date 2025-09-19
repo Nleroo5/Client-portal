@@ -462,4 +462,49 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add sidebar hover effects
         const sidebar = document.getElementById('floatingSidebar');
         if (sidebar) {
-            sidebar.addEventListener('mouseenter', ()
+        // Add sidebar hover effects
+        const sidebar = document.getElementById('floatingSidebar');
+        if (sidebar) {
+            sidebar.addEventListener('mouseenter', () => {
+                sidebar.classList.add('expanded');
+            });
+            
+            sidebar.addEventListener('mouseleave', () => {
+                sidebar.classList.remove('expanded');
+            });
+        }
+    }
+
+    // Setup all event listeners
+    window.setupEventListeners();
+
+    console.log('✅ Portal initialization complete!');
+    console.log('🎯 Progress bar should now be working...');
+    
+    // FINAL DEBUG: Log current progress state
+    setTimeout(() => {
+        const finalProgressResults = window.updateProgressBar();
+        console.log('🔍 Final progress check:', finalProgressResults);
+        
+        // Check if progress bar elements exist and have values
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const progressPercent = document.getElementById('progressPercent');
+        
+        console.log('🎛️ Progress bar elements:', {
+            progressFill: progressFill ? progressFill.style.width : 'NOT FOUND',
+            progressText: progressText ? progressText.textContent : 'NOT FOUND',
+            progressPercent: progressPercent ? progressPercent.textContent : 'NOT FOUND'
+        });
+    }, 100);
+});
+
+// Close admin panel when clicking outside
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('adminPanel');
+    const toggle = document.getElementById('adminToggle');
+
+    if (panel && toggle && !panel.contains(e.target) && !toggle.contains(e.target)) {
+        panel.style.display = 'none';
+    }
+});
