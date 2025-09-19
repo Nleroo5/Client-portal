@@ -1,11 +1,11 @@
 // Firebase Configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyC6nh1sDnue09mvJuFzBb7mGzcMtoBRZEQ",
+    apiKey: "AIzaSyC6nhisBnue09mvJuFzBb7m6zcMtqBRZEQ",
     authDomain: "client-portal-2fa80.firebaseapp.com",
     projectId: "client-portal-2fa80",
     storageBucket: "client-portal-2fa80.firebasestorage.app",
-    messagingSenderId: "417272730860",
-    appId: "1:417272730860:web:9530a097347fbbf72f5771"
+    messagingSenderId: "417272730660",
+    appId: "1:417272730660:web:9530a097347fbbf72f5771"
 };
 
 // Initialize Firebase
@@ -21,13 +21,16 @@ const DLM_CONFIG = {
     },
     stripeLinks: {
         service6: {
-            monthly: "https://stripe-6-month-monthly-payment-link",
-            upfront: "https://stripe-6-month-upfront-5percent-discount-link"
+            monthly: "https://buy.stripe.com/test_6month_monthly",
+            upfront: "https://buy.stripe.com/test_6month_upfront"
         },
         service12: {
-            monthly: "https://stripe-12-month-monthly-payment-link",
-            upfront: "https://stripe-12-month-upfront-5percent-discount-link"
+            monthly: "https://buy.stripe.com/test_12month_monthly",
+            upfront: "https://buy.stripe.com/test_12month_upfront"
         }
+    },
+    googleDrive: {
+        defaultUploadLink: "https://drive.google.com/drive/folders/1jds7K6SdV6G_SwTyZZjxqjuftqIHiaPY?usp=sharing"
     },
     support: {
         opsEmail: "Nicolas@driveleadmedia.com",
