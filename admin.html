@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Drive Lead Media</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Young+Serif:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #012E40;
+            background: linear-gradient(135deg, #F0F9F7 0%, #DFF5F3 100%);
+            min-height: 100vh;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+            color: #EEF4D9;
+            padding: 30px 20px;
+            box-shadow: 0 4px 20px rgba(1, 46, 64, 0.2);
+        }
+        
+        .admin-header h1 {
+            font-family: 'Young Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .admin-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .admin-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(5, 144, 140, 0.1);
+            border: 1px solid #85C7B3;
+        }
+        
+        .admin-section h2 {
+            color: #05908C;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #85C7B3;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #012E40;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #85C7B3;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #F2A922;
+            box-shadow: 0 0 0 3px rgba(242, 169, 34, 0.2);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background: #05908C;
+            color: #EEF4D9;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            background: #012E40;
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background: #F2A922;
+            color: #012E40;
+        }
+        
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .client-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .client-table th {
+            background: #05908C;
+            color: #EEF4D9;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .client-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .client-table tr:hover {
+            background: #F0F9F7;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        
+        .status-inactive {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+        
+        .progress-mini {
+            display: flex;
+            gap: 4px;
+            margin-top: 5px;
+        }
+        
+        .progress-step {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .progress-step.complete {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .portal-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #05908C;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .portal-link:hover {
+            text-decoration: underline;
+        }
+        
+        .copy-btn {
+            padding: 4px 8px;
+            background: #85C7B3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .copy-btn:hover {
+            background: #05908C;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+        }
+        
+        .alert-error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+        
+        .link-section {
+            background: #F0F9F7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .link-section h3 {
+            color: #05908C;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .client-table {
+                font-size: 0.9rem;
+            }
+            
+            .client-table th,
+            .client-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <h1>Admin Dashboard</h1>
+        <p>Manage Client Portals - Drive Lead Media</p>
+    </div>
+    
+    <div class="admin-container">
+        <!-- Alert Messages -->
+        <div id="alertMessage" style="display: none;"></div>
+        
+        <!-- Create New Client -->
+        <div class="admin-section">
+            <h2>Create New Client Portal</h2>
+            <form id="createClientForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientName">Client/Business Name *</label>
+                        <input type="text" id="clientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientEmail">Client Email</label>
+                        <input type="email" id="clientEmail">
+                    </div>
+                </div>
+                
+                <div class="link-section">
+                    <h3>DocuSign Links (Optional - Leave blank for defaults)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dpaLink">Custom DPA Link</label>
+                            <input type="url" id="dpaLink" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="service6Link">Custom 6-Month Service Agreement</label>
+                            <input type="url" id="service6Link" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="service12Link">Custom 12-Month Service Agreement</label>
+                        <input type="url" id="service12Link" placeholder="Leave blank for default">
+                    </div>
+                </div>
+                
+                <div class="link-section">
+                    <h3>Stripe Payment Links (Optional)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stripe6Monthly">6-Month Monthly Payment</label>
+                            <input type="url" id="stripe6Monthly" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="stripe6Upfront">6-Month Upfront Payment</label>
+                            <input type="url" id="stripe6Upfront" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stripe12Monthly">12-Month Monthly Payment</label>
+                            <input type="url" id="stripe12Monthly" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="stripe12Upfront">12-Month Upfront Payment</label>
+                            <input type="url" id="stripe12Upfront" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="link-section">
+                    <h3>Other Links (Optional)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="googleDriveLink">Google Drive Upload Link</label>
+                            <input type="url" id="googleDriveLink" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="creativeLink">Creative Preview Link</label>
+                            <input type="url" id="creativeLink" placeholder="Add later when creatives are ready">
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Create Client Portal</button>
+            </form>
+        </div>
+        
+        <!-- Existing Clients -->
+        <div class="admin-section">
+            <h2>Existing Clients</h2>
+            <table class="client-table">
+                <thead>
+                    <tr>
+                        <th>Client Name</th>
+                        <th>Status</th>
+                        <th>Progress</th>
+                        <th>Portal Link</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="clientsTableBody">
+                    <!-- Clients will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6nhisBnue09mvJuFzBb7m6zcMtqBRZEQ",
+            authDomain: "client-portal-2fa80.firebaseapp.com",
+            projectId: "client-portal-2fa80",
+            storageBucket: "client-portal-2fa80.firebasestorage.app",
+            messagingSenderId: "417272730660",
+            appId: "1:417272730660:web:9530a097347fbbf72f5771"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        // Your portal URL (update this after deploying to Vercel)
+        const PORTAL_BASE_URL = 'https://your-portal.vercel.app';
+        
+        // Show alert message
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.getElementById('alertMessage');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Generate unique client ID
+        function generateClientId() {
+            return 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Create new client
+        document.getElementById('createClientForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const clientId = generateClientId();
+            const clientData = {
+                clientId: clientId,
+                clientName: document.getElementById('clientName').value,
+                clientEmail: document.getElementById('clientEmail').value || null,
+                active: true,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                
+                // Progress tracking
+                step1Complete: false,
+                step2Complete: false,
+                step3Complete: false,
+                step4Complete: false,
+                step5Complete: false,
+                
+                // Custom links (only save if provided)
+                dpaLink: document.getElementById('dpaLink').value || null,
+                service6Link: document.getElementById('service6Link').value || null,
+                service12Link: document.getElementById('service12Link').value || null,
+                
+                // Stripe links
+                stripe6Monthly: document.getElementById('stripe6Monthly').value || null,
+                stripe6Upfront: document.getElementById('stripe6Upfront').value || null,
+                stripe12Monthly: document.getElementById('stripe12Monthly').value || null,
+                stripe12Upfront: document.getElementById('stripe12Upfront').value || null,
+                
+                // Other links
+                googleDriveLink: document.getElementById('googleDriveLink').value || null,
+                creativeLink: document.getElementById('creativeLink').value || null
+            };
+            
+            try {
+                await db.collection('clients').doc(clientId).set(clientData);
+                showAlert(`Client portal created successfully! Portal link: ${PORTAL_BASE_URL}?c=${clientId}`);
+                document.getElementById('createClientForm').reset();
+                loadClients();
+            } catch (error) {
+                console.error('Error creating client:', error);
+                showAlert('Error creating client portal. Please try again.', 'error');
+            }
+        });
+        
+        // Load existing clients
+        async function loadClients() {
+            try {
+                const snapshot = await db.collection('clients').orderBy('createdAt', 'desc').get();
+                const tbody = document.getElementById('clientsTableBody');
+                tbody.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const portalLink = `${PORTAL_BASE_URL}?c=${data.clientId}`;
+                    
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${data.clientName}</td>
+                        <td>
+                            <span class="status-badge status-${data.active ? 'active' : 'inactive'}">
+                                ${data.active ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="progress-mini">
+                                <div class="progress-step ${data.step1Complete ? 'complete' : ''}">1</div>
+                                <div class="progress-step ${data.step2Complete ? 'complete' : ''}">2</div>
+                                <div class="progress-step ${data.step3Complete ? 'complete' : ''}">3</div>
+                                <div class="progress-step ${data.step4Complete ? 'complete' : ''}">4</div>
+                                <div class="progress-step ${data.step5Complete ? 'complete' : ''}">5</div>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" value="${portalLink}" id="link-${data.clientId}" readonly style="width: 200px; padding: 4px; margin-right: 5px;">
+                            <button class="copy-btn" onclick="copyLink('${data.clientId}')">Copy</button>
+                        </td>
+                        <td>
+                            <button class="btn btn-success" onclick="toggleStatus('${data.clientId}', ${!data.active})">
+                                ${data.active ? 'Deactivate' : 'Activate'}
+                            </button>
+                            <button class="btn" onclick="editClient('${data.clientId}')">Edit</button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading clients:', error);
+                showAlert('Error loading clients', 'error');
+            }
+        }
+        
+        // Copy portal link
+        function copyLink(clientId) {
+            const input = document.getElementById(`link-${clientId}`);
+            input.select();
+            document.execCommand('copy');
+            showAlert('Portal link copied to clipboard!');
+        }
+        
+        // Toggle client status
+        async function toggleStatus(clientId, activate) {
+            try {
+                await db.collection('clients').doc(clientId).update({
+                    active: activate,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showAlert(`Client ${activate ? 'activated' : 'deactivated'} successfully`);
+                loadClients();
+            } catch (error) {
+                console.error('Error updating status:', error);
+                showAlert('Error updating client status', 'error');
+            }
+        }
+        
+        // Edit client (placeholder - you can expand this)
+        function editClient(clientId) {
+            alert(`Edit functionality coming soon for client: ${clientId}`);
+        }
+        
+        // Load clients on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadClients();
+        });
+    </script>
+</body>
+</html>
