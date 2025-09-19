@@ -1,526 +1,698 @@
-(function() {
-    // Portal State
-    let portalState = {
-        "1": false,
-        "2": false,
-        "3": false,
-        "4": false,
-        "5": false,
-        "creativeLink": null,
-        "googleDriveLink": null,
-        "docuSignLinks": {
-            "dpa": null,
-            "service6": null,
-            "service12": null
-        },
-        "stripeLinks": {
-            "service6": {
-                "monthly": null,
-                "upfront": null
-            },
-            "service12": {
-                "monthly": null,
-                "upfront": null
-            }
-        }
-    };
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    // Load state from Firebase
-    async function loadState() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const clientId = urlParams.get('c');
-        
-        // Hide loading screen function
-        const hideLoading = () => {
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen) {
-                loadingScreen.style.display = 'none';
-            }
-        };
-        
-        if (!clientId) {
-            document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Invalid Access</h1><p style="font-size: 1.1rem;">Please use the link provided by Drive Lead Media.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
-            return;
-        }
-        
-        try {
-            const doc = await db.collection('clients').doc(clientId).get();
-            
-            if (!doc.exists) {
-                document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Portal Not Found</h1><p style="font-size: 1.1rem;">Please contact Drive Lead Media for assistance.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
-                return;
-            }
-            
-            const data = doc.data();
-            
-            if (!data.active) {
-                document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Portal Inactive</h1><p style="font-size: 1.1rem;">This portal is currently inactive. Please contact Drive Lead Media.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
-                return;
-            }
-            
-            // Load client name if available
-            if (data.clientName) {
-                const hero = document.querySelector('.hero h1');
-                if (hero) {
-                    hero.textContent = `Welcome, ${data.clientName}!`;
-                }
-            }
-            
-            // Load progress
-            portalState['1'] = data.step1Complete || false;
-            portalState['2'] = data.step2Complete || false;
-            portalState['3'] = data.step3Complete || false;
-            portalState['4'] = data.step4Complete || false;
-            portalState['5'] = data.step5Complete || false;
-            
-            // Load custom DocuSign links
-            if (data.dpaLink) {
-                portalState.docuSignLinks.dpa = data.dpaLink;
-                const dpaBtn = document.getElementById('dpaBtn');
-                if (dpaBtn) dpaBtn.href = data.dpaLink;
-            }
-            
-            if (data.service6Link) {
-                portalState.docuSignLinks.service6 = data.service6Link;
-            }
-            
-            if (data.service12Link) {
-                portalState.docuSignLinks.service12 = data.service12Link;
-            }
-            
-            // Load Stripe links
-            if (data.stripe6Monthly) {
-                if (!portalState.stripeLinks.service6) portalState.stripeLinks.service6 = {};
-                portalState.stripeLinks.service6.monthly = data.stripe6Monthly;
-            }
-            
-            if (data.stripe6Upfront) {
-                if (!portalState.stripeLinks.service6) portalState.stripeLinks.service6 = {};
-                portalState.stripeLinks.service6.upfront = data.stripe6Upfront;
-            }
-            
-            if (data.stripe12Monthly) {
-                if (!portalState.stripeLinks.service12) portalState.stripeLinks.service12 = {};
-                portalState.stripeLinks.service12.monthly = data.stripe12Monthly;
-            }
-            
-            if (data.stripe12Upfront) {
-                if (!portalState.stripeLinks.service12) portalState.stripeLinks.service12 = {};
-                portalState.stripeLinks.service12.upfront = data.stripe12Upfront;
-            }
-            
-            // Load Google Drive link
-            if (data.googleDriveLink) {
-                portalState.googleDriveLink = data.googleDriveLink;
-                const uploadBtn = document.getElementById('uploadBtn');
-                if (uploadBtn) uploadBtn.href = data.googleDriveLink;
-            }
-            
-            // Load creative link
-            if (data.creativeLink) {
-                portalState.creativeLink = data.creativeLink;
-                updateCreativeGallery(data.creativeLink);
-            }
-            
-            // Store client ID for saving
-            window.currentClientId = clientId;
-            
-            // Hide loading screen after successful load
-            hideLoading();
-            
-        } catch (error) {
-            console.error('Error loading:', error);
-            document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Loading Error</h1><p style="font-size: 1.1rem;">Please refresh the page or contact support.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
-        }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.6;
+    color: #EEF4D9;
+    background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+    min-height: 100vh;
+    position: relative;
+}
+
+.portal-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.hero {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px 20px;
+    background: linear-gradient(135deg, #FF6B35 0%, #F7931E 25%, #FFD23F 50%, #06FFA5 75%, #4D9DE0 100%);
+    background-size: 300% 300%;
+    animation: colorWave 8s ease-in-out infinite;
+    color: #012E40;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(5, 144, 140, 0.3);
+}
+
+@keyframes colorWave {
+    0%, 100% { background-position: 0% 50%; }
+    33% { background-position: 50% 0%; }
+    66% { background-position: 100% 50%; }
+}
+
+.hero h1 {
+    font-family: 'Young Serif', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #012E40;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 25px;
+    color: #012E40;
+}
+
+.progress-container {
+    margin-top: 25px;
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(1, 46, 64, 0.3);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    animation: progressBarGlow 3s ease-in-out infinite;
+}
+
+@keyframes progressBarGlow {
+    0%, 100% { 
+        box-shadow: 
+            inset 0 2px 4px rgba(0, 0, 0, 0.1),
+            0 0 10px rgba(242, 169, 34, 0.2);
     }
-
-    // Save state to Firebase
-    async function saveState() {
-        if (!window.currentClientId) return;
-        
-        try {
-            await db.collection('clients').doc(window.currentClientId).update({
-                step1Complete: portalState['1'],
-                step2Complete: portalState['2'],
-                step3Complete: portalState['3'],
-                step4Complete: portalState['4'],
-                step5Complete: portalState['5'],
-                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        } catch (error) {
-            console.error('Error saving:', error);
-        }
+    50% { 
+        box-shadow: 
+            inset 0 2px 4px rgba(0, 0, 0, 0.1),
+            0 0 20px rgba(242, 169, 34, 0.6),
+            0 0 30px rgba(242, 169, 34, 0.3);
     }
+}
 
-    // Update Progress Bar
-    function updateProgressBar() {
-        const completedSteps = Object.keys(portalState)
-            .filter(key => !isNaN(key) && portalState[key]).length;
-        const totalSteps = 5;
-        const percentage = Math.round((completedSteps / totalSteps) * 100);
-        
-        const fill = document.getElementById('progressFill');
-        const text = document.getElementById('progressText');
-        const percent = document.getElementById('progressPercent');
-        
-        if (fill) fill.style.width = percentage + '%';
-        if (text) text.textContent = `${completedSteps} of ${totalSteps} steps completed`;
-        if (percent) percent.textContent = percentage + '%';
-        
-        return { completedSteps, percentage };
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #F2A922 0%, #85C7B3 100%);
+    border-radius: 20px;
+    transition: width 0.6s ease;
+    box-shadow: 
+        0 2px 8px rgba(242, 169, 34, 0.3),
+        0 0 20px rgba(242, 169, 34, 0.4);
+    animation: progressPulse 2s ease-in-out infinite;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: progressShimmer 2.5s ease-in-out infinite;
+}
+
+@keyframes progressPulse {
+    0%, 100% { 
+        box-shadow: 
+            0 2px 8px rgba(242, 169, 34, 0.3),
+            0 0 20px rgba(242, 169, 34, 0.4);
     }
-
-    // Update Floating Sidebar
-    function updateFloatingSidebar() {
-        const { completedSteps, percentage } = updateProgressBar();
-        
-        // Update circle
-        const circle = document.getElementById('sidebarProgressCircle');
-        if (circle) {
-            const offset = 126 - (percentage / 100 * 126);
-            circle.style.strokeDashoffset = offset;
-        }
-        
-        // Update percentage text
-        const percentText = document.getElementById('sidebarProgressPercent');
-        if (percentText) percentText.textContent = percentage + '%';
-        
-        // Update dynamic message
-        const msg = document.getElementById('sidebarProgressMessage');
-        if (msg) {
-            if (percentage === 0) msg.textContent = "Let's get started!";
-            else if (percentage === 20) msg.textContent = "Great beginning!";
-            else if (percentage === 40) msg.textContent = "Making progress";
-            else if (percentage === 60) msg.textContent = "Over halfway!";
-            else if (percentage === 80) msg.textContent = "Almost there!";
-            else if (percentage === 100) msg.textContent = "All complete! 🎉";
-        }
-        
-        // Update step bubbles
-        for (let i = 1; i <= 5; i++) {
-            const bubble = document.getElementById(`sidebarBubble${i}`);
-            if (bubble) {
-                bubble.className = 'sidebar-step-bubble upcoming';
-                if (portalState[i.toString()]) {
-                    bubble.className = 'sidebar-step-bubble completed';
-                } else if (i === 1 || portalState[(i - 1).toString()]) {
-                    if (!portalState[i.toString()]) {
-                        bubble.className = 'sidebar-step-bubble current';
-                    }
-                }
-            }
-        }
+    50% { 
+        box-shadow: 
+            0 2px 15px rgba(242, 169, 34, 0.8),
+            0 0 40px rgba(242, 169, 34, 1),
+            0 0 60px rgba(242, 169, 34, 0.6);
     }
+}
 
-    // Update Step States
-    function updateStepStates() {
-        for (let i = 1; i <= 5; i++) {
-            const step = document.getElementById(`step${i}`);
-            if (step) {
-                const isCompleted = portalState[i.toString()];
-                const isUnlocked = i === 1 || portalState[(i - 1).toString()];
-                
-                step.classList.toggle('completed', isCompleted);
-                step.classList.toggle('locked', !isUnlocked);
-                
-                const btn = step.querySelector('.btn-complete');
-                if (btn) {
-                    btn.textContent = isCompleted ? `✓ Step ${i} Completed` : `Mark Step ${i} Complete`;
-                    if (isCompleted) btn.setAttribute('disabled', 'true');
-                    else btn.removeAttribute('disabled');
-                }
-            }
-        }
-        updateFloatingSidebar();
+@keyframes progressShimmer {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(0%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #012E40;
+    font-weight: 600;
+}
+
+#progressPercent {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #000000;
+}
+
+/* Floating Sidebar */
+.floating-progress-sidebar {
+    position: fixed !important;
+    left: 30px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: rgba(1, 46, 64, 0.95) !important;
+    backdrop-filter: blur(12px);
+    border: 2px solid rgba(133, 199, 179, 0.3) !important;
+    border-radius: 20px !important;
+    padding: 25px 15px !important;
+    z-index: 10000 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+    display: block !important;
+}
+
+.sidebar-progress-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.progress-percentage-circle {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 10px;
+    position: relative;
+}
+
+.progress-percentage-circle svg {
+    transform: rotate(-90deg);
+    width: 50px;
+    height: 50px;
+}
+
+.progress-percentage-circle .background {
+    fill: none;
+    stroke: rgba(133, 199, 179, 0.2);
+    stroke-width: 4;
+}
+
+.progress-percentage-circle .progress {
+    fill: none;
+    stroke: #F2A922;
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease;
+}
+
+.progress-percentage-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    font-weight: 700;
+    color: #F2A922;
+}
+
+.progress-message {
+    color: #85C7B3;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 20px;
+    min-height: 20px;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-steps-track {
+    position: relative;
+    padding: 10px 0;
+}
+
+.sidebar-step-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-step-bubble {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-step-bubble.completed {
+    background: linear-gradient(135deg, #F2A922 0%, #f2b854 100%);
+    color: #012E40;
+    box-shadow: 0 4px 12px rgba(242, 169, 34, 0.4);
+}
+
+.sidebar-step-bubble.current {
+    background: linear-gradient(135deg, #05908C 0%, #85C7B3 100%);
+    color: #EEF4D9;
+    box-shadow: 0 4px 12px rgba(5, 144, 140, 0.4);
+    animation: pulse 2s infinite;
+}
+
+.sidebar-step-bubble.upcoming {
+    background: rgba(133, 199, 179, 0.1);
+    border: 2px solid rgba(133, 199, 179, 0.5);
+    color: rgba(133, 199, 179, 0.8);
+}
+
+.sidebar-step-info {
+    margin-left: 15px;
+    opacity: 1 !important;
+    visibility: visible !important;
+    white-space: nowrap;
+}
+
+.sidebar-step-label {
+    color: #EEF4D9;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Steps */
+.step {
+    background: #EEF4D9;
+    border-radius: 14px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(5, 144, 140, 0.2);
+    border: 2px solid #85C7B3;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.step.locked {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.step.completed {
+    border-color: #22c55e;
+    background: linear-gradient(135deg, #FBE9D1 0%, rgba(34, 197, 94, 0.05) 100%);
+    box-shadow: 0 0 25px rgba(34, 197, 94, 0.4), 0 4px 20px rgba(34, 197, 94, 0.2);
+    animation: completeGlow 0.8s ease-out;
+}
+
+@keyframes completeGlow {
+    0% {
+        box-shadow: 0 0 0 rgba(34, 197, 94, 0);
+        border-color: #F2A922;
     }
-
-    // Mark Step Complete
-    function markStepComplete(stepNum) {
-        portalState[stepNum.toString()] = true;
-        saveState();
-        
-        // Add completing animation to button
-        const step = document.getElementById(`step${stepNum}`);
-        const btn = step?.querySelector('.btn-complete');
-        if (btn) {
-            btn.classList.add('completing');
-            setTimeout(() => btn.classList.remove('completing'), 600);
-        }
-        
-        // Add green flash effect to step
-        if (step) {
-            step.style.transition = 'none';
-            step.style.boxShadow = '0 0 0 rgba(34, 197, 94, 0)';
-            setTimeout(() => {
-                step.style.transition = 'all 0.8s ease';
-                step.style.boxShadow = '0 0 50px rgba(34, 197, 94, 0.8)';
-                setTimeout(() => {
-                    updateStepStates();
-                }, 200);
-            }, 10);
-        } else {
-            updateStepStates();
-        }
-        
-        // Check if all complete
-        const allComplete = [1,2,3,4,5].every(n => portalState[n.toString()]);
-        if (allComplete) {
-            const successMsg = document.getElementById('successMessage');
-            if (successMsg) {
-                setTimeout(() => {
-                    successMsg.style.display = 'block';
-                    successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 1000);
-            }
-        }
+    50% {
+        box-shadow: 0 0 40px rgba(34, 197, 94, 0.8), 0 0 60px rgba(34, 197, 94, 0.4);
+        border-color: #10b981;
     }
-
-    // Update Service Button
-    function updateServiceButton() {
-        const service12 = document.getElementById('service12');
-        const serviceBtn = document.getElementById('serviceBtn');
-        if (service12 && serviceBtn) {
-            if (service12.checked) {
-                serviceBtn.textContent = 'Sign Service Agreement (12-month)';
-                serviceBtn.href = portalState.docuSignLinks?.service12 || DLM_CONFIG.docuSign.service12;
-            } else {
-                serviceBtn.textContent = 'Sign Service Agreement (6-month)';
-                serviceBtn.href = portalState.docuSignLinks?.service6 || DLM_CONFIG.docuSign.service6;
-            }
-            updatePaymentOptions();
-        }
+    100% {
+        box-shadow: 0 0 25px rgba(34, 197, 94, 0.4), 0 4px 20px rgba(34, 197, 94, 0.2);
+        border-color: #22c55e;
     }
+}
 
-    // Update Payment Options
-    function updatePaymentOptions() {
-        const serviceTerm = document.getElementById('service12')?.checked ? 'service12' : 'service6';
-        const termText = serviceTerm === 'service12' ? '12-Month' : '6-Month';
-        const paymentTermText = document.getElementById('paymentTermText');
-        if (paymentTermText) paymentTermText.textContent = termText;
-        updatePaymentButton();
+.step.completed .step-number {
+    background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+    animation: numberPulse 0.6s ease-out;
+}
+
+@keyframes numberPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.step-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    gap: 15px;
+}
+
+.step h2 {
+    color: #012E40;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.step-number {
+    background: #05908C;
+    color: #EEF4D9;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.step.completed .step-number {
+    background: #F2A922;
+    color: #012E40;
+}
+
+.step-content {
+    margin-bottom: 25px;
+    color: #012E40;
+}
+
+.step-note {
+    background: #DFF5F3;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #012E40;
+    margin: 15px 0;
+    border-left: 3px solid #05908C;
+}
+
+.step-actions {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid rgba(133, 199, 179, 0.3);
+    text-align: center;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #05908C;
+    color: #EEF4D9;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 5px;
+}
+
+.btn:hover {
+    background: #012E40;
+    transform: translateY(-1px);
+}
+
+.btn-complete {
+    background: linear-gradient(135deg, #F2A922 0%, #85C7B3 100%);
+    color: #012E40;
+    font-weight: 700;
+    padding: 14px 28px;
+    font-size: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(242, 169, 34, 0.3);
+}
+
+.btn-complete:hover {
+    background: linear-gradient(135deg, #85C7B3 0%, #F2A922 100%);
+    transform: translateY(-2px);
+}
+
+.btn-complete.completing {
+    animation: completeButtonPulse 0.6s ease-out;
+    background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+}
+
+@keyframes completeButtonPulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 rgba(34, 197, 94, 0); }
+    50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); }
+    100% { transform: scale(1); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+}
+
+.btn-complete:disabled,
+.step.completed .btn-complete {
+    background: #85C7B3;
+    opacity: 0.7;
+    cursor: default;
+    pointer-events: none;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #05908C;
+    border: 2px solid #05908C;
+}
+
+.btn-outline:hover {
+    background: #05908C;
+    color: #EEF4D9;
+}
+
+.btn-secondary {
+    background: #F2A922;
+    color: #012E40;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    margin: 15px 0;
+    flex-wrap: wrap;
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #012E40;
+    background: rgba(238, 244, 217, 0.5);
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    flex: 1;
+    min-width: 200px;
+}
+
+.radio-item:hover {
+    background: rgba(133, 199, 179, 0.2);
+    border-color: #85C7B3;
+}
+
+.radio-item:has(input[type="radio"]:checked) {
+    background: rgba(242, 169, 34, 0.2);
+    border-color: #F2A922;
+    font-weight: 600;
+}
+
+.form-group {
+    margin: 15px 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #012E40;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #85C7B3;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease;
+    background: rgba(238, 244, 217, 0.9);
+    color: #012E40;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #F2A922;
+    box-shadow: 0 0 0 3px rgba(242, 169, 34, 0.2);
+}
+
+/* Info button styles */
+.info-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.info-header h5 {
+    color: #012E40;
+    margin: 0;
+}
+
+.btn-info {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    background: transparent;
+    color: #05908C;
+    border: 1px solid #05908C;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-info:hover {
+    background: #05908C;
+    color: #EEF4D9;
+}
+
+.info-box {
+    display: none;
+    background: #DFF5F3;
+    padding: 15px;
+    border-radius: 6px;
+    margin: 10px 0;
+    border: 1px solid #05908C;
+}
+
+.info-box.warning {
+    background: #FBE9D1;
+    border: 1px solid #F2A922;
+}
+
+.info-box h6 {
+    color: #012E40;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.info-box p {
+    color: #012E40;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Brand Kit specific */
+.brand-kit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 15px 0;
+}
+
+/* Success Message */
+.success-message {
+    background: linear-gradient(135deg, #F2A922 0%, #85C7B3 100%);
+    color: #012E40;
+    padding: 30px;
+    border-radius: 14px;
+    text-align: center;
+    margin: 20px 0;
+    box-shadow: 0 4px 20px rgba(242, 169, 34, 0.3);
+}
+
+.gallery-placeholder {
+    background: #F0F9F7;
+    border: 2px dashed #85C7B3;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    margin: 20px 0;
+    color: #012E40;
+}
+
+.payment-term-display {
+    background: #DFF5F3;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 3px solid #05908C;
+}
+
+.discount-tag {
+    background: #F2A922;
+    color: #012E40;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 8px;
+    display: inline-block;
+}
+
+.portal-footer {
+    text-align: center;
+    padding: 30px 20px;
+    margin-top: 40px;
+    border-top: 2px solid rgba(133, 199, 179, 0.3);
+    color: #EEF4D9;
+    font-size: 0.9rem;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.footer-links a {
+    color: #F2A922;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+    color: #85C7B3;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .floating-progress-sidebar {
+        display: none !important;
     }
+}
 
-    // Update Payment Button
-    function updatePaymentButton() {
-        const serviceTerm = document.getElementById('service12')?.checked ? 'service12' : 'service6';
-        const paymentType = document.getElementById('paymentUpfront')?.checked ? 'upfront' : 'monthly';
-        const stripeBtn = document.getElementById('stripeBtn');
-        
-        if (stripeBtn) {
-            const typeText = paymentType === 'upfront' ? 
-                'Set Up Upfront Payment (5% Discount)' : 'Set Up Monthly Payment';
-            stripeBtn.textContent = typeText;
-            
-            // Use custom link if available, otherwise use default
-            let paymentLink;
-            if (portalState.stripeLinks?.[serviceTerm]?.[paymentType]) {
-                paymentLink = portalState.stripeLinks[serviceTerm][paymentType];
-            } else {
-                paymentLink = DLM_CONFIG.stripeLinks[serviceTerm][paymentType];
-            }
-            stripeBtn.href = paymentLink;
-        }
+@media (max-width: 768px) {
+    .portal-container {
+        padding: 15px;
     }
-
-    // Update Creative Gallery
-    function updateCreativeGallery(link) {
-        const gallery = document.getElementById('galleryPlaceholder');
-        if (gallery) {
-            if (link) {
-                gallery.innerHTML = `
-                    <p style="color: #012E40; margin-bottom: 15px; font-weight: 600;">
-                        🎨 Your Creative Previews Are Ready!
-                    </p>
-                    <a href="${link}" class="btn" target="_blank" rel="noopener">
-                        View Creative Previews
-                    </a>
-                `;
-            } else {
-                gallery.innerHTML = `
-                    <p>Creative previews will be shared via secure link</p>
-                    <p style="font-size: 0.9rem; color: #85C7B3; margin-top: 10px;">
-                        Links will be provided once creatives are ready for review
-                    </p>
-                `;
-            }
-        }
+    .hero h1 {
+        font-size: 1.8rem;
     }
-
-    // Toggle Brand Kit Info
-    function toggleBrandKitInfo() {
-        const infoBox = document.getElementById('brandKitInfo');
-        if (infoBox) {
-            const isVisible = infoBox.style.display === 'block';
-            infoBox.style.display = isVisible ? 'none' : 'block';
-        }
+    .step {
+        padding: 20px;
     }
-
-    // Toggle GA4 Info
-    function toggleGA4Info() {
-        const infoBox = document.getElementById('ga4Info');
-        if (infoBox) {
-            const isVisible = infoBox.style.display === 'block';
-            infoBox.style.display = isVisible ? 'none' : 'block';
-        }
+    .radio-group {
+        flex-direction: column;
     }
-
-    // Toggle Pixel Info
-    function togglePixelInfo() {
-        const infoBox = document.getElementById('pixelInfo');
-        if (infoBox) {
-            const isVisible = infoBox.style.display === 'block';
-            infoBox.style.display = isVisible ? 'none' : 'block';
-        }
+    .radio-item {
+        min-width: auto;
     }
-
-    // Email Admin Details
-    function emailAdminDetails() {
-        const adminName = document.getElementById('adminName').value;
-        const adminEmail = document.getElementById('adminEmail').value;
-        const adminPhone = document.getElementById('adminPhone').value;
-        const platform = document.getElementById('websitePlatform').value;
-        const platformOther = document.getElementById('websitePlatformOther').value;
-        
-        if (!adminEmail) {
-            alert('Please enter admin email address');
-            return;
-        }
-        
-        const platformText = platform === 'other' ? platformOther : platform;
-        const subject = 'Website Admin Contact Details - Client Portal';
-        const body = `Website Admin Contact Details:\n\n` +
-            `Name: ${adminName || 'Not provided'}\n` +
-            `Email: ${adminEmail}\n` +
-            `Phone: ${adminPhone || 'Not provided'}\n` +
-            `Platform: ${platformText || 'Not specified'}\n\n` +
-            `Please contact them to coordinate tracking installation.`;
-        
-        window.open(`mailto:${DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+    .brand-kit-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
     }
-
-    // Email Access Details
-    function emailAccessDetails() {
-        const websiteUrl = document.getElementById('websiteUrl').value;
-        const loginUrl = document.getElementById('loginUrl').value;
-        const username = document.getElementById('tempUsername').value;
-        const password = document.getElementById('tempPassword').value;
-        const platform = document.getElementById('sitePlatform').value;
-        const platformOther = document.getElementById('sitePlatformOther').value;
-        
-        if (!websiteUrl || !username || !password) {
-            alert('Please fill in all required fields');
-            return;
-        }
-        
-        const platformText = platform === 'other' ? platformOther : platform;
-        const subject = 'Temporary Website Access Details - Client Portal';
-        const body = `Temporary Website Access Details:\n\n` +
-            `Website URL: ${websiteUrl}\n` +
-            `Login URL: ${loginUrl || 'Not provided'}\n` +
-            `Username: ${username}\n` +
-            `Password: ${password}\n` +
-            `Platform: ${platformText || 'Not specified'}\n\n` +
-            `Please install tracking and remove access when complete.`;
-        
-        window.open(`mailto:${DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
-    }
-
-    // Approve Creatives
-    function approveCreatives() {
-        if (confirm('Approve creatives for launch?')) {
-            markStepComplete(5);
-            alert('Approved! Your campaign will launch within 24-48 hours.');
-        }
-    }
-
-    // Request Revisions
-    function requestRevisions() {
-        const form = document.getElementById('revisionForm');
-        if (form) {
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        }
-    }
-
-    // Submit Revisions
-    function submitRevisions() {
-        const notes = document.getElementById('revisionNotes').value;
-        if (!notes) {
-            alert('Please enter revision notes');
-            return;
-        }
-        const subject = 'Creative Revision Request';
-        window.open(`mailto:${DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(notes)}`);
-    }
-
-    // Initialize on DOM ready
-    document.addEventListener('DOMContentLoaded', async function() {
-        await loadState();
-        updateStepStates();
-        
-        // Set default DocuSign DPA link if no custom link
-        const dpaBtn = document.getElementById('dpaBtn');
-        if (dpaBtn && !portalState.docuSignLinks?.dpa) {
-            dpaBtn.href = DLM_CONFIG.docuSign.dpa;
-        }
-        
-        // Initialize Service Agreement
-        updateServiceButton();
-        
-        // Set contact info
-        const contactEmail = document.getElementById('contactEmail');
-        const contactPhone = document.getElementById('contactPhone');
-        if (contactEmail) contactEmail.textContent = DLM_CONFIG.support.opsEmail;
-        if (contactPhone) contactPhone.textContent = DLM_CONFIG.support.opsPhone;
-        
-        // Event listeners
-        document.querySelectorAll('input[name="serviceTerm"]').forEach(radio => {
-            radio.addEventListener('change', updateServiceButton);
-        });
-        
-        document.querySelectorAll('input[name="paymentType"]').forEach(radio => {
-            radio.addEventListener('change', updatePaymentButton);
-        });
-        
-        // Step 4 website access event listeners
-        document.querySelectorAll('input[name="websiteAccess"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                const connectForm = document.getElementById('connectAdminForm');
-                const tempForm = document.getElementById('tempAccessForm');
-                if (connectForm) connectForm.style.display = this.value === 'connect' ? 'block' : 'none';
-                if (tempForm) tempForm.style.display = this.value === 'temporary' ? 'block' : 'none';
-            });
-        });
-        
-        // Platform selection handlers for Step 4
-        ['websitePlatform', 'sitePlatform'].forEach(selectId => {
-            const selectElement = document.getElementById(selectId);
-            const otherInput = document.getElementById(selectId + 'Other');
-            
-            if (selectElement && otherInput) {
-                selectElement.addEventListener('change', function() {
-                    if (this.value === 'other') {
-                        otherInput.style.display = 'block';
-                        otherInput.required = true;
-                    } else {
-                        otherInput.style.display = 'none';
-                        otherInput.required = false;
-                        otherInput.value = '';
-                    }
-                });
-            }
-        });
-        
-        console.log('✓ Portal initialized successfully with Firebase');
-    });
-
-    // Expose functions globally
-    window.markStepComplete = markStepComplete;
-    window.toggleBrandKitInfo = toggleBrandKitInfo;
-    window.toggleGA4Info = toggleGA4Info;
-    window.togglePixelInfo = togglePixelInfo;
-    window.emailAdminDetails = emailAdminDetails;
-    window.emailAccessDetails = emailAccessDetails;
-    window.approveCreatives = approveCreatives;
-    window.requestRevisions = requestRevisions;
-    window.submitRevisions = submitRevisions;
-})();
+}
