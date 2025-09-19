@@ -1,4 +1,4 @@
-// ===== DRIVE LEAD MEDIA PORTAL CONFIGURATION =====
+// ===== DRIVE LEAD MEDIA PORTAL CONFIGURATION - CORRECTED VERSION =====
 // Edit this file to change emails, links, and settings
 
 window.DLM_CONFIG = {
