@@ -472,90 +472,6 @@ Please contact them to coordinate tracking installation.`;
     window.open(mailtoLink);
 };
 
-window.emailAccessDetails = function() {
-    const websiteUrl = document.getElementById('websiteUrl').value;
-    const loginUrl = document.getElementById('loginUrl').value;
-    const username = document.getElementById('tempUsername').value;
-    const password = document.getElementById('tempPassword').value;
-    const platform = document.getElementById('sitePlatform').value;
-    const platformOther = document.getElementById('sitePlatformOther').value;
-
-    if (!websiteUrl || !username || !password) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    const platformText = platform === 'other' ? platformOther : platform;
-    const subject = 'Temporary Website Access Details - Client Portal';
-    const body = `Temporary Website Access Details:
-
-
-Website URL: ${websiteUrl}
-Login URL: ${loginUrl || 'Not provided'}
-Username: ${username}
-Password: ${password}
-Platform: ${platformText || 'Not specified'}
-
-Please install tracking and remove access when complete.`;
-
-    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink);
-};
-
-window.emailRevisionRequest = function() {
-    const name = document.getElementById('revisionName').value;
-    const email = document.getElementById('revisionEmail').value;
-    const notes = document.getElementById('revisionNotes').value;
-
-    if (!name || !email || !notes) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    const subject = 'Creative Revision Request - Client Portal';
-    const body = `Creative Revision Request:
-
-
-Client Name: ${name}
-Client Email: ${email}
-
-Revision Notes:
-${notes}`;
-
-    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink);
-};
-
-window.emailSetupRequest = function() {
-    // Get selected days
-    const selectedDays = [];
-    document.querySelectorAll('input[name="setupDays"]:checked').forEach(checkbox => {
-        selectedDays.push(checkbox.value);
-    });
-
-    const setupTime = document.getElementById('setupTime').value;
-    const setupPhone = document.getElementById('setupPhone').value;
-    const setupTimezone = document.getElementById('setupTimezone').value;
-
-    if (selectedDays.length === 0 || !setupTime || !setupPhone || !setupTimezone) {
-        alert('Please fill in all fields to schedule your setup call');
-        return;
-    }
-
-    const subject = 'Meta Business Suite Setup Call Request - Client Portal';
-    const body = `Meta Business Suite Setup Call Request:
-
-Preferred Days: ${selectedDays.join(', ')}
-Best Time: ${setupTime}
-Phone Number: ${setupPhone}
-Time Zone: ${setupTimezone}
-
-Please schedule a setup call to help create Meta Business Suite account.`;
-
-    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink);
-};
-
 // ===== COPY TO CLIPBOARD FUNCTION =====
 window.copyRevisionToClipboard = function() {
     const name = document.getElementById('revisionName').value;
@@ -1281,4 +1197,88 @@ document.addEventListener('click', function(e) {
     if (panel && toggle && !panel.contains(e.target) && !toggle.contains(e.target)) {
         panel.style.display = 'none';
     }
-});
+}););
+};
+
+window.emailAccessDetails = function() {
+    const websiteUrl = document.getElementById('websiteUrl').value;
+    const loginUrl = document.getElementById('loginUrl').value;
+    const username = document.getElementById('tempUsername').value;
+    const password = document.getElementById('tempPassword').value;
+    const platform = document.getElementById('sitePlatform').value;
+    const platformOther = document.getElementById('sitePlatformOther').value;
+
+    if (!websiteUrl || !username || !password) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    const platformText = platform === 'other' ? platformOther : platform;
+    const subject = 'Temporary Website Access Details - Client Portal';
+    const body = `Temporary Website Access Details:
+
+
+Website URL: ${websiteUrl}
+Login URL: ${loginUrl || 'Not provided'}
+Username: ${username}
+Password: ${password}
+Platform: ${platformText || 'Not specified'}
+
+Please install tracking and remove access when complete.`;
+
+    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailtoLink);
+};
+
+window.emailRevisionRequest = function() {
+    const name = document.getElementById('revisionName').value;
+    const email = document.getElementById('revisionEmail').value;
+    const notes = document.getElementById('revisionNotes').value;
+
+    if (!name || !email || !notes) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    const subject = 'Creative Revision Request - Client Portal';
+    const body = `Creative Revision Request:
+
+
+Client Name: ${name}
+Client Email: ${email}
+
+Revision Notes:
+${notes}`;
+
+    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailtoLink);
+};
+
+window.emailSetupRequest = function() {
+    // Get selected days
+    const selectedDays = [];
+    document.querySelectorAll('input[name="setupDays"]:checked').forEach(checkbox => {
+        selectedDays.push(checkbox.value);
+    });
+
+    const setupTime = document.getElementById('setupTime').value;
+    const setupPhone = document.getElementById('setupPhone').value;
+    const setupTimezone = document.getElementById('setupTimezone').value;
+
+    if (selectedDays.length === 0 || !setupTime || !setupPhone || !setupTimezone) {
+        alert('Please fill in all fields to schedule your setup call');
+        return;
+    }
+
+    const subject = 'Meta Business Suite Setup Call Request - Client Portal';
+    const body = `Meta Business Suite Setup Call Request:
+
+Preferred Days: ${selectedDays.join(', ')}
+Best Time: ${setupTime}
+Phone Number: ${setupPhone}
+Time Zone: ${setupTimezone}
+
+Please schedule a setup call to help create Meta Business Suite account.`;
+
+    const mailtoLink = `mailto:${window.DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailtoLink
