@@ -104,6 +104,7 @@
             font-weight: 600;
             transition: all 0.2s ease;
             margin-right: 10px;
+            font-size: 0.9rem;
         }
         
         .btn:hover {
@@ -124,6 +125,16 @@
         .btn-success {
             background: #22c55e;
             color: white;
+        }
+        
+        .btn-secondary {
+            background: #85C7B3;
+            color: #012E40;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.85rem;
         }
         
         .client-table {
@@ -248,6 +259,105 @@
             margin-bottom: 10px;
         }
         
+        /* Edit Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #85C7B3;
+        }
+        
+        .modal-header h2 {
+            color: #05908C;
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #85C7B3;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-btn:hover {
+            background: #F0F9F7;
+            color: #05908C;
+        }
+        
+        .progress-controls {
+            background: #DFF5F3;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .progress-controls h3 {
+            color: #05908C;
+            margin-bottom: 15px;
+        }
+        
+        .progress-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #85C7B3;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+        }
+        
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -260,6 +370,15 @@
             .client-table th,
             .client-table td {
                 padding: 8px;
+            }
+            
+            .modal {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .progress-checkboxes {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -369,6 +488,134 @@
         </div>
     </div>
     
+    <!-- Edit Client Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Edit Client Portal</h2>
+                <button type="button" class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            
+            <form id="editClientForm">
+                <input type="hidden" id="editClientId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editClientName">Client/Business Name *</label>
+                        <input type="text" id="editClientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editClientEmail">Client Email</label>
+                        <input type="email" id="editClientEmail">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editClientStatus">Status</label>
+                        <select id="editClientStatus">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                    <div></div>
+                </div>
+                
+                <div class="progress-controls">
+                    <h3>Progress Control</h3>
+                    <div class="progress-checkboxes">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editStep1">
+                            <label for="editStep1">Step 1: Agreements</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editStep2">
+                            <label for="editStep2">Step 2: Payment</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editStep3">
+                            <label for="editStep3">Step 3: Meta Setup</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editStep4">
+                            <label for="editStep4">Step 4: Tracking</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editStep5">
+                            <label for="editStep5">Step 5: Approval</label>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button type="button" class="btn btn-secondary btn-small" onclick="resetAllSteps()">Reset All Steps</button>
+                        <button type="button" class="btn btn-success btn-small" onclick="completeAllSteps()">Complete All Steps</button>
+                    </div>
+                </div>
+                
+                <div class="link-section">
+                    <h3>DocuSign Links</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editDpaLink">Custom DPA Link</label>
+                            <input type="url" id="editDpaLink" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="editService6Link">Custom 6-Month Service Agreement</label>
+                            <input type="url" id="editService6Link" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editService12Link">Custom 12-Month Service Agreement</label>
+                        <input type="url" id="editService12Link" placeholder="Leave blank for default">
+                    </div>
+                </div>
+                
+                <div class="link-section">
+                    <h3>Stripe Payment Links</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editStripe6Monthly">6-Month Monthly Payment</label>
+                            <input type="url" id="editStripe6Monthly" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="editStripe6Upfront">6-Month Upfront Payment</label>
+                            <input type="url" id="editStripe6Upfront" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editStripe12Monthly">12-Month Monthly Payment</label>
+                            <input type="url" id="editStripe12Monthly" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="editStripe12Upfront">12-Month Upfront Payment</label>
+                            <input type="url" id="editStripe12Upfront" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="link-section">
+                    <h3>Other Links</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editGoogleDriveLink">Google Drive Upload Link</label>
+                            <input type="url" id="editGoogleDriveLink" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="editCreativeLink">Creative Preview Link</label>
+                            <input type="url" id="editCreativeLink" placeholder="Add when creatives are ready">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 2px solid #85C7B3;">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteClient()" style="margin-left: 20px;">Delete Client</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -390,6 +637,9 @@
         
         // Your portal URL
         const PORTAL_BASE_URL = 'https://portal.driveleadmedia.com';
+        
+        // Current client being edited
+        let currentEditingClient = null;
         
         // Show alert message
         function showAlert(message, type = 'success') {
@@ -488,10 +738,10 @@
                             <button class="copy-btn" onclick="copyLink('${data.clientId}')">Copy</button>
                         </td>
                         <td>
-                            <button class="btn btn-success" onclick="toggleStatus('${data.clientId}', ${!data.active})">
+                            <button class="btn btn-success btn-small" onclick="toggleStatus('${data.clientId}', ${!data.active})">
                                 ${data.active ? 'Deactivate' : 'Activate'}
                             </button>
-                            <button class="btn" onclick="editClient('${data.clientId}')">Edit</button>
+                            <button class="btn btn-small" onclick="editClient('${data.clientId}')">Edit</button>
                         </td>
                     `;
                 });
@@ -524,10 +774,166 @@
             }
         }
         
-        // Edit client (placeholder - you can expand this)
-        function editClient(clientId) {
-            alert(`Edit functionality coming soon for client: ${clientId}`);
+        // Edit client - Open modal with current data
+        async function editClient(clientId) {
+            try {
+                const doc = await db.collection('clients').doc(clientId).get();
+                if (!doc.exists) {
+                    showAlert('Client not found', 'error');
+                    return;
+                }
+                
+                const data = doc.data();
+                currentEditingClient = clientId;
+                
+                // Populate form with current data
+                document.getElementById('editClientId').value = clientId;
+                document.getElementById('editClientName').value = data.clientName || '';
+                document.getElementById('editClientEmail').value = data.clientEmail || '';
+                document.getElementById('editClientStatus').value = data.active ? 'true' : 'false';
+                
+                // Progress checkboxes
+                document.getElementById('editStep1').checked = data.step1Complete || false;
+                document.getElementById('editStep2').checked = data.step2Complete || false;
+                document.getElementById('editStep3').checked = data.step3Complete || false;
+                document.getElementById('editStep4').checked = data.step4Complete || false;
+                document.getElementById('editStep5').checked = data.step5Complete || false;
+                
+                // DocuSign links
+                document.getElementById('editDpaLink').value = data.dpaLink || '';
+                document.getElementById('editService6Link').value = data.service6Link || '';
+                document.getElementById('editService12Link').value = data.service12Link || '';
+                
+                // Stripe links
+                document.getElementById('editStripe6Monthly').value = data.stripe6Monthly || '';
+                document.getElementById('editStripe6Upfront').value = data.stripe6Upfront || '';
+                document.getElementById('editStripe12Monthly').value = data.stripe12Monthly || '';
+                document.getElementById('editStripe12Upfront').value = data.stripe12Upfront || '';
+                
+                // Other links
+                document.getElementById('editGoogleDriveLink').value = data.googleDriveLink || '';
+                document.getElementById('editCreativeLink').value = data.creativeLink || '';
+                
+                // Show modal
+                document.getElementById('editModal').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error loading client data:', error);
+                showAlert('Error loading client data', 'error');
+            }
         }
+        
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditingClient = null;
+        }
+        
+        // Reset all steps
+        function resetAllSteps() {
+            if (confirm('Reset all progress steps for this client? This cannot be undone.')) {
+                document.getElementById('editStep1').checked = false;
+                document.getElementById('editStep2').checked = false;
+                document.getElementById('editStep3').checked = false;
+                document.getElementById('editStep4').checked = false;
+                document.getElementById('editStep5').checked = false;
+            }
+        }
+        
+        // Complete all steps
+        function completeAllSteps() {
+            if (confirm('Mark all steps as complete for this client?')) {
+                document.getElementById('editStep1').checked = true;
+                document.getElementById('editStep2').checked = true;
+                document.getElementById('editStep3').checked = true;
+                document.getElementById('editStep4').checked = true;
+                document.getElementById('editStep5').checked = true;
+            }
+        }
+        
+        // Save client changes
+        document.getElementById('editClientForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentEditingClient) return;
+            
+            const updateData = {
+                clientName: document.getElementById('editClientName').value,
+                clientEmail: document.getElementById('editClientEmail').value || null,
+                active: document.getElementById('editClientStatus').value === 'true',
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                
+                // Progress tracking
+                step1Complete: document.getElementById('editStep1').checked,
+                step2Complete: document.getElementById('editStep2').checked,
+                step3Complete: document.getElementById('editStep3').checked,
+                step4Complete: document.getElementById('editStep4').checked,
+                step5Complete: document.getElementById('editStep5').checked,
+                
+                // DocuSign links (null if empty)
+                dpaLink: document.getElementById('editDpaLink').value || null,
+                service6Link: document.getElementById('editService6Link').value || null,
+                service12Link: document.getElementById('editService12Link').value || null,
+                
+                // Stripe links (null if empty)
+                stripe6Monthly: document.getElementById('editStripe6Monthly').value || null,
+                stripe6Upfront: document.getElementById('editStripe6Upfront').value || null,
+                stripe12Monthly: document.getElementById('editStripe12Monthly').value || null,
+                stripe12Upfront: document.getElementById('editStripe12Upfront').value || null,
+                
+                // Other links (null if empty)
+                googleDriveLink: document.getElementById('editGoogleDriveLink').value || null,
+                creativeLink: document.getElementById('editCreativeLink').value || null
+            };
+            
+            try {
+                await db.collection('clients').doc(currentEditingClient).update(updateData);
+                showAlert('Client updated successfully!');
+                closeEditModal();
+                loadClients();
+            } catch (error) {
+                console.error('Error updating client:', error);
+                showAlert('Error updating client. Please try again.', 'error');
+            }
+        });
+        
+        // Delete client
+        async function deleteClient() {
+            if (!currentEditingClient) return;
+            
+            const clientName = document.getElementById('editClientName').value;
+            const confirmText = `Are you sure you want to PERMANENTLY DELETE the client portal for "${clientName}"?\n\nThis action cannot be undone and will:\n- Delete all client data\n- Break their portal link\n- Remove all progress tracking\n\nType "DELETE" to confirm:`;
+            
+            const userInput = prompt(confirmText);
+            
+            if (userInput === 'DELETE') {
+                try {
+                    await db.collection('clients').doc(currentEditingClient).delete();
+                    showAlert(`Client "${clientName}" deleted successfully`);
+                    closeEditModal();
+                    loadClients();
+                } catch (error) {
+                    console.error('Error deleting client:', error);
+                    showAlert('Error deleting client. Please try again.', 'error');
+                }
+            } else if (userInput !== null) {
+                showAlert('Deletion cancelled - incorrect confirmation text', 'error');
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('editModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('editModal')) {
+                closeEditModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('editModal').style.display === 'flex') {
+                closeEditModal();
+            }
+        });
         
         // Load clients on page load
         document.addEventListener('DOMContentLoaded', () => {
