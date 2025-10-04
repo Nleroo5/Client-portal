@@ -27,12 +27,34 @@
             color: #EEF4D9;
             padding: 30px 20px;
             box-shadow: 0 4px 20px rgba(1, 46, 64, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        
+
         .admin-header h1 {
             font-family: 'Young Serif', serif;
             font-size: 2rem;
             margin-bottom: 10px;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.9) 0%, rgba(185, 28, 28, 0.9) 100%);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease-out;
+        }
+
+        .btn-logout:hover {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 1) 0%, rgba(185, 28, 28, 1) 100%);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
         }
 
         /* Admin Navigation Tabs */
@@ -645,8 +667,11 @@
 <body>
     <!-- Password Protection Overlay -->
     <div class="admin-header">
-        <h1>Admin Dashboard</h1>
-        <p>Manage Client Portals - Drive Lead Media</p>
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p>Manage Client Portals - Drive Lead Media</p>
+        </div>
+        <button class="btn-logout" onclick="logoutAdmin()">Logout</button>
     </div>
 
     <!-- Admin Navigation Tabs -->
@@ -1143,6 +1168,18 @@
         function showAlert(message, type = 'success') {
             // Use toast notifications instead of inline alerts
             showToast(message, type);
+        }
+
+        // Logout function
+        function logoutAdmin() {
+            if (confirm('Are you sure you want to logout?')) {
+                firebase.auth().signOut().then(() => {
+                    window.location.href = 'index.html';
+                }).catch((error) => {
+                    console.error('Logout error:', error);
+                    alert('Error logging out. Please try again.');
+                });
+            }
         }
 
         // Switch between admin tabs
