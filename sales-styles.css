@@ -9,46 +9,53 @@
 }
 
 :root {
-    /* Drive Lead Media Brand Colors */
-    --primary: #05908C !important;        /* DLM Teal - Main brand color */
-    --primary-hover: #047a72 !important;  /* DLM Teal Dark - Hover state */
-    --secondary: #85C7B3 !important;      /* DLM Mint - Accent color */
-    --secondary-hover: #6bb39e !important;
-    --dark-teal: #012E40 !important;      /* DLM Deep Teal - Dark accent */
-    --light-mint: #EEF4D9 !important;     /* DLM Light - Subtle highlight */
+    /* Drive Lead Media Official Color Palette */
+    --deep-navy: #012E40 !important;      /* Deep Navy - Dark primary */
+    --golden-yellow: #F2A922 !important;  /* Golden Yellow - Accent */
+    --teal: #05908C !important;           /* Teal - Main brand */
+    --aqua: #85C7B3 !important;           /* Aqua - Light accent */
+    --cream: #EEF4D9 !important;          /* Cream - Light background */
+
+    /* Primary Usage */
+    --primary: #05908C !important;        /* Teal for main actions */
+    --primary-hover: #047a72 !important;  /* Darker teal hover */
+    --secondary: #85C7B3 !important;      /* Aqua for secondary */
+    --accent: #F2A922 !important;         /* Golden yellow for highlights */
 
     /* Backgrounds */
-    --bg-main: #F9FAFB;                   /* Soft gray background */
-    --bg-card: #FFFFFF;                   /* Pure white cards */
+    --bg-main: #EEF4D9;                   /* Cream for main background */
+    --bg-card: #FFFFFF;                   /* White for cards (contrast) */
+    --bg-dark: #012E40;                   /* Deep navy for dark sections */
 
     /* Text Colors */
-    --text-primary: #012E40;              /* DLM Deep Teal for headings */
-    --text-secondary: #6b7280;            /* Muted gray for body text */
-    --text-muted: #94A3B8;
+    --text-primary: #012E40;              /* Deep navy for headings */
+    --text-secondary: #05908C;            /* Teal for subtext */
+    --text-light: #85C7B3;                /* Aqua for muted text */
+    --text-on-dark: #EEF4D9;              /* Cream on dark backgrounds */
 
     /* Borders */
-    --border: #E5E7EB;
-    --border-light: #F1F5F9;
+    --border: #85C7B3;                    /* Aqua borders */
+    --border-light: #EEF4D9;              /* Cream borders */
+    --border-dark: #012E40;               /* Navy borders */
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px rgba(1, 46, 64, 0.04);
-    --shadow-md: 0 4px 6px rgba(1, 46, 64, 0.06);
-    --shadow-lg: 0 10px 15px rgba(1, 46, 64, 0.08);
+    --shadow-sm: 0 1px 2px rgba(1, 46, 64, 0.08);
+    --shadow-md: 0 4px 6px rgba(1, 46, 64, 0.12);
+    --shadow-lg: 0 10px 15px rgba(1, 46, 64, 0.15);
 
     /* Status Colors */
-    --success: #85C7B3;                   /* Use DLM mint for success */
-    --warning: #F59E0B;
-    --error: #c33;                        /* DLM error red */
+    --success: #85C7B3;                   /* Aqua for success */
+    --warning: #F2A922;                   /* Golden yellow for warnings */
+    --error: #dc2626;                     /* Red for errors */
 
-    /* Accent Colors */
-    --accent-orange: #F2A922;             /* DLM Orange/Yellow - from portal gradient */
-    --deal-card-bg: #EEF4D9;              /* Light mint for deal cards */
+    /* Legacy mappings */
+    --accent-orange: #F2A922;
+    --deal-card-bg: #EEF4D9;
 }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
-    background-attachment: fixed;
+    background: var(--bg-main);
     color: var(--text-primary);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -58,18 +65,16 @@ body {
 
 /* Dashboard Header */
 .dashboard-header {
-    background: var(--bg-card);
+    background: var(--bg-dark);
     padding: 20px 40px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid var(--golden-yellow);
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(8px);
-    background: rgba(255, 255, 255, 0.95);
 }
 
 .header-left {
@@ -79,12 +84,12 @@ body {
 .header-left h1 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--golden-yellow);
     letter-spacing: -0.025em;
 }
 
 .welcome-text {
-    color: var(--text-secondary);
+    color: var(--text-on-dark);
     font-size: 0.875rem;
     font-weight: 500;
     margin-top: 2px;
@@ -96,12 +101,12 @@ body {
 
 /* Navigation Tabs */
 .nav-tabs {
-    background: var(--bg-card);
+    background: var(--bg-dark);
     display: flex;
     justify-content: center;
     gap: 8px;
     padding: 16px 32px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid var(--aqua);
     position: sticky;
     top: 73px;
     z-index: 99;
@@ -109,28 +114,28 @@ body {
 
 .nav-tab {
     background: transparent;
-    border: 1px solid var(--border);
+    border: 2px solid var(--aqua);
     border-radius: 8px;
     padding: 10px 20px;
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: var(--text-on-dark);
     cursor: pointer;
     transition: all 0.15s ease-out;
     letter-spacing: -0.01em;
 }
 
 .nav-tab:hover {
-    border-color: var(--primary);
-    color: var(--text-primary);
-    box-shadow: var(--shadow-sm);
+    border-color: var(--golden-yellow);
+    background: rgba(242, 169, 34, 0.1);
+    color: var(--golden-yellow);
     transform: translateY(-1px);
 }
 
 .nav-tab.active {
-    background: var(--primary);
+    background: var(--teal);
     color: white;
-    border-color: var(--primary);
+    border-color: var(--teal);
     box-shadow: var(--shadow-md);
 }
 
@@ -239,15 +244,15 @@ body {
 
 .btn-logout {
     background: transparent;
-    color: var(--error);
-    border: 1px solid var(--error);
+    color: var(--golden-yellow);
+    border: 2px solid var(--golden-yellow);
     padding: 8px 20px;
     font-size: 0.875rem;
 }
 
 .btn-logout:hover {
-    background: var(--error);
-    color: white;
+    background: var(--golden-yellow);
+    color: var(--deep-navy);
 }
 
 /* Pipeline Board */
@@ -391,11 +396,11 @@ textarea:focus {
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     letter-spacing: -0.025em;
-    color: var(--accent-orange);
+    color: var(--golden-yellow);
 }
 
 p {
-    color: var(--text-secondary);
+    color: var(--text-primary);
 }
 
 /* Responsive Design */
