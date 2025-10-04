@@ -18,9 +18,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Sales Reps collection - Admin can manage, reps can read their own data
+    // Sales Reps collection - Public can read active reps (for login dropdown), Admin can manage
     match /salesReps/{repId} {
-      allow read: if isAuthenticated();
+      // Allow anyone to read active sales reps (needed for login dropdown)
+      // Only name, email, and active status exposed - passwords are in Firebase Auth, not here
+      allow read: if resource.data.active == true || isAuthenticated();
       allow create, update, delete: if isAdmin();
     }
 
