@@ -170,20 +170,20 @@ body {
 }
 
 .btn-primary {
-    background: transparent;
-    color: var(--primary);
-    border: 1px solid var(--primary);
+    background: var(--primary) !important;
+    color: white !important;
+    border: 1px solid var(--primary) !important;
 }
 
 .btn-primary:hover {
-    background: var(--primary);
-    color: white;
+    background: var(--primary-hover) !important;
+    color: white !important;
     box-shadow: var(--shadow-md);
     transform: translateY(-1px);
 }
 
 .btn-primary:active {
-    background: var(--primary-hover);
+    background: var(--primary-hover) !important;
     transform: translateY(0);
 }
 
@@ -207,14 +207,14 @@ body {
 }
 
 .btn-outline {
-    background: transparent;
-    color: var(--primary);
-    border: 1px solid var(--primary);
+    background: var(--primary) !important;
+    color: white !important;
+    border: 1px solid var(--primary) !important;
 }
 
 .btn-outline:hover {
-    background: var(--primary);
-    color: white;
+    background: var(--primary-hover) !important;
+    color: white !important;
     box-shadow: var(--shadow-sm);
 }
 
