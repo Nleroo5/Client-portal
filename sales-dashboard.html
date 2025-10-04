@@ -164,14 +164,14 @@
         <!-- Tab 4: Action Items -->
         <div class="tab-content" id="tab-actions">
             <div style="margin-bottom: 24px;">
-                <h2 style="font-family: 'Bitter', serif; font-size: 2rem; font-weight: 700; margin-bottom: 4px; color: #000000;">Action Items</h2>
+                <h2 style="font-family: 'Bitter', serif; font-size: 2rem; font-weight: 700; margin-bottom: 4px; color: #FFFFFF;">Action Items</h2>
                 <p style="color: #EEF4D9; font-size: 1rem; margin: 0;">What needs your attention right now</p>
             </div>
 
             <!-- Stuck Deals (New Priority Section) -->
             <div style="margin-bottom: 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h3 style="font-family: 'Bitter', serif; font-size: 1.25rem; font-weight: 700; color: #dc2626; margin: 0;">Stuck Deals (>7 Days)</h3>
+                    <h3 style="font-family: 'Bitter', serif; font-size: 1.25rem; font-weight: 700; color: #FFFFFF; margin: 0;">Stuck Deals (>7 Days)</h3>
                     <span id="stuckDealsCount" style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">0</span>
                 </div>
                 <div id="stuckDeals" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
@@ -182,7 +182,7 @@
             <!-- Overdue -->
             <div style="margin-bottom: 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h3 style="font-family: 'Bitter', serif; font-size: 1.25rem; font-weight: 700; color: #dc2626; margin: 0;">Overdue</h3>
+                    <h3 style="font-family: 'Bitter', serif; font-size: 1.25rem; font-weight: 700; color: #FFFFFF; margin: 0;">Overdue</h3>
                     <span id="overdueCount" style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">0</span>
                 </div>
                 <div id="overdueTasks" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
@@ -193,7 +193,7 @@
             <!-- Due Today -->
             <div style="margin-bottom: 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h3 style="font-family: 'Bitter', serif; font-size: 1.25rem; font-weight: 700; color: #f59e0b; margin: 0;">Due Today</h3>
+                    <h3 style="font-family: 'Bitter', serif; font-size: 1.25rem; font-weight: 700; color: #FFFFFF; margin: 0;">Due Today</h3>
                     <span id="dueTodayCount" style="background: #f59e0b; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">0</span>
                 </div>
                 <div id="dueTodayTasks" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
@@ -204,7 +204,7 @@
             <!-- Upcoming -->
             <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h3 style="font-family: 'Bitter', serif; font-size: 1.25rem; font-weight: 700; color: #64748B; margin: 0;">Upcoming</h3>
+                    <h3 style="font-family: 'Bitter', serif; font-size: 1.25rem; font-weight: 700; color: #FFFFFF; margin: 0;">Upcoming</h3>
                     <span id="upcomingCount" style="background: #64748B; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">0</span>
                 </div>
                 <div id="upcomingTasks" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #E2E8F0; max-height: 400px; overflow-y: auto; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
@@ -551,14 +551,47 @@
                     const lastUpdated = deal.lastUpdated?.toDate() || deal.createdAt?.toDate() || new Date();
                     const daysInStage = Math.floor((new Date() - lastUpdated) / (1000 * 60 * 60 * 24));
 
-                    // Determine if stalling (>7 days in stage)
-                    const isStalling = daysInStage > 7;
-                    const stageColor = isStalling ? '#dc2626' : '#6b7280';
+                    // Stage-specific thresholds
+                    const stageThresholds = {
+                        'qualified': { ideal: 2, warning: 3 },
+                        'cold-outreach': { ideal: 5, warning: 7 },
+                        'follow-up': { ideal: 7, warning: 10 },
+                        'discovery-scheduled': { ideal: 3, warning: 3 },
+                        'discovery-completed': { ideal: 4, warning: 5 },
+                        'onboarding-portal': { ideal: 7, warning: 10 },
+                        'campaign-live': { ideal: 30, warning: 45 },
+                        'follow-up-resell': { ideal: 60, warning: 90 }
+                    };
+
+                    const threshold = stageThresholds[deal.stage] || { ideal: 7, warning: 7 };
+
+                    // Color-coded status: green (on track), yellow (warning), red (overdue)
+                    let statusColor, statusBg, statusText;
+                    if (daysInStage <= threshold.ideal) {
+                        statusColor = '#10B981'; // green
+                        statusBg = '#d1fae5';
+                        statusText = 'On Track';
+                    } else if (daysInStage <= threshold.warning) {
+                        statusColor = '#F59E0B'; // yellow
+                        statusBg = '#fef3c7';
+                        statusText = 'Warning';
+                    } else {
+                        statusColor = '#dc2626'; // red
+                        statusBg = '#fee2e2';
+                        statusText = 'Overdue';
+                    }
+
+                    const isStalling = daysInStage > threshold.warning;
+                    const stageColor = isStalling ? '#dc2626' : statusColor;
 
                     // Format last activity
                     const lastActivityText = daysInStage === 0 ? 'Today' :
                                            daysInStage === 1 ? 'Yesterday' :
                                            `${daysInStage} days ago`;
+
+                    // Expected timeline text
+                    const expectedDays = threshold.ideal;
+                    const timelineText = expectedDays === 1 ? '1 day' : `${expectedDays} days`;
 
                     if (isCompressed) {
                         // COMPRESSED VIEW - Only show company and contact name, click to expand
@@ -568,21 +601,23 @@
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
                                         <div>
                                             <div style="font-weight: 600; color: #012E40; font-size: 0.9rem;">${deal.companyName || 'Unnamed Deal'}</div>
-                                            <div style="font-size: 0.8rem; color: #05908C; margin-top: 2px;">${deal.contactName || 'No contact'}</div>
+                                            <div style="font-size: 0.8rem; color: #64748B; margin-top: 2px;">${deal.contactName || 'No contact'}</div>
                                         </div>
-                                        ${isStalling ? '<span style="background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">!</span>' : ''}
+                                        <div style="display: flex; align-items: center; gap: 6px;">
+                                            <span style="background: ${statusBg}; color: ${statusColor}; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">${daysInStage}d</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="card-details" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 2px solid #85C7B3;">
                                     <!-- Edit & Delete Controls -->
                                     <div style="display: flex; gap: 6px; margin-bottom: 12px;">
-                                        <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #012E40; font-weight: 600;" title="Edit deal">Edit</button>
-                                        <button onclick="confirmLostDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #fef2f2; border: 2px solid #fecaca; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #dc2626; font-weight: 600;" title="Mark as lost">Lost</button>
+                                        <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #EEF4D9; border: 2px solid #000000; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #012E40; font-weight: 600;" title="Edit deal">Edit</button>
+                                        <button onclick="confirmLostDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #fef2f2; border: 2px solid #000000; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #000000; font-weight: 600;" title="Mark as lost">Lost</button>
                                     </div>
 
                                     <!-- Quick Stage Change -->
                                     <div style="margin-bottom: 8px;">
-                                        <select onchange="changeStage('${deal.id}', this.value); event.stopPropagation();" style="width: 100%; padding: 6px 8px; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.8rem; background: #FFFFFF; cursor: pointer; color: #012E40;">
+                                        <select onchange="changeStage('${deal.id}', this.value); event.stopPropagation();" style="width: 100%; padding: 6px 8px; border: 2px solid #000000; border-radius: 4px; font-size: 0.8rem; background: #FFFFFF; cursor: pointer; color: #012E40;">
                                             <option value="" disabled selected>Move to stage...</option>
                                             <option value="qualified" ${deal.stage === 'qualified' ? 'disabled' : ''}>Qualified</option>
                                             <option value="cold-outreach" ${deal.stage === 'cold-outreach' ? 'disabled' : ''}>Cold Outreach</option>
@@ -595,14 +630,15 @@
                                         </select>
                                     </div>
 
-                                    <div style="display: flex; gap: 12px; font-size: 0.75rem; margin-bottom: 10px;">
-                                        <span style="color: ${stageColor};">${daysInStage} days in stage</span>
-                                        <span style="color: #05908C;">Last: ${lastActivityText}</span>
+                                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
+                                        <span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">${statusText}</span>
+                                        <span style="color: #000000; font-size: 0.75rem;">${daysInStage} of ${timelineText}</span>
+                                        <span style="color: #000000; font-size: 0.75rem;">• ${lastActivityText}</span>
                                     </div>
                                     <div style="display: flex; gap: 6px;">
-                                        <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #012E40;">Call</button>
-                                        <button onclick="logActivity('${deal.id}', 'email'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #012E40;">Email</button>
-                                        <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #05908C; border: 2px solid #05908C; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">Next</button>
+                                        <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #EEF4D9; border: 2px solid #000000; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #012E40;">Call</button>
+                                        <button onclick="logActivity('${deal.id}', 'email'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #EEF4D9; border: 2px solid #000000; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #012E40;">Email</button>
+                                        <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #05908C; border: 2px solid #000000; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">Next</button>
                                     </div>
                                 </div>
                             </div>
@@ -613,19 +649,19 @@
                             <div class="deal-card" id="deal-${deal.id}" draggable="true" ondragstart="handleDragStart(event, '${deal.id}')" ondragend="handleDragEnd(event)" style="background: linear-gradient(135deg, #FFFFFF 0%, #EEF4D9 100%); border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 4px solid #F2A922; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); border: 2px solid #000000; position: relative; cursor: move;">
                                 <!-- Edit & Delete Controls -->
                                 <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
-                                    <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #012E40; font-weight: 600;" title="Edit deal">Edit</button>
-                                    <button onclick="confirmLostDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #fef2f2; border: 2px solid #fecaca; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #dc2626; font-weight: 600;" title="Mark as lost">Lost</button>
+                                    <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #EEF4D9; border: 2px solid #000000; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #012E40; font-weight: 600;" title="Edit deal">Edit</button>
+                                    <button onclick="confirmLostDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #fef2f2; border: 2px solid #000000; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #000000; font-weight: 600;" title="Mark as lost">Lost</button>
                                 </div>
 
                                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; padding-right: 120px;">
                                     <div style="font-weight: 700; color: #012E40;">${deal.companyName || 'Unnamed Deal'}</div>
                                     ${isStalling ? '<span style="background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">STALLING</span>' : ''}
                                 </div>
-                                <div style="font-size: 0.85rem; color: #05908C; margin-bottom: 8px;">${deal.contactName || 'No contact'}</div>
+                                <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 8px;">${deal.contactName || 'No contact'}</div>
 
                                 <!-- Quick Stage Change -->
                                 <div style="margin-bottom: 8px;">
-                                    <select onchange="changeStage('${deal.id}', this.value); event.stopPropagation();" style="width: 100%; padding: 6px 8px; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.8rem; background: #F8FAFC; cursor: pointer; color: #0F172A;">
+                                    <select onchange="changeStage('${deal.id}', this.value); event.stopPropagation();" style="width: 100%; padding: 6px 8px; border: 2px solid #000000; border-radius: 4px; font-size: 0.8rem; background: #FFFFFF; cursor: pointer; color: #012E40;">
                                         <option value="" disabled selected>Move to stage...</option>
                                         <option value="qualified" ${deal.stage === 'qualified' ? 'disabled' : ''}>Qualified</option>
                                         <option value="cold-outreach" ${deal.stage === 'cold-outreach' ? 'disabled' : ''}>Cold Outreach</option>
@@ -638,14 +674,15 @@
                                     </select>
                                 </div>
 
-                                <div style="display: flex; gap: 12px; font-size: 0.75rem;">
-                                    <span style="color: ${stageColor};">${daysInStage} days in stage</span>
-                                    <span style="color: #05908C;">Last: ${lastActivityText}</span>
+                                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
+                                    <span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">${statusText}</span>
+                                    <span style="color: #000000; font-size: 0.75rem;">${daysInStage} of ${timelineText}</span>
+                                    <span style="color: #000000; font-size: 0.75rem;">• Last: ${lastActivityText}</span>
                                 </div>
                                 <div style="display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #EEF4D9;">
-                                    <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #012E40;">Call</button>
-                                    <button onclick="logActivity('${deal.id}', 'email'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #012E40;">Email</button>
-                                    <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #05908C; border: 2px solid #05908C; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">Next</button>
+                                    <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #EEF4D9; border: 2px solid #000000; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #012E40;">Call</button>
+                                    <button onclick="logActivity('${deal.id}', 'email'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #EEF4D9; border: 2px solid #000000; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #012E40;">Email</button>
+                                    <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #05908C; border: 2px solid #000000; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">Next</button>
                                 </div>
                             </div>
                         `;

@@ -106,30 +106,34 @@ body {
 }
 
 .nav-tab {
-    background: transparent;
+    background: linear-gradient(135deg, rgba(238, 244, 217, 0.6) 0%, rgba(133, 199, 179, 0.6) 100%);
     border: 2px solid var(--aqua);
     border-radius: 10px;
     padding: 14px 28px;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--text-on-dark);
+    color: #000000;
     cursor: pointer;
     transition: all 0.15s ease-out;
     letter-spacing: 0.02em;
+    font-family: 'Bitter', serif;
+    opacity: 0.8;
 }
 
 .nav-tab:hover {
     border-color: var(--golden-yellow);
-    background: rgba(242, 169, 34, 0.1);
-    color: var(--golden-yellow);
+    background: linear-gradient(135deg, rgba(242, 169, 34, 0.4) 0%, rgba(238, 244, 217, 0.6) 100%);
+    color: #000000;
     transform: translateY(-1px);
+    opacity: 0.9;
 }
 
 .nav-tab.active {
-    background: var(--teal);
-    color: white;
+    background: linear-gradient(135deg, var(--teal) 0%, var(--aqua) 100%);
+    color: #000000;
     border-color: var(--teal);
     box-shadow: var(--shadow-md);
+    opacity: 1;
 }
 
 /* Main Container */
