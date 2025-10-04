@@ -9,10 +9,10 @@
 }
 
 :root {
-    --primary: #0EA5E9;
-    --primary-hover: #0284C7;
-    --secondary: #10B981;
-    --secondary-hover: #059669;
+    --primary: #0EA5E9 !important;
+    --primary-hover: #0284C7 !important;
+    --secondary: #10B981 !important;
+    --secondary-hover: #059669 !important;
     --bg-main: #F8FAFC;
     --bg-card: #FFFFFF;
     --text-primary: #1E293B;
