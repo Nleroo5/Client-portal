@@ -783,25 +783,20 @@
                     <h2 style="margin-bottom: 4px;">Client Portals</h2>
                     <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">Manage active client onboarding portals</p>
                 </div>
-                <div style="color: #05908C; font-weight: 600; font-size: 0.95rem;">
-                    <span id="totalClientsCount">0</span> Total Clients
+                <div style="display: flex; gap: 24px; align-items: center;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #05908C;" id="totalClientsCount">0</div>
+                        <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Total Clients</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #47a5a3;" id="activeClientsCount">0</div>
+                        <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Active</div>
+                    </div>
                 </div>
             </div>
-            <table class="client-table">
-                <thead>
-                    <tr>
-                        <th>Client Name</th>
-                        <th>Portal Type</th>
-                        <th>Status</th>
-                        <th>Progress</th>
-                        <th>Portal Link</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="clientsTableBody">
-                    <!-- Clients will be loaded here -->
-                </tbody>
-            </table>
+            <div id="clientsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px;">
+                <!-- Client cards will be loaded here -->
+            </div>
         </div>
 
         </div>
@@ -877,25 +872,20 @@
                         <h2 style="margin-bottom: 4px;">Sales Team</h2>
                         <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">Manage sales representatives and their targets</p>
                     </div>
-                    <div style="color: #05908C; font-weight: 600; font-size: 0.95rem;">
-                        <span id="totalRepsCount">0</span> Active Reps
+                    <div style="display: flex; gap: 24px; align-items: center;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #05908C;" id="totalRepsCount">0</div>
+                            <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Active Reps</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #85C7B3;" id="inactiveRepsCount">0</div>
+                            <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Inactive</div>
+                        </div>
                     </div>
                 </div>
-                <table class="client-table" id="repsTable">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Weekly Targets</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Reps will be loaded here -->
-                    </tbody>
-                </table>
+                <div id="repsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px;">
+                    <!-- Rep cards will be loaded here -->
+                </div>
             </div>
 
         </div>
@@ -1231,43 +1221,84 @@
                     .orderBy('createdAt', 'desc')
                     .get();
 
-                const tbody = document.querySelector('#repsTable tbody');
-                tbody.innerHTML = '';
+                const grid = document.getElementById('repsGrid');
+                grid.innerHTML = '';
 
-                // Count active reps
+                // Count active and inactive reps
                 const activeCount = snapshot.docs.filter(doc => doc.data().active).length;
-                const countDisplay = document.getElementById('totalRepsCount');
-                if (countDisplay) {
-                    countDisplay.textContent = activeCount;
-                }
+                const inactiveCount = snapshot.size - activeCount;
+
+                const activeDisplay = document.getElementById('totalRepsCount');
+                const inactiveDisplay = document.getElementById('inactiveRepsCount');
+                if (activeDisplay) activeDisplay.textContent = activeCount;
+                if (inactiveDisplay) inactiveDisplay.textContent = inactiveCount;
 
                 if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 40px;">No sales reps yet. Add your first rep above.</td></tr>';
+                    grid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; background: white; border-radius: 12px; border: 2px dashed #e5e7eb;">
+                            <div style="font-size: 3rem; margin-bottom: 16px; opacity: 0.3;">👤</div>
+                            <h3 style="color: #6b7280; font-weight: 500; margin-bottom: 8px;">No Sales Reps Yet</h3>
+                            <p style="color: #9ca3af; font-size: 0.9rem;">Add your first rep using the form above to get started.</p>
+                        </div>
+                    `;
                     return;
                 }
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td style="font-weight: 600; color: #012E40;">${data.name}</td>
-                        <td style="color: #6b7280;">${data.email || '—'}</td>
-                        <td><span class="badge badge-${data.role === 'leadership' ? 'success' : 'info'}">${data.role === 'leadership' ? 'Leadership' : 'Rep'}</span></td>
-                        <td><span class="badge badge-${data.active ? 'success' : 'secondary'}">${data.active ? 'Active' : 'Inactive'}</span></td>
-                        <td style="font-size: 0.85rem; color: #4b5563;">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-                                <span>Discovery Sched: <strong>${data.weeklyTargets.discoveryCallsScheduled}</strong></span>
-                                <span>Discovery Comp: <strong>${data.weeklyTargets.discoveryCallsCompleted}</strong></span>
-                                <span>Onboarding: <strong>${data.weeklyTargets.dealsOnboarding}</strong></span>
-                                <span>Gone Live: <strong>${data.weeklyTargets.dealsLive}</strong></span>
+                    const card = document.createElement('div');
+                    card.style.cssText = 'background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s ease; border-left: 4px solid ' + (data.active ? '#05908C' : '#d1d5db');
+
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                                    <h3 style="font-size: 1.1rem; font-weight: 700; color: #012E40; margin: 0;">${data.name}</h3>
+                                    <span class="badge badge-${data.role === 'leadership' ? 'success' : 'info'}" style="font-size: 0.7rem;">${data.role === 'leadership' ? 'Leadership' : 'Rep'}</span>
+                                </div>
+                                <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">${data.email || 'No email provided'}</p>
                             </div>
-                        </td>
-                        <td>
-                            <button class="btn-edit" onclick="editRep('${doc.id}')">Edit</button>
-                            <button class="btn-delete" onclick="deleteRep('${doc.id}', '${data.name}')">Delete</button>
-                        </td>
+                            <span class="badge badge-${data.active ? 'success' : 'secondary'}">${data.active ? 'Active' : 'Inactive'}</span>
+                        </div>
+
+                        <div style="background: #f9fafb; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+                            <div style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 600;">Weekly Targets</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div>
+                                    <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Discovery Scheduled</div>
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: #05908C;">${data.weeklyTargets.discoveryCallsScheduled}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Discovery Completed</div>
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: #05908C;">${data.weeklyTargets.discoveryCallsCompleted}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Onboarding</div>
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: #47a5a3;">${data.weeklyTargets.dealsOnboarding}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Gone Live</div>
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: #47a5a3;">${data.weeklyTargets.dealsLive}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-edit" onclick="editRep('${doc.id}')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Edit</button>
+                            <button class="btn-delete" onclick="deleteRep('${doc.id}', '${data.name}')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Delete</button>
+                        </div>
                     `;
-                    tbody.appendChild(row);
+
+                    card.addEventListener('mouseenter', () => {
+                        card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
+                        card.style.transform = 'translateY(-4px)';
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        card.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                        card.style.transform = 'translateY(0)';
+                    });
+
+                    grid.appendChild(card);
                 });
             } catch (error) {
                 console.error('Error loading reps:', error);
@@ -1483,64 +1514,105 @@
         async function loadClients() {
             try {
                 const snapshot = await db.collection('clients').orderBy('createdAt', 'desc').get();
-                const tbody = document.getElementById('clientsTableBody');
-                tbody.innerHTML = '';
+                const grid = document.getElementById('clientsGrid');
+                grid.innerHTML = '';
 
-                // Update total clients count
-                const countDisplay = document.getElementById('totalClientsCount');
-                if (countDisplay) {
-                    countDisplay.textContent = snapshot.size;
-                }
+                // Count total and active clients
+                const activeCount = snapshot.docs.filter(doc => doc.data().active).length;
+
+                const totalDisplay = document.getElementById('totalClientsCount');
+                const activeDisplay = document.getElementById('activeClientsCount');
+                if (totalDisplay) totalDisplay.textContent = snapshot.size;
+                if (activeDisplay) activeDisplay.textContent = activeCount;
 
                 if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #9ca3af;">No clients added yet. Click "Add New Client" to get started.</td></tr>';
+                    grid.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; background: white; border-radius: 12px; border: 2px dashed #e5e7eb;">
+                            <div style="font-size: 3rem; margin-bottom: 16px; opacity: 0.3;">📋</div>
+                            <h3 style="color: #6b7280; font-weight: 500; margin-bottom: 8px;">No Clients Yet</h3>
+                            <p style="color: #9ca3af; font-size: 0.9rem;">Click "Add New Client" above to create your first portal.</p>
+                        </div>
+                    `;
                     return;
                 }
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
+
                     // Generate correct portal link based on portal type
-                    const portalType = data.portalType || 'contract'; // Default to contract for old clients
+                    const portalType = data.portalType || 'contract';
                     const portalLink = portalType === 'm2m' ?
                         `${PORTAL_BASE_URL}/index-m2m.html?c=${data.clientId}` :
                         `${PORTAL_BASE_URL}/index-contract.html?c=${data.clientId}`;
 
-                    const portalTypeBadge = portalType === 'm2m' ?
-                        '<span class="badge badge-warning">M2M</span>' :
-                        '<span class="badge badge-success">Contract</span>';
+                    // Calculate progress percentage
+                    const completedSteps = [
+                        data.step1Complete,
+                        data.step2Complete,
+                        data.step3Complete,
+                        data.step4Complete,
+                        data.step5Complete
+                    ].filter(Boolean).length;
+                    const progressPercent = (completedSteps / 5) * 100;
 
-                    const row = tbody.insertRow();
-                    row.innerHTML = `
-                        <td>
-                            <div style="font-weight: 600; color: #012E40; margin-bottom: 2px;">${data.clientName}</div>
-                            <div style="font-size: 0.85rem; color: #6b7280;">${data.clientEmail || '—'}</div>
-                        </td>
-                        <td>${portalTypeBadge}</td>
-                        <td>
-                            <span class="status-badge status-${data.active ? 'active' : 'inactive'}">
-                                ${data.active ? 'Active' : 'Inactive'}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="progress-mini">
-                                <div class="progress-step ${data.step1Complete ? 'complete' : ''}">1</div>
-                                <div class="progress-step ${data.step2Complete ? 'complete' : ''}">2</div>
-                                <div class="progress-step ${data.step3Complete ? 'complete' : ''}">3</div>
-                                <div class="progress-step ${data.step4Complete ? 'complete' : ''}">4</div>
-                                <div class="progress-step ${data.step5Complete ? 'complete' : ''}">5</div>
+                    const card = document.createElement('div');
+                    card.style.cssText = 'background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s ease; border-left: 4px solid ' + (data.active ? '#05908C' : '#d1d5db');
+
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 14px;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                                    <h3 style="font-size: 1.1rem; font-weight: 700; color: #012E40; margin: 0;">${data.clientName}</h3>
+                                    <span class="badge badge-${portalType === 'm2m' ? 'warning' : 'success'}" style="font-size: 0.7rem;">${portalType === 'm2m' ? 'M2M' : 'Contract'}</span>
+                                </div>
+                                <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">${data.clientEmail || 'No email provided'}</p>
                             </div>
-                        </td>
-                        <td>
-                            <input type="text" value="${portalLink}" id="link-${data.clientId}" readonly style="width: 200px; padding: 4px; margin-right: 5px;">
-                            <button class="copy-btn" onclick="copyLink('${data.clientId}')">Copy</button>
-                        </td>
-                        <td>
-                            <button class="btn btn-success btn-small" onclick="toggleStatus('${data.clientId}', ${!data.active})">
+                            <span class="badge badge-${data.active ? 'success' : 'secondary'}">${data.active ? 'Active' : 'Inactive'}</span>
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <span style="font-size: 0.75rem; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Onboarding Progress</span>
+                                <span style="font-size: 0.85rem; font-weight: 700; color: #05908C;">${completedSteps}/5 Steps</span>
+                            </div>
+                            <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #05908C 0%, #47a5a3 100%); height: 100%; width: ${progressPercent}%; transition: width 0.3s ease;"></div>
+                            </div>
+                            <div style="display: flex; gap: 6px; margin-top: 10px;">
+                                <div class="progress-step ${data.step1Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step1Complete ? '#05908C' : '#f3f4f6'}; color: ${data.step1Complete ? 'white' : '#9ca3af'};">1</div>
+                                <div class="progress-step ${data.step2Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step2Complete ? '#05908C' : '#f3f4f6'}; color: ${data.step2Complete ? 'white' : '#9ca3af'};">2</div>
+                                <div class="progress-step ${data.step3Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step3Complete ? '#05908C' : '#f3f4f6'}; color: ${data.step3Complete ? 'white' : '#9ca3af'};">3</div>
+                                <div class="progress-step ${data.step4Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step4Complete ? '#05908C' : '#f3f4f6'}; color: ${data.step4Complete ? 'white' : '#9ca3af'};">4</div>
+                                <div class="progress-step ${data.step5Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step5Complete ? '#05908C' : '#f3f4f6'}; color: ${data.step5Complete ? 'white' : '#9ca3af'};">5</div>
+                            </div>
+                        </div>
+
+                        <div style="background: #f9fafb; border-radius: 8px; padding: 10px; margin-bottom: 14px;">
+                            <div style="font-size: 0.7rem; color: #9ca3af; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Portal Link</div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <input type="text" value="${portalLink}" id="link-${data.clientId}" readonly style="flex: 1; background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px; font-size: 0.8rem; color: #4b5563; font-family: monospace;">
+                                <button class="copy-btn" onclick="copyLink('${data.clientId}')" style="padding: 8px 16px; white-space: nowrap;">Copy</button>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-${data.active ? 'secondary' : 'success'} btn-small" onclick="toggleStatus('${data.clientId}', ${!data.active})" style="flex: 1; padding: 10px; font-size: 0.85rem;">
                                 ${data.active ? 'Deactivate' : 'Activate'}
                             </button>
-                            <button class="btn btn-small" onclick="editClient('${data.clientId}')">Edit</button>
-                        </td>
+                            <button class="btn btn-small" onclick="editClient('${data.clientId}')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Edit</button>
+                        </div>
                     `;
+
+                    card.addEventListener('mouseenter', () => {
+                        card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
+                        card.style.transform = 'translateY(-4px)';
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        card.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                        card.style.transform = 'translateY(0)';
+                    });
+
+                    grid.appendChild(card);
                 });
             } catch (error) {
                 console.error('Error loading clients:', error);
