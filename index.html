@@ -1075,7 +1075,10 @@
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
+
+    <!-- Configuration -->
+    <script src="config.js"></script>
+
     <script>
         // ============================================
         // PASSWORD PROTECTION (Server-Side Verification)
@@ -1147,18 +1150,7 @@
         // ============================================
         // FIREBASE CONFIGURATION
         // ============================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyC6nhisBnue09mvJuFzBb7m6zcMtqBRZEQ",
-            authDomain: "client-portal-2fa80.firebaseapp.com",
-            projectId: "client-portal-2fa80",
-            storageBucket: "client-portal-2fa80.firebasestorage.app",
-            messagingSenderId: "417272730660",
-            appId: "1:417272730660:web:9530a097347fbbf72f5771"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // Firebase is initialized in config.js
 
         // Your portal URL
         const PORTAL_BASE_URL = 'https://portal.driveleadmedia.com';
