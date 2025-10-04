@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Launch Portal - Drive Lead Media (Contract)</title>
+    <title>Client Launch Portal - Drive Lead Media (Month-to-Month)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Young+Serif:wght@400&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
             <div style="width: 50px; height: 50px; border: 3px solid #EEF4D9; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin: 0 auto;"></div>
         </div>
     </div>
-    
+
     <style>
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -31,7 +31,7 @@
             <div class="progress-percentage-circle">
                 <svg>
                     <circle class="background" cx="25" cy="25" r="20"></circle>
-                    <circle class="progress" id="sidebarProgressCircle" cx="25" cy="25" r="20" 
+                    <circle class="progress" id="sidebarProgressCircle" cx="25" cy="25" r="20"
                             stroke-dasharray="126" stroke-dashoffset="126"></circle>
                 </svg>
                 <div class="progress-percentage-text" id="sidebarProgressPercent">0%</div>
@@ -77,7 +77,7 @@
         <div class="hero">
             <h1>Client Launch Portal</h1>
             <p>Complete each step. We'll handle the rest.</p>
-            
+
             <div class="progress-container">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
@@ -106,58 +106,33 @@
             </div>
             <div class="step-content">
                 <div style="margin-bottom: 20px;">
+                    <a href="#" class="btn" id="serviceAgreementBtn" target="_blank" rel="noopener">
+                        Sign Service Agreement
+                    </a>
                     <a href="#" class="btn" id="dpaBtn" target="_blank" rel="noopener">
                         Sign DPA (Data Processing Agreement)
                     </a>
                 </div>
-                <div class="radio-group">
-                    <div class="radio-item">
-                        <input type="radio" id="service6" name="serviceTerm" value="6" checked>
-                        <label for="service6">6-month service agreement</label>
-                    </div>
-                    <div class="radio-item">
-                        <input type="radio" id="service12" name="serviceTerm" value="12">
-                        <label for="service12">12-month service agreement</label>
-                    </div>
-                </div>
-                <a href="#" class="btn" id="serviceBtn" target="_blank" rel="noopener">
-                    Sign Service Agreement (6-month)
-                </a>
             </div>
             <div class="step-actions">
                 <button class="btn btn-complete" onclick="window.markStepComplete(1)">Mark Step 1 Complete</button>
             </div>
         </div>
 
-        <!-- Step 2: Set Up Payment -->
+        <!-- Step 2: Pay First Invoice -->
         <div class="step locked" id="step2">
             <div class="step-header">
                 <div>
-                    <h2>Set Up Payment</h2>
+                    <h2>Pay First Invoice</h2>
                     <div class="step-note">Secure payment processing via Stripe. All major payment methods accepted.</div>
                 </div>
                 <div class="step-number">2</div>
             </div>
             <div class="step-content">
-                <div class="payment-term-display">
-                    <h4 style="color: #012E40; margin: 0;">
-                        <span id="paymentTermText">6-Month</span> Payment Options
-                    </h4>
-                </div>
-                
-                <div class="radio-group" style="margin-bottom: 20px;">
-                    <div class="radio-item">
-                        <input type="radio" id="paymentMonthly" name="paymentType" value="monthly" checked>
-                        <label for="paymentMonthly">Pay Monthly</label>
-                    </div>
-                    <div class="radio-item">
-                        <input type="radio" id="paymentUpfront" name="paymentType" value="upfront">
-                        <label for="paymentUpfront">Pay All Upfront <span class="discount-tag">5% Discount</span></label>
-                    </div>
-                </div>
-                
-                <a href="#" class="btn" id="stripeBtn" target="_blank" rel="noopener">
-                    Set Up Monthly Payment
+                <p style="color: #012E40; margin-bottom: 20px;">Click the link below to pay your first invoice securely through Stripe.</p>
+
+                <a href="#" class="btn" id="invoiceBtn" target="_blank" rel="noopener">
+                    Pay First Invoice
                 </a>
             </div>
             <div class="step-actions">
@@ -177,24 +152,24 @@
                 <div style="margin-bottom: 25px;">
                     <h4 style="color: #012E40; margin-bottom: 15px;">Meta Business Suite Setup</h4>
                     <p style="color: #012E40; margin-bottom: 15px;">Let's handle this together - I'll walk you through the setup step-by-step.</p>
-                    
+
                     <div style="background: #DFF5F3; padding: 25px; border-radius: 12px; border: 2px solid #85C7B3; text-align: center; max-width: 450px; margin: 0 auto;">
-                        <img src="https://www.driveleadmedia.com/s/IMG_1337.png" 
-                             alt="Nicolas - Drive Lead Media" 
+                        <img src="https://www.driveleadmedia.com/s/IMG_1337.png"
+                             alt="Nicolas - Drive Lead Media"
                              style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #05908C;">
-                        
+
                         <h5 style="color: #012E40; margin-bottom: 10px;">Call Nicolas</h5>
-                        
+
                         <div style="background: #05908C; color: #EEF4D9; padding: 12px 20px; border-radius: 8px; margin: 15px 0; font-size: 1.1rem; font-weight: 700;">
                             <a href="tel:+16786506411" style="color: #EEF4D9; text-decoration: none;">
                                 (678) 650-6411
                             </a>
                         </div>
-                        
+
                         <div style="color: #012E40; font-size: 0.9rem; line-height: 1.5;">
                             <p style="margin-bottom: 5px;"><strong>Available:</strong> 9am - 5pm, Mon-Sat</p>
                             <p style="margin-bottom: 10px;"><strong>Call Duration:</strong> ~15 minutes</p>
-                            
+
                             <div style="background: rgba(242, 169, 34, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #F2A922; margin-top: 10px;">
                                 <p style="margin: 0; font-size: 0.85rem;">
                                     If I don't answer, shoot me a text or leave a voicemail - I'll get right back to you.
@@ -203,7 +178,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Brand Kit Upload Section -->
                 <div style="margin: 30px 0 20px 0; border-top: 2px solid rgba(133, 199, 179, 0.3); padding-top: 25px;">
                     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
@@ -212,7 +187,7 @@
                             What is a brand kit?
                         </button>
                     </div>
-                    
+
                     <!-- Brand Kit Explanation (hidden initially) -->
                     <div id="brandKitInfo" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
                         <h5 style="color: #012E40; margin-bottom: 10px;">Your Brand Kit Should Include:</h5>
@@ -242,9 +217,9 @@
                             </p>
                         </div>
                     </div>
-                    
+
                     <p style="color: #012E40; margin-bottom: 15px;">Upload your logos, brand guidelines, fonts, and any existing creative assets so we can create ads that perfectly match your brand.</p>
-                    <a href="https://drive.google.com/drive/folders/1jds7K6SdV6G_SwTyZZjxqjuftqIHiaPY?usp=sharing" 
+                    <a href="https://drive.google.com/drive/folders/1jds7K6SdV6G_SwTyZZjxqjuftqIHiaPY?usp=sharing"
                        class="btn btn-outline" id="uploadBtn" target="_blank" rel="noopener">
                         Upload Brand Assets
                     </a>
@@ -268,7 +243,7 @@
                 <div style="margin-bottom: 25px;">
                     <h4 style="color: #012E40; margin-bottom: 15px;">🖥️ Website Access Needed</h4>
                     <p style="color: #012E40; margin-bottom: 15px;">Choose the easiest option for you:</p>
-                    
+
                     <div class="radio-group">
                         <div class="radio-item">
                             <input type="radio" id="connectWebAdmin" name="websiteAccess" value="connect" checked>
@@ -363,7 +338,7 @@
                         <button class="btn-info" onclick="window.toggleGA4Info()">What is GA4?</button>
                         <button class="btn-info" onclick="window.togglePixelInfo()">What is Meta Pixel?</button>
                     </div>
-                    
+
                     <!-- GA4 Explanation (hidden initially) -->
                     <div id="ga4Info" class="info-box">
                         <h6>Google Analytics 4 (GA4):</h6>
@@ -412,7 +387,7 @@
                         Links will be provided once creatives are ready for review
                     </p>
                 </div>
-                
+
                 <div style="margin: 20px 0;">
                     <button class="btn btn-secondary" onclick="window.approveCreatives()">
                         🚀 Approve to Launch
@@ -421,7 +396,7 @@
                         Request Revisions
                     </button>
                 </div>
-                
+
                 <!-- Revision Form (hidden) -->
                 <div id="revisionForm" style="display: none; background: #DFF5F3; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #85C7B3;">
                     <h4 style="color: #012E40;">Request Revisions</h4>
@@ -439,7 +414,7 @@
 
         <!-- Footer -->
         <div class="portal-footer">
-            <p>Drive Lead Media — We never process PHI. All analytics used solely for advertising performance.</p>
+            <p>Drive Lead Media — Professional digital marketing solutions.</p>
             <div class="footer-links">
                 <span id="contactEmail">Nicolas@driveleadmedia.com</span>
                 <span>•</span>
@@ -451,11 +426,11 @@
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
+
     <!-- Configuration -->
     <script src="config.js"></script>
-    
-    <!-- Main Functions -->
-    <script src="functions.js"></script>
+
+    <!-- Main Functions - Month-to-Month Version -->
+    <script src="functions-m2m.js"></script>
 </body>
 </html>

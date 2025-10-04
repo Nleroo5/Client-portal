@@ -384,11 +384,26 @@
     </style>
 </head>
 <body>
+    <!-- Password Protection Overlay -->
+    <div id="passwordOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); display: flex; align-items: center; justify-content: center; z-index: 999999;">
+        <div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);">
+            <h1 style="font-family: 'Young Serif', serif; color: #012E40; margin-bottom: 10px;">Admin Access</h1>
+            <p style="color: #05908C; margin-bottom: 25px;">Enter password to continue</p>
+            <input type="password" id="adminPassword" placeholder="Enter password" style="width: 100%; padding: 12px; border: 2px solid #85C7B3; border-radius: 8px; font-size: 1rem; margin-bottom: 15px;">
+            <button onclick="checkPassword()" style="width: 100%; padding: 12px 24px; background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: #EEF4D9; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer;">
+                Unlock Dashboard
+            </button>
+            <div id="passwordError" style="color: #ff6b6b; margin-top: 15px; display: none; font-weight: 600;">
+                ❌ Incorrect password
+            </div>
+        </div>
+    </div>
+
     <div class="admin-header">
         <h1>Admin Dashboard</h1>
         <p>Manage Client Portals - Drive Lead Media</p>
     </div>
-    
+
     <div class="admin-container">
         <!-- Alert Messages -->
         <div id="alertMessage" style="display: none;"></div>
@@ -407,7 +422,20 @@
                         <input type="email" id="clientEmail">
                     </div>
                 </div>
-                
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="portalType">Portal Type *</label>
+                        <select id="portalType" required>
+                            <option value="contract">Contract (6/12-Month Agreement)</option>
+                            <option value="m2m">Month-to-Month</option>
+                        </select>
+                    </div>
+                    <div></div>
+                </div>
+
+                <!-- Contract Portal Links (shown by default) -->
+                <div id="contractLinks">
                 <div class="link-section">
                     <h3>DocuSign Links (Optional - Leave blank for defaults)</h3>
                     <div class="form-row">
@@ -449,9 +477,37 @@
                         </div>
                     </div>
                 </div>
-                
+                </div>
+                <!-- End Contract Portal Links -->
+
+                <!-- Month-to-Month Portal Links (hidden by default) -->
+                <div id="m2mLinks" style="display: none;">
                 <div class="link-section">
-                    <h3>Other Links (Optional)</h3>
+                    <h3>Month-to-Month DocuSign Links (Optional)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="m2mServiceAgreementLink">Custom Service Agreement Link</label>
+                            <input type="url" id="m2mServiceAgreementLink" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="m2mDpaLink">Custom DPA Link</label>
+                            <input type="url" id="m2mDpaLink" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="link-section">
+                    <h3>Month-to-Month Payment Link (Optional)</h3>
+                    <div class="form-group">
+                        <label for="m2mInvoiceLink">Stripe Invoice/Payment Link</label>
+                        <input type="url" id="m2mInvoiceLink" placeholder="Leave blank for default">
+                    </div>
+                </div>
+                </div>
+                <!-- End Month-to-Month Portal Links -->
+
+                <div class="link-section">
+                    <h3>Other Links (Optional - Shared by Both Portals)</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="googleDriveLink">Google Drive Upload Link</label>
@@ -621,7 +677,50 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // Firebase Configuration
+        // ============================================
+        // PASSWORD PROTECTION
+        // ============================================
+        const ADMIN_PASSWORD = "DLM2024!"; // ⚠️ CHANGE THIS PASSWORD!
+
+        function checkPassword() {
+            const passwordInput = document.getElementById('adminPassword');
+            const passwordError = document.getElementById('passwordError');
+            const passwordOverlay = document.getElementById('passwordOverlay');
+
+            if (passwordInput.value === ADMIN_PASSWORD) {
+                // Correct password - hide overlay and store session
+                passwordOverlay.style.display = 'none';
+                sessionStorage.setItem('adminAuthenticated', 'true');
+                passwordError.style.display = 'none';
+            } else {
+                // Wrong password - show error
+                passwordError.style.display = 'block';
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+
+        // Allow Enter key to submit password
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('adminPassword');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkPassword();
+                    }
+                });
+                passwordInput.focus();
+            }
+
+            // Check if already authenticated in this session
+            if (sessionStorage.getItem('adminAuthenticated') === 'true') {
+                document.getElementById('passwordOverlay').style.display = 'none';
+            }
+        });
+
+        // ============================================
+        // FIREBASE CONFIGURATION
+        // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyC6nhisBnue09mvJuFzBb7m6zcMtqBRZEQ",
             authDomain: "client-portal-2fa80.firebaseapp.com",
@@ -630,14 +729,14 @@
             messagingSenderId: "417272730660",
             appId: "1:417272730660:web:9530a097347fbbf72f5771"
         };
-        
+
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        
+
         // Your portal URL
         const PORTAL_BASE_URL = 'https://portal.driveleadmedia.com';
-        
+
         // Current client being edited
         let currentEditingClient = null;
         
@@ -657,47 +756,82 @@
         function generateClientId() {
             return 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
-        
+
+        // Toggle portal type fields
+        function togglePortalTypeFields() {
+            const portalType = document.getElementById('portalType').value;
+            const contractLinks = document.getElementById('contractLinks');
+            const m2mLinks = document.getElementById('m2mLinks');
+
+            if (portalType === 'm2m') {
+                contractLinks.style.display = 'none';
+                m2mLinks.style.display = 'block';
+            } else {
+                contractLinks.style.display = 'block';
+                m2mLinks.style.display = 'none';
+            }
+        }
+
+        // Initialize portal type toggle
+        document.getElementById('portalType').addEventListener('change', togglePortalTypeFields);
+
         // Create new client
         document.getElementById('createClientForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const clientId = generateClientId();
+            const portalType = document.getElementById('portalType').value;
+
+            // Base client data (common to both portal types)
             const clientData = {
                 clientId: clientId,
                 clientName: document.getElementById('clientName').value,
                 clientEmail: document.getElementById('clientEmail').value || null,
+                portalType: portalType, // NEW: Store portal type
                 active: true,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-                
+
                 // Progress tracking
                 step1Complete: false,
                 step2Complete: false,
                 step3Complete: false,
                 step4Complete: false,
                 step5Complete: false,
-                
-                // Custom links (only save if provided)
-                dpaLink: document.getElementById('dpaLink').value || null,
-                service6Link: document.getElementById('service6Link').value || null,
-                service12Link: document.getElementById('service12Link').value || null,
-                
-                // Stripe links
-                stripe6Monthly: document.getElementById('stripe6Monthly').value || null,
-                stripe6Upfront: document.getElementById('stripe6Upfront').value || null,
-                stripe12Monthly: document.getElementById('stripe12Monthly').value || null,
-                stripe12Upfront: document.getElementById('stripe12Upfront').value || null,
-                
-                // Other links
+
+                // Shared links
                 googleDriveLink: document.getElementById('googleDriveLink').value || null,
                 creativeLink: document.getElementById('creativeLink').value || null
             };
-            
+
+            // Add portal-specific links
+            if (portalType === 'contract') {
+                // Contract portal (6/12 month) links
+                clientData.dpaLink = document.getElementById('dpaLink').value || null;
+                clientData.service6Link = document.getElementById('service6Link').value || null;
+                clientData.service12Link = document.getElementById('service12Link').value || null;
+                clientData.stripe6Monthly = document.getElementById('stripe6Monthly').value || null;
+                clientData.stripe6Upfront = document.getElementById('stripe6Upfront').value || null;
+                clientData.stripe12Monthly = document.getElementById('stripe12Monthly').value || null;
+                clientData.stripe12Upfront = document.getElementById('stripe12Upfront').value || null;
+            } else if (portalType === 'm2m') {
+                // Month-to-month portal links
+                clientData.serviceAgreementLink = document.getElementById('m2mServiceAgreementLink').value || null;
+                clientData.dpaLink = document.getElementById('m2mDpaLink').value || null;
+                clientData.invoiceLink = document.getElementById('m2mInvoiceLink').value || null;
+            }
+
             try {
                 await db.collection('clients').doc(clientId).set(clientData);
-                showAlert(`Client portal created successfully! Portal link: ${PORTAL_BASE_URL}?c=${clientId}`);
+
+                // Generate correct portal URL based on type
+                const portalUrl = portalType === 'm2m' ?
+                    `${PORTAL_BASE_URL}/index-m2m.html?c=${clientId}` :
+                    `${PORTAL_BASE_URL}?c=${clientId}`;
+
+                showAlert(`${portalType === 'm2m' ? 'Month-to-Month' : 'Contract'} portal created successfully! Portal link: ${portalUrl}`);
                 document.getElementById('createClientForm').reset();
+                togglePortalTypeFields(); // Reset UI to default
                 loadClients();
             } catch (error) {
                 console.error('Error creating client:', error);
@@ -714,11 +848,19 @@
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    const portalLink = `${PORTAL_BASE_URL}?c=${data.clientId}`;
-                    
+                    // Generate correct portal link based on portal type
+                    const portalType = data.portalType || 'contract'; // Default to contract for old clients
+                    const portalLink = portalType === 'm2m' ?
+                        `${PORTAL_BASE_URL}/index-m2m.html?c=${data.clientId}` :
+                        `${PORTAL_BASE_URL}?c=${data.clientId}`;
+
+                    const portalTypeBadge = portalType === 'm2m' ?
+                        '<span style="background: #F2A922; color: #012E40; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 8px;">M2M</span>' :
+                        '<span style="background: #05908C; color: #EEF4D9; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 8px;">Contract</span>';
+
                     const row = tbody.insertRow();
                     row.innerHTML = `
-                        <td>${data.clientName}</td>
+                        <td>${data.clientName}${portalTypeBadge}</td>
                         <td>
                             <span class="status-badge status-${data.active ? 'active' : 'inactive'}">
                                 ${data.active ? 'Active' : 'Inactive'}
