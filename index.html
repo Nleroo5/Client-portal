@@ -263,6 +263,7 @@
 
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <!-- Configuration -->
@@ -326,35 +327,37 @@
             e.preventDefault();
 
             const password = document.getElementById('admin-password').value;
-            const errorDiv = document.getElementById('admin-error');
             const btn = e.target.querySelector('.btn-login');
 
             // Show loading state
-            btn.textContent = 'Checking...';
+            btn.textContent = 'Logging in...';
             btn.classList.add('loading-state');
 
             try {
-                // Fetch password from server
-                const response = await fetch('https://portal.driveleadmedia.com/admin-password.json');
+                // Sign in with Firebase Authentication
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(
+                    'admin@driveleadmedia.com',
+                    password
+                );
 
-                if (!response.ok) {
-                    throw new Error('Failed to verify password');
-                }
+                // Success - store session and redirect
+                sessionStorage.setItem('adminAuthenticated', 'true');
+                sessionStorage.setItem('adminUid', userCredential.user.uid);
+                window.location.href = 'admin.html';
 
-                const data = await response.json();
-
-                if (password === data.password) {
-                    // Correct password - store session and redirect
-                    sessionStorage.setItem('adminAuthenticated', 'true');
-                    window.location.href = 'admin.html';
-                } else {
-                    // Wrong password
-                    showError('admin', 'Incorrect password. Please try again.');
-                    document.getElementById('admin-password').value = '';
-                }
             } catch (error) {
                 console.error('Login error:', error);
-                showError('admin', 'Unable to verify password. Check your connection.');
+
+                // Handle specific error messages
+                if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    showError('admin', 'Incorrect password. Please try again.');
+                } else if (error.code === 'auth/too-many-requests') {
+                    showError('admin', 'Too many failed attempts. Please try again later.');
+                } else {
+                    showError('admin', 'Login failed. Please try again.');
+                }
+
+                document.getElementById('admin-password').value = '';
             } finally {
                 btn.textContent = 'Login to Admin Dashboard';
                 btn.classList.remove('loading-state');

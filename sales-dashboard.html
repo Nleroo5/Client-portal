@@ -14,7 +14,7 @@
     <div class="dashboard-header">
         <div class="header-left">
             <h1>Drive Lead Media</h1>
-            <p class="welcome-text">Welcome back, <span id="repNameDisplay">Loading...</span>! 👋</p>
+            <p class="welcome-text">Welcome back, <span id="repNameDisplay">Loading...</span></p>
         </div>
         <div class="header-right">
             <button class="btn btn-logout" onclick="logout()">Logout</button>
@@ -24,16 +24,16 @@
     <!-- Navigation Tabs -->
     <div class="nav-tabs">
         <button class="nav-tab active" data-tab="pipeline" onclick="switchTab('pipeline')">
-            📊 My Pipeline
+            My Pipeline
         </button>
         <button class="nav-tab" data-tab="scorecard" onclick="switchTab('scorecard')">
-            ✅ My Scorecard
+            My Scorecard
         </button>
         <button class="nav-tab" data-tab="team" onclick="switchTab('team')">
-            👥 Team
+            Team
         </button>
         <button class="nav-tab" data-tab="tasks" onclick="switchTab('tasks')">
-            📋 Tasks
+            Tasks
         </button>
     </div>
 
@@ -43,7 +43,10 @@
         <!-- Tab 1: My Pipeline -->
         <div class="tab-content active" id="tab-pipeline">
             <div class="section-header">
-                <h2>My Pipeline</h2>
+                <div>
+                    <h2 style="margin-bottom: 4px;">My Pipeline</h2>
+                    <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">Track your active deals across all stages</p>
+                </div>
                 <button class="btn btn-primary" onclick="openNewDealModal()">+ New Deal</button>
             </div>
 
@@ -59,7 +62,10 @@
         <!-- Tab 2: My Scorecard -->
         <div class="tab-content" id="tab-scorecard">
             <div class="section-header">
-                <h2>My Scorecard - This Week</h2>
+                <div>
+                    <h2 style="margin-bottom: 4px;">My Scorecard - This Week</h2>
+                    <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">Monitor your weekly performance metrics</p>
+                </div>
                 <button class="btn btn-secondary" onclick="openLogActivityModal()">+ Log Activity</button>
             </div>
 
@@ -82,7 +88,7 @@
             </div>
 
             <div class="activity-log-section">
-                <h3>Recent Activities</h3>
+                <h3 style="color: #012E40; margin-bottom: 16px; font-size: 1rem; font-weight: 600;">Recent Activities</h3>
                 <div id="recentActivities">
                     <p class="no-data">No activities logged yet.</p>
                 </div>
@@ -92,8 +98,11 @@
         <!-- Tab 3: Team Performance -->
         <div class="tab-content" id="tab-team">
             <div class="section-header">
-                <h2>Team Performance</h2>
-                <div class="week-indicator" id="weekIndicator">Week of Loading...</div>
+                <div>
+                    <h2 style="margin-bottom: 4px;">Team Performance</h2>
+                    <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">Compare your performance with team members</p>
+                </div>
+                <div class="week-indicator" id="weekIndicator" style="color: #05908C; font-weight: 600; font-size: 0.95rem;">Week of Loading...</div>
             </div>
 
             <div class="team-leaderboard">
@@ -116,7 +125,7 @@
             </div>
 
             <div class="team-pipeline-section">
-                <h3>Team Pipeline Overview</h3>
+                <h3 style="color: #012E40; margin-bottom: 16px; font-size: 1rem; font-weight: 600;">Team Pipeline Overview</h3>
                 <div id="teamPipelineStats">
                     <p class="no-data">Loading team pipeline...</p>
                 </div>
@@ -127,27 +136,29 @@
         <!-- Tab 4: Tasks -->
         <div class="tab-content" id="tab-tasks">
             <div class="section-header">
-                <h2>My Tasks</h2>
-                <p class="subtitle">Track your action items and follow-ups</p>
+                <div>
+                    <h2 style="margin-bottom: 4px;">My Tasks</h2>
+                    <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">Track your action items and follow-ups</p>
+                </div>
             </div>
 
             <div class="tasks-container">
                 <div class="task-section">
-                    <h3 class="task-section-title overdue">⚠️ Overdue (<span id="overdueCount">0</span>)</h3>
+                    <h3 class="task-section-title overdue" style="font-size: 1rem; font-weight: 600;">Overdue (<span id="overdueCount">0</span>)</h3>
                     <div id="overdueTasks" class="task-list">
                         <p class="no-data">No overdue tasks</p>
                     </div>
                 </div>
 
                 <div class="task-section">
-                    <h3 class="task-section-title due-today">📅 Due Today (<span id="dueTodayCount">0</span>)</h3>
+                    <h3 class="task-section-title due-today" style="font-size: 1rem; font-weight: 600;">Due Today (<span id="dueTodayCount">0</span>)</h3>
                     <div id="dueTodayTasks" class="task-list">
                         <p class="no-data">No tasks due today</p>
                     </div>
                 </div>
 
                 <div class="task-section">
-                    <h3 class="task-section-title upcoming">📋 Upcoming (<span id="upcomingCount">0</span>)</h3>
+                    <h3 class="task-section-title upcoming" style="font-size: 1rem; font-weight: 600;">Upcoming (<span id="upcomingCount">0</span>)</h3>
                     <div id="upcomingTasks" class="task-list">
                         <p class="no-data">No upcoming tasks</p>
                     </div>
