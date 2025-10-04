@@ -42,12 +42,11 @@
 
         <!-- Tab 1: My Deals -->
         <div class="tab-content active" id="tab-deals">
-            <!-- Pipeline Value & Filter -->
+            <!-- Pipeline Header -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
                 <div>
-                    <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 4px;">Total Pipeline Value</div>
-                    <div style="font-size: 2rem; font-weight: 700; color: #000;" id="totalPipelineValue">$0</div>
-                    <div style="font-size: 0.85rem; color: #6b7280; margin-top: 4px;"><span id="totalDealsCount">0</span> active deals</div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #012E40;">My Pipeline</div>
+                    <div style="font-size: 0.9rem; color: #6b7280; margin-top: 4px;"><span id="totalDealsCount">0</span> active deals</div>
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center;">
                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 16px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
@@ -222,16 +221,6 @@
                             <option value="follow-up-resell">Follow-Up & Resell</option>
                         </select>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <div>
-                            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #012E40;">MRR</label>
-                            <input type="number" id="dealMRR" placeholder="Monthly recurring revenue" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem;">
-                        </div>
-                        <div>
-                            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #012E40;">Contract Length (months)</label>
-                            <input type="number" id="dealContractLength" placeholder="6, 12, etc." style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem;">
-                        </div>
-                    </div>
                 </div>
                 <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
                     <button type="button" onclick="closeDealModal()" class="btn btn-outline" style="flex: 1;">Cancel</button>
@@ -350,21 +339,15 @@
                     .get();
 
                 const deals = [];
-                let totalValue = 0;
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     // Only show active deals (not completed or closed-lost)
                     if (data.stage !== 'completed' && data.stage !== 'closed-lost') {
                         deals.push({ id: doc.id, ...data });
-                        // Calculate total pipeline value (MRR * contract length)
-                        if (data.mrr && data.contractLength) {
-                            totalValue += (data.mrr * data.contractLength);
-                        }
                     }
                 });
 
-                // Update pipeline value display
-                document.getElementById('totalPipelineValue').textContent = '$' + totalValue.toLocaleString();
+                // Update deal count display
                 document.getElementById('totalDealsCount').textContent = deals.length;
 
                 renderPipelineBoard(deals);
@@ -426,8 +409,7 @@
                     html += `
                         <div class="deal-card" style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 3px solid #000; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
                             <div style="font-weight: 700; color: #012E40; margin-bottom: 4px;">${deal.companyName || 'Unnamed Deal'}</div>
-                            <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 8px;">${deal.contactName || 'No contact'}</div>
-                            ${deal.mrr ? `<div style="font-size: 0.9rem; font-weight: 600; color: #05908C;">$${deal.mrr}/mo</div>` : ''}
+                            <div style="font-size: 0.85rem; color: #6b7280;">${deal.contactName || 'No contact'}</div>
                         </div>
                     `;
                 });
@@ -1060,8 +1042,6 @@
                 email: document.getElementById('dealEmail').value || null,
                 phone: document.getElementById('dealPhone').value || null,
                 stage: document.getElementById('dealStage').value,
-                mrr: parseFloat(document.getElementById('dealMRR').value) || null,
-                contractLength: parseInt(document.getElementById('dealContractLength').value) || null,
                 assignedTo: repId,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
