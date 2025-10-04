@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources - Sales Dashboard</title>
+    <link rel="stylesheet" href="sales-styles.css">
+    <style>
+        .resources-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .resources-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .resources-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .resources-header p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 32px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.15s ease-out;
+        }
+
+        .back-button:hover {
+            color: var(--primary-hover);
+        }
+
+        .resource-section {
+            margin-bottom: 48px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+            text-align: left;
+        }
+
+        .placeholder-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+        }
+
+        .placeholder-text {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.875rem;
+        }
+
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .resource-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            transition: all 0.15s ease-out;
+        }
+
+        .resource-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="resources-container">
+        <a href="sales-dashboard.html" class="back-button">← Back to Dashboard</a>
+
+        <div class="resources-header">
+            <h1>Sales Resources</h1>
+            <p>Sales training materials and company information</p>
+        </div>
+
+        <!-- Company Information -->
+        <div class="resource-section">
+            <h2 class="section-title">About Drive Lead Media</h2>
+            <div class="placeholder-card">
+                <p class="placeholder-text">Company information will be added here. Contact admin to upload company details, mission statement, and key statistics.</p>
+            </div>
+        </div>
+
+        <!-- Targeted Advertising Resources -->
+        <div class="resource-section">
+            <h2 class="section-title">Targeted Advertising Resources</h2>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <p class="placeholder-text">Advertising resources, infographics, and case studies will be added here. Contact admin to upload materials.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Training -->
+        <div class="resource-section">
+            <h2 class="section-title">Sales Training & Best Practices</h2>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <p class="placeholder-text">Sales training materials, guides, and best practices will be added here. Contact admin to upload content.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Industry Resources -->
+        <div class="resource-section">
+            <h2 class="section-title">Industry Articles & Blogs</h2>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <p class="placeholder-text">Industry articles, blog posts, and thought leadership content will be added here. Contact admin to upload links.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer style="background: #FFFFFF; border-top: 1px solid #E2E8F0; padding: 32px 0; margin-top: 60px;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 24px; text-align: center;">
+            <p style="color: #94A3B8; font-size: 0.75rem; margin: 0;">© 2025 Drive Lead Media. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

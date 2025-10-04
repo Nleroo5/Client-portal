@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Sales Dashboard</title>
+    <link rel="stylesheet" href="sales-styles.css">
+    <style>
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .faq-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .faq-header p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .faq-section {
+            margin-bottom: 40px;
+        }
+
+        .faq-section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+            text-align: left;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            transition: all 0.15s ease-out;
+        }
+
+        .faq-item:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .faq-question {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .faq-answer {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            text-align: left;
+        }
+
+        .faq-answer ul, .faq-answer ol {
+            margin: 12px 0;
+            padding-left: 24px;
+        }
+
+        .faq-answer li {
+            margin-bottom: 8px;
+        }
+
+        .faq-answer strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .faq-answer code {
+            background: var(--bg-main);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 32px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.15s ease-out;
+        }
+
+        .back-button:hover {
+            color: var(--primary-hover);
+        }
+
+        .highlight-box {
+            background: rgba(14, 165, 233, 0.05);
+            border-left: 3px solid var(--primary);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="faq-container">
+        <a href="sales-dashboard.html" class="back-button">← Back to Dashboard</a>
+
+        <div class="faq-header">
+            <h1>Sales Dashboard FAQ</h1>
+            <p>Everything you need to know about your sales performance dashboard</p>
+        </div>
+
+        <!-- Point System Section -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Point System</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">How does the point system work?</div>
+                <div class="faq-answer">
+                    <p>The point system rewards both <strong>activity</strong> and <strong>results</strong> to encourage consistent effort while prioritizing actual conversions:</p>
+
+                    <div class="highlight-box">
+                        <strong>Activity Points (Low Value):</strong>
+                        <ul>
+                            <li><strong>0.1 point</strong> per call made</li>
+                            <li><strong>0.1 point</strong> per email sent</li>
+                        </ul>
+
+                        <strong>Engagement Points (Medium Value):</strong>
+                        <ul>
+                            <li><strong>3 points</strong> per discovery call scheduled</li>
+                            <li><strong>5 points</strong> per discovery call completed</li>
+                        </ul>
+
+                        <strong>Conversion Points (High Value):</strong>
+                        <ul>
+                            <li><strong>10 points</strong> per deal moved to onboarding</li>
+                            <li><strong>20 points</strong> per deal gone live</li>
+                        </ul>
+                    </div>
+
+                    <p>Your total weekly score is calculated automatically and displayed on the Team Leaderboard.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Why are some activities worth more points than others?</div>
+                <div class="faq-answer">
+                    <p>The point values reflect business impact:</p>
+                    <ul>
+                        <li><strong>Low-value activities</strong> (calls, emails) are important for volume but don't guarantee results</li>
+                        <li><strong>Medium-value activities</strong> (discovery calls) show engagement and progress</li>
+                        <li><strong>High-value activities</strong> (onboarding, live deals) represent actual revenue generation</li>
+                    </ul>
+                    <p>This balanced approach ensures reps are rewarded for both effort and outcomes.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How do I log activities to earn points?</div>
+                <div class="faq-answer">
+                    <p>There are two ways to log activities:</p>
+                    <ol>
+                        <li><strong>Quick Log Buttons</strong> (This Week tab): Click buttons like "Call Made" or "Discovery Scheduled" to instantly log activity</li>
+                        <li><strong>Deal Card Actions</strong> (My Deals tab): Click "Call" or "Email" buttons on individual deal cards</li>
+                    </ol>
+                    <p>Both methods automatically update your scorecard and team leaderboard in real-time.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pipeline Section -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Sales Pipeline</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">What are the stages in the sales pipeline?</div>
+                <div class="faq-answer">
+                    <p>Your pipeline has <strong>8 stages</strong> that represent the customer journey:</p>
+                    <ol>
+                        <li><strong>Qualified</strong> - Lead has been vetted and meets criteria</li>
+                        <li><strong>Cold Outreach</strong> - Initial contact attempts</li>
+                        <li><strong>Follow-Up</strong> - Continuing communication with interested prospects</li>
+                        <li><strong>Discovery Scheduled</strong> - First meeting booked</li>
+                        <li><strong>Discovery Completed</strong> - Initial consultation finished</li>
+                        <li><strong>Onboarding Portal</strong> - Deal accepted, client entering onboarding</li>
+                        <li><strong>Campaign Live</strong> - Active paying customer</li>
+                        <li><strong>Follow-Up & Resell</strong> - Maintaining relationship for upsells</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How do I move deals between stages?</div>
+                <div class="faq-answer">
+                    <p>You have three options:</p>
+                    <ul>
+                        <li><strong>Stage Dropdown</strong>: Click the dropdown on any deal card and select a new stage</li>
+                        <li><strong>Next Button</strong>: Click the "Next" button to move the deal to the next sequential stage</li>
+                        <li><strong>Edit Deal</strong>: Click the edit button (✏️) and change the stage in the modal</li>
+                    </ul>
+                    <p>When you move a deal, its "last updated" timestamp refreshes automatically.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What does "stalling" mean?</div>
+                <div class="faq-answer">
+                    <p>A deal is marked as <strong>stalling</strong> when it has been in the same stage for <strong>more than 7 days</strong> without any updates.</p>
+                    <p>Stalling deals appear:</p>
+                    <ul>
+                        <li>With a "STALLING" badge on the deal card</li>
+                        <li>In the "Stuck Deals" section on the Action Items tab</li>
+                        <li>In the "Today's Focus" zone on My Deals tab</li>
+                    </ul>
+                    <p>Take action on stalling deals by logging a call, sending an email, or moving them to the next stage.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I edit or delete deals?</div>
+                <div class="faq-answer">
+                    <p>Yes! Each deal card has two buttons in the top-right corner:</p>
+                    <ul>
+                        <li><strong>Edit (✏️)</strong>: Opens the deal editor to update company name, contact info, email, phone, or stage</li>
+                        <li><strong>Archive (🗑️)</strong>: Moves the deal to "closed-lost" status, removing it from your active pipeline</li>
+                    </ul>
+                    <p>Archived deals are not deleted permanently - they're stored with a "closed-lost" stage.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Targets Section -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Weekly Targets & Metrics</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">How do I set my weekly targets?</div>
+                <div class="faq-answer">
+                    <p>On the <strong>This Week</strong> tab, click the <strong>"Edit My Targets"</strong> button to set your personal weekly goals for:</p>
+                    <ul>
+                        <li>Calls Made</li>
+                        <li>Emails Sent</li>
+                        <li>Discovery Calls Scheduled</li>
+                        <li>Discovery Calls Completed</li>
+                        <li>Deals to Onboarding</li>
+                        <li>Deals Gone Live</li>
+                    </ul>
+                    <p>Your targets are personal and can be adjusted anytime based on your capacity and goals.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">When does the week reset?</div>
+                <div class="faq-answer">
+                    <p>The sales week runs from <strong>Monday to Sunday</strong>. Your scorecard resets every Monday at midnight, giving you a fresh start each week.</p>
+                    <p>Historical data is preserved, so you can always review previous weeks' performance.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What happens if I exceed my targets?</div>
+                <div class="faq-answer">
+                    <p>When you hit or exceed a target, you'll see:</p>
+                    <ul>
+                        <li>A "Target hit!" message on that metric</li>
+                        <li>The progress bar shows 100% completion</li>
+                        <li>Your points continue to accumulate beyond the target</li>
+                    </ul>
+                    <p>There's no limit to how many points you can earn - targets are goals, not caps.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Features Section -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Dashboard Features</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">What is "Today's Focus"?</div>
+                <div class="faq-answer">
+                    <p>Today's Focus is your personalized priority zone on the My Deals tab. It highlights:</p>
+                    <ul>
+                        <li><strong>Stalled Deals</strong>: Deals that haven't been updated in over 7 days</li>
+                        <li><strong>Discovery Calls Today</strong>: Deals in "Discovery Scheduled" stage</li>
+                        <li><strong>Quick Wins</strong>: Deals in onboarding or live stages that need attention</li>
+                    </ul>
+                    <p>This helps you prioritize your daily activities for maximum impact.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How does the Team Leaderboard work?</div>
+                <div class="faq-answer">
+                    <p>The Team Leaderboard (Team tab) ranks all sales reps by their weekly point total.</p>
+                    <ul>
+                        <li>Updated in real-time as activities are logged</li>
+                        <li>Shows rank, name, and total points</li>
+                        <li>Your personal rank is displayed at the top</li>
+                        <li>Top 3 performers are highlighted with #1, #2, #3 badges</li>
+                    </ul>
+                    <p>Use this to track your performance against teammates and stay competitive.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What are Action Items?</div>
+                <div class="faq-answer">
+                    <p>The Action Items tab shows tasks that need your attention, organized by urgency:</p>
+                    <ul>
+                        <li><strong>Stuck Deals</strong>: Deals stalling for more than 7 days</li>
+                        <li><strong>Overdue</strong>: Tasks past their due date</li>
+                        <li><strong>Due Today</strong>: Tasks due today</li>
+                        <li><strong>Upcoming</strong>: Future tasks on your calendar</li>
+                    </ul>
+                    <p>You can mark tasks as done or snooze them to a later date.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How do I add a new deal?</div>
+                <div class="faq-answer">
+                    <p>Click the <strong>"+ Add New Deal"</strong> button on the My Deals tab. You'll be prompted to enter:</p>
+                    <ul>
+                        <li>Company Name (required)</li>
+                        <li>Contact Name</li>
+                        <li>Email</li>
+                        <li>Phone</li>
+                        <li>Pipeline Stage (required)</li>
+                    </ul>
+                    <p>The deal will appear immediately in your pipeline under the selected stage.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Section -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Technical & Account</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">Is my data saved automatically?</div>
+                <div class="faq-answer">
+                    <p>Yes! All actions are saved to the cloud immediately:</p>
+                    <ul>
+                        <li>Logging activities</li>
+                        <li>Moving deals between stages</li>
+                        <li>Editing deals or targets</li>
+                        <li>Completing tasks</li>
+                    </ul>
+                    <p>You can safely close your browser or switch devices - your data is always synced.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I access the dashboard on mobile?</div>
+                <div class="faq-answer">
+                    <p>Yes! The dashboard is fully responsive and works on all devices:</p>
+                    <ul>
+                        <li>Mobile phones (iOS and Android)</li>
+                        <li>Tablets</li>
+                        <li>Desktop computers</li>
+                    </ul>
+                    <p>The layout automatically adjusts for optimal viewing on your screen size.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Who can see my deals and activity?</div>
+                <div class="faq-answer">
+                    <p>Privacy controls:</p>
+                    <ul>
+                        <li><strong>Your Deals</strong>: Only visible to you and admins</li>
+                        <li><strong>Your Scorecard</strong>: Visible to all team members (for leaderboard)</li>
+                        <li><strong>Your Targets</strong>: Personal and private</li>
+                        <li><strong>Your Tasks</strong>: Only visible to you and admins</li>
+                    </ul>
+                    <p>Team members can see your point total but not individual deal details.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How do I log out?</div>
+                <div class="faq-answer">
+                    <p>Click the <strong>"Logout"</strong> button in the top-right corner of the dashboard header. You'll be redirected to the login page.</p>
+                    <p>For security, always log out when using shared devices.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Section -->
+        <div class="faq-section">
+            <h2 class="faq-section-title">Need More Help?</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">I found a bug or have a feature request</div>
+                <div class="faq-answer">
+                    <p>Contact our support team at <strong><a href="mailto:support@driveleadmedia.com" style="color: var(--primary);">support@driveleadmedia.com</a></strong></p>
+                    <p>Please include:</p>
+                    <ul>
+                        <li>What you were trying to do</li>
+                        <li>What happened instead</li>
+                        <li>Your browser and device type</li>
+                        <li>Screenshots if applicable</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer style="background: #FFFFFF; border-top: 1px solid #E2E8F0; padding: 32px 0; margin-top: 60px;">
+        <div style="max-width: 900px; margin: 0 auto; padding: 0 24px; text-align: center;">
+            <p style="color: #94A3B8; font-size: 0.75rem; margin: 0;">© 2025 Drive Lead Media. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
