@@ -37,10 +37,9 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Scorecard collection - Reps can read/write their own, admin can read all
+    // Scorecard collection - Reps can read all (for team leaderboard), write their own, admin can read all
     match /scorecard/{scorecardId} {
-      allow read: if isAdmin() ||
-        (isAuthenticated() && resource.data.repId == request.auth.uid);
+      allow read: if isAuthenticated();
       allow write: if isAuthenticated() && request.resource.data.repId == request.auth.uid;
     }
 

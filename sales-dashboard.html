@@ -102,12 +102,12 @@
             <div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e5e7eb;">
                 <h3 style="font-size: 1rem; font-weight: 600; color: #012E40; margin-bottom: 16px;">Quick Log Activity</h3>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <button class="btn btn-outline" onclick="quickLog('call')">📞 Call Made</button>
-                    <button class="btn btn-outline" onclick="quickLog('email')">✉️ Email Sent</button>
-                    <button class="btn btn-outline" onclick="quickLog('discovery-scheduled')">✓ Discovery Scheduled</button>
-                    <button class="btn btn-outline" onclick="quickLog('discovery-completed')">✓ Discovery Completed</button>
-                    <button class="btn btn-outline" onclick="quickLog('onboarding')">✓ To Onboarding</button>
-                    <button class="btn btn-outline" onclick="quickLog('live')">✓ Gone Live</button>
+                    <button class="btn btn-outline" onclick="quickLog('call', event)">📞 Call Made</button>
+                    <button class="btn btn-outline" onclick="quickLog('email', event)">✉️ Email Sent</button>
+                    <button class="btn btn-outline" onclick="quickLog('discovery-scheduled', event)">✓ Discovery Scheduled</button>
+                    <button class="btn btn-outline" onclick="quickLog('discovery-completed', event)">✓ Discovery Completed</button>
+                    <button class="btn btn-outline" onclick="quickLog('onboarding', event)">✓ To Onboarding</button>
+                    <button class="btn btn-outline" onclick="quickLog('live', event)">✓ Gone Live</button>
                 </div>
             </div>
         </div>
@@ -1135,7 +1135,7 @@
         }
 
         // Quick log activity
-        async function quickLog(type) {
+        async function quickLog(type, event) {
             const repId = sessionStorage.getItem('repId');
             if (!repId) return;
 
