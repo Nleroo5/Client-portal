@@ -156,7 +156,7 @@
                 </table>
             </div>
 
-            <div style="margin-top: 20px; padding: 16px; background: #F8FAFC; border-radius: 8px; border-left: 4px solid #14B8A6; display: none;" id="gapToFirst">
+            <div style="margin-top: 20px; padding: 16px; background: #F8FAFC; border-radius: 8px; border-left: 4px solid #0EA5E9; display: none;" id="gapToFirst">
                 <p style="margin: 0; font-size: 0.9rem; color: #0F172A;"><strong>Gap to #1:</strong> <span id="gapText">—</span></p>
             </div>
         </div>
@@ -558,7 +558,7 @@
                                            `${daysInStage} days ago`;
 
                     html += `
-                        <div class="deal-card" style="background: #FFFFFF; border-radius: 6px; padding: 12px; margin-bottom: 12px; border-left: 3px solid #14B8A6; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06); position: relative;">
+                        <div class="deal-card" style="background: #FFFFFF; border-radius: 6px; padding: 12px; margin-bottom: 12px; border-left: 3px solid #0EA5E9; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06); position: relative;">
                             <!-- Edit & Delete Controls -->
                             <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
                                 <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #0F172A; font-weight: 600;" title="Edit deal">Edit</button>
@@ -593,7 +593,7 @@
                             <div style="display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #F8FAFC;">
                                 <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #0F172A;">Call</button>
                                 <button onclick="logActivity('${deal.id}', 'email'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #0F172A;">Email</button>
-                                <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #14B8A6; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">Next</button>
+                                <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #0EA5E9; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">Next</button>
                             </div>
                         </div>
                     `;
@@ -735,7 +735,7 @@
 
                 if (metric.target > 0) {
                     if (percentage >= 100) {
-                        statusColor = '#059669'; // green (hit target)
+                        statusColor = '#10B981'; // green (hit target)
                         statusBg = '#d1fae5';
                     } else if (percentage >= 70) {
                         statusColor = '#f59e0b'; // yellow (close)
@@ -877,7 +877,7 @@
                 // Rank badge styling
                 let rankBadge = '';
                 if (rank === 1) {
-                    rankBadge = '<span style="font-size: 1.2rem; font-weight: 700; color: #14B8A6;">#1</span>';
+                    rankBadge = '<span style="font-size: 1.2rem; font-weight: 700; color: #0EA5E9;">#1</span>';
                 } else if (rank === 2) {
                     rankBadge = '<span style="font-size: 1.2rem; font-weight: 700; color: #64748B;">#2</span>';
                 } else if (rank === 3) {
@@ -887,13 +887,13 @@
                 }
 
                 const rowStyle = isCurrentUser
-                    ? 'background: #F8FAFC; border-left: 4px solid #14B8A6; font-weight: 600;'
+                    ? 'background: #F8FAFC; border-left: 4px solid #0EA5E9; font-weight: 600;'
                     : '';
 
                 html += `
                     <tr style="${rowStyle}">
                         <td style="text-align: center;">${rankBadge}</td>
-                        <td>${rep.name}${isCurrentUser ? ' <span style="color: #14B8A6; font-size: 0.75rem;">(You)</span>' : ''}</td>
+                        <td>${rep.name}${isCurrentUser ? ' <span style="color: #0EA5E9; font-size: 0.75rem;">(You)</span>' : ''}</td>
                         <td style="text-align: center;">${rep.scorecard.callsMade || 0}</td>
                         <td style="text-align: center;">${rep.scorecard.emailsSent || 0}</td>
                         <td style="text-align: center;">${rep.scorecard.discoveryCompleted || 0}</td>
@@ -909,7 +909,7 @@
             // Update rank display
             if (currentUserRank === 1) {
                 document.getElementById('yourRankDisplay').innerHTML = `
-                    <div style="font-size: 1.5rem; font-weight: 700; color: #14B8A6;">#1</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #0EA5E9;">#1</div>
                     <div style="font-size: 0.85rem; color: #64748B;">You're #1!</div>
                 `;
             } else {
@@ -1070,7 +1070,7 @@
                             </div>
                             <div style="display: flex; gap: 8px;">
                                 <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="padding: 6px 12px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.85rem; cursor: pointer; color: #0F172A;">Call</button>
-                                <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="padding: 6px 12px; background: #14B8A6; border: none; border-radius: 4px; font-size: 0.85rem; cursor: pointer; color: white;">Next</button>
+                                <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="padding: 6px 12px; background: #0EA5E9; border: none; border-radius: 4px; font-size: 0.85rem; cursor: pointer; color: white;">Next</button>
                             </div>
                         </div>
                     `;
@@ -1160,8 +1160,8 @@
 
                 // Show feedback
                 event.target.textContent = 'Done!';
-                event.target.style.background = '#14B8A6';
-                event.target.style.borderColor = '#14B8A6';
+                event.target.style.background = '#0EA5E9';
+                event.target.style.borderColor = '#0EA5E9';
                 event.target.style.color = 'white';
 
                 setTimeout(() => {
@@ -1247,8 +1247,8 @@
                 const btn = event.target;
                 const originalText = btn.textContent;
                 btn.textContent = 'Logged!';
-                btn.style.background = '#14B8A6';
-                btn.style.borderColor = '#14B8A6';
+                btn.style.background = '#0EA5E9';
+                btn.style.borderColor = '#0EA5E9';
                 btn.style.color = 'white';
 
                 setTimeout(() => {
@@ -1300,7 +1300,7 @@
                 // Show success feedback
                 const msg = activityType === 'call' ? 'Call logged!' : 'Email logged!';
                 const toast = document.createElement('div');
-                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #0EA5E9; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
                 toast.textContent = msg;
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
@@ -1331,7 +1331,7 @@
 
                 // Show success
                 const toast = document.createElement('div');
-                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #0EA5E9; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
                 toast.textContent = 'Deal moved to next stage!';
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
@@ -1355,7 +1355,7 @@
 
                 // Show success
                 const toast = document.createElement('div');
-                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #0EA5E9; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
                 toast.textContent = 'Stage updated!';
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
@@ -1411,7 +1411,7 @@
 
                 // Show success
                 const toast = document.createElement('div');
-                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #0EA5E9; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
                 toast.textContent = 'Deal archived!';
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
@@ -1461,7 +1461,7 @@
 
                     // Show success message
                     const successDiv = document.createElement('div');
-                    successDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 16px 24px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                    successDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #0EA5E9; color: white; padding: 16px 24px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
                     successDiv.textContent = 'Deal updated successfully!';
                     document.body.appendChild(successDiv);
                     setTimeout(() => successDiv.remove(), 3000);
@@ -1472,7 +1472,7 @@
 
                     // Show success message
                     const successDiv = document.createElement('div');
-                    successDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 16px 24px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                    successDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #0EA5E9; color: white; padding: 16px 24px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
                     successDiv.textContent = 'Deal created successfully!';
                     document.body.appendChild(successDiv);
                     setTimeout(() => successDiv.remove(), 3000);
