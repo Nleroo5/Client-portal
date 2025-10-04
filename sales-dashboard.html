@@ -44,7 +44,7 @@
         <div class="tab-content active" id="tab-deals">
             <!-- Focus Zone -->
             <div id="focusZone" style="background: linear-gradient(135deg, #EEF4D9 0%, #FFFFFF 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 8px 16px rgba(1, 46, 64, 0.15); border: 2px solid #F2A922;">
-                <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: #F2A922;">
+                <h3 style="font-family: 'Bitter', serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: #000000;">
                     Today's Focus
                 </h3>
                 <div id="focusItems" style="display: grid; gap: 10px;">
@@ -55,7 +55,7 @@
             <!-- Pipeline Header -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: linear-gradient(135deg, #EEF4D9 0%, #FFFFFF 100%); padding: 20px; border-radius: 12px; border: 2px solid #F2A922; box-shadow: 0 8px 16px rgba(1, 46, 64, 0.15);">
                 <div>
-                    <div style="font-size: 1.25rem; font-weight: 700; color: #F2A922;">My Pipeline</div>
+                    <div style="font-family: 'Bitter', serif; font-size: 1.25rem; font-weight: 700; color: #000000;">My Pipeline</div>
                     <div style="font-size: 0.9rem; color: #012E40; margin-top: 4px;"><span id="totalDealsCount">0</span> active deals</div>
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center;">
@@ -537,7 +537,7 @@
                 html += `
                     <div class="stage-column" data-stage="${stage.id}" ondrop="handleDrop(event, '${stage.id}')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" style="background: linear-gradient(180deg, rgba(238, 244, 217, 0.4) 0%, rgba(255, 255, 255, 0.8) 100%); backdrop-filter: blur(8px); border-radius: 12px; padding: 18px; min-height: 400px; border: 2px solid #85C7B3; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(1, 46, 64, 0.1);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #F2A922;">
-                            <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #012E40; margin: 0;">${stage.name}</h3>
+                            <h3 style="font-family: 'Bitter', serif; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #000000; margin: 0;">${stage.name}</h3>
                             <span style="background: linear-gradient(135deg, #05908C 0%, #85C7B3 100%); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 6px rgba(5, 144, 140, 0.3);">${stageDeals.length}</span>
                         </div>
                         <div class="stage-cards">
