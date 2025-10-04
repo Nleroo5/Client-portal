@@ -543,6 +543,9 @@
                         <div>
                 `;
 
+                // Check if multiple deals in this stage
+                const isCompressed = stageDeals.length > 1;
+
                 stageDeals.forEach(deal => {
                     // Calculate days in stage
                     const lastUpdated = deal.lastUpdated?.toDate() || deal.createdAt?.toDate() || new Date();
@@ -557,46 +560,62 @@
                                            daysInStage === 1 ? 'Yesterday' :
                                            `${daysInStage} days ago`;
 
-                    html += `
-                        <div class="deal-card" style="background: #FFFFFF; border-radius: 6px; padding: 12px; margin-bottom: 12px; border-left: 3px solid #0EA5E9; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06); position: relative;">
-                            <!-- Edit & Delete Controls -->
-                            <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
-                                <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #0F172A; font-weight: 600;" title="Edit deal">Edit</button>
-                                <button onclick="confirmLostDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #dc2626; font-weight: 600;" title="Mark as lost">Lost</button>
+                    if (isCompressed) {
+                        // COMPRESSED VIEW - Only show company and contact name
+                        html += `
+                            <div class="deal-card" onclick="expandDeal('${deal.id}')" style="background: var(--deal-card-bg); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; border-left: 3px solid var(--accent-orange); cursor: pointer; transition: all 0.15s ease;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">${deal.companyName || 'Unnamed Deal'}</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">${deal.contactName || 'No contact'}</div>
+                                    </div>
+                                    ${isStalling ? '<span style="background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">!</span>' : ''}
+                                </div>
                             </div>
+                        `;
+                    } else {
+                        // FULL VIEW - Show all details when only one deal
+                        html += `
+                            <div class="deal-card" style="background: #FFFFFF; border-radius: 6px; padding: 12px; margin-bottom: 12px; border-left: 3px solid #0EA5E9; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06); position: relative;">
+                                <!-- Edit & Delete Controls -->
+                                <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
+                                    <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #0F172A; font-weight: 600;" title="Edit deal">Edit</button>
+                                    <button onclick="confirmLostDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #dc2626; font-weight: 600;" title="Mark as lost">Lost</button>
+                                </div>
 
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; padding-right: 120px;">
-                                <div style="font-weight: 700; color: #0F172A;">${deal.companyName || 'Unnamed Deal'}</div>
-                                ${isStalling ? '<span style="background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">STALLING</span>' : ''}
-                            </div>
-                            <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 8px;">${deal.contactName || 'No contact'}</div>
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; padding-right: 120px;">
+                                    <div style="font-weight: 700; color: #0F172A;">${deal.companyName || 'Unnamed Deal'}</div>
+                                    ${isStalling ? '<span style="background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">STALLING</span>' : ''}
+                                </div>
+                                <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 8px;">${deal.contactName || 'No contact'}</div>
 
-                            <!-- Quick Stage Change -->
-                            <div style="margin-bottom: 8px;">
-                                <select onchange="changeStage('${deal.id}', this.value); event.stopPropagation();" style="width: 100%; padding: 6px 8px; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.8rem; background: #F8FAFC; cursor: pointer; color: #0F172A;">
-                                    <option value="" disabled selected>Move to stage...</option>
-                                    <option value="qualified" ${deal.stage === 'qualified' ? 'disabled' : ''}>Qualified</option>
-                                    <option value="cold-outreach" ${deal.stage === 'cold-outreach' ? 'disabled' : ''}>Cold Outreach</option>
-                                    <option value="follow-up" ${deal.stage === 'follow-up' ? 'disabled' : ''}>Follow-Up</option>
-                                    <option value="discovery-scheduled" ${deal.stage === 'discovery-scheduled' ? 'disabled' : ''}>Discovery Scheduled</option>
-                                    <option value="discovery-completed" ${deal.stage === 'discovery-completed' ? 'disabled' : ''}>Discovery Completed</option>
-                                    <option value="onboarding-portal" ${deal.stage === 'onboarding-portal' ? 'disabled' : ''}>Onboarding Portal</option>
-                                    <option value="campaign-live" ${deal.stage === 'campaign-live' ? 'disabled' : ''}>Campaign Live</option>
-                                    <option value="follow-up-resell" ${deal.stage === 'follow-up-resell' ? 'disabled' : ''}>Follow-Up & Resell</option>
-                                </select>
-                            </div>
+                                <!-- Quick Stage Change -->
+                                <div style="margin-bottom: 8px;">
+                                    <select onchange="changeStage('${deal.id}', this.value); event.stopPropagation();" style="width: 100%; padding: 6px 8px; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.8rem; background: #F8FAFC; cursor: pointer; color: #0F172A;">
+                                        <option value="" disabled selected>Move to stage...</option>
+                                        <option value="qualified" ${deal.stage === 'qualified' ? 'disabled' : ''}>Qualified</option>
+                                        <option value="cold-outreach" ${deal.stage === 'cold-outreach' ? 'disabled' : ''}>Cold Outreach</option>
+                                        <option value="follow-up" ${deal.stage === 'follow-up' ? 'disabled' : ''}>Follow-Up</option>
+                                        <option value="discovery-scheduled" ${deal.stage === 'discovery-scheduled' ? 'disabled' : ''}>Discovery Scheduled</option>
+                                        <option value="discovery-completed" ${deal.stage === 'discovery-completed' ? 'disabled' : ''}>Discovery Completed</option>
+                                        <option value="onboarding-portal" ${deal.stage === 'onboarding-portal' ? 'disabled' : ''}>Onboarding Portal</option>
+                                        <option value="campaign-live" ${deal.stage === 'campaign-live' ? 'disabled' : ''}>Campaign Live</option>
+                                        <option value="follow-up-resell" ${deal.stage === 'follow-up-resell' ? 'disabled' : ''}>Follow-Up & Resell</option>
+                                    </select>
+                                </div>
 
-                            <div style="display: flex; gap: 12px; font-size: 0.75rem;">
-                                <span style="color: ${stageColor};">${daysInStage} days in stage</span>
-                                <span style="color: #64748B;">Last: ${lastActivityText}</span>
+                                <div style="display: flex; gap: 12px; font-size: 0.75rem;">
+                                    <span style="color: ${stageColor};">${daysInStage} days in stage</span>
+                                    <span style="color: #64748B;">Last: ${lastActivityText}</span>
+                                </div>
+                                <div style="display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #F8FAFC;">
+                                    <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #0F172A;">Call</button>
+                                    <button onclick="logActivity('${deal.id}', 'email'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #0F172A;">Email</button>
+                                    <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #0EA5E9; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">Next</button>
+                                </div>
                             </div>
-                            <div style="display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #F8FAFC;">
-                                <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #0F172A;">Call</button>
-                                <button onclick="logActivity('${deal.id}', 'email'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #0F172A;">Email</button>
-                                <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #0EA5E9; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">Next</button>
-                            </div>
-                        </div>
-                    `;
+                        `;
+                    }
                 });
 
                 html += `
@@ -1424,6 +1443,11 @@
                 console.error('Error archiving deal:', error);
                 alert('Error archiving deal. Please try again.');
             }
+        }
+
+        // Expand deal - open edit modal when clicking compressed card
+        function expandDeal(dealId) {
+            openEditDeal(dealId);
         }
 
         // Deal Modal Functions
