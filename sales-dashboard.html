@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Dashboard - Drive Lead Media</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Young+Serif:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="sales-styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="header-left">
+            <h1>Drive Lead Media</h1>
+            <p class="welcome-text">Welcome back, <span id="repNameDisplay">Loading...</span>! 👋</p>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-logout" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="pipeline" onclick="switchTab('pipeline')">
+            📊 My Pipeline
+        </button>
+        <button class="nav-tab" data-tab="scorecard" onclick="switchTab('scorecard')">
+            ✅ My Scorecard
+        </button>
+        <button class="nav-tab" data-tab="team" onclick="switchTab('team')">
+            👥 Team
+        </button>
+        <button class="nav-tab" data-tab="tasks" onclick="switchTab('tasks')">
+            📋 Tasks
+        </button>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="dashboard-container">
+
+        <!-- Tab 1: My Pipeline -->
+        <div class="tab-content active" id="tab-pipeline">
+            <div class="section-header">
+                <h2>My Pipeline</h2>
+                <button class="btn btn-primary" onclick="openNewDealModal()">+ New Deal</button>
+            </div>
+
+            <div class="pipeline-board" id="pipelineBoard">
+                <!-- Pipeline columns will be dynamically loaded here -->
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading your pipeline...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: My Scorecard -->
+        <div class="tab-content" id="tab-scorecard">
+            <div class="section-header">
+                <h2>My Scorecard - This Week</h2>
+                <button class="btn btn-secondary" onclick="openLogActivityModal()">+ Log Activity</button>
+            </div>
+
+            <div class="scorecard-widget">
+                <table class="scorecard-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Target</th>
+                            <th>Actual</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scorecardTableBody">
+                        <tr>
+                            <td colspan="4" class="loading-cell">Loading scorecard...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="activity-log-section">
+                <h3>Recent Activities</h3>
+                <div id="recentActivities">
+                    <p class="no-data">No activities logged yet.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Team Performance -->
+        <div class="tab-content" id="tab-team">
+            <div class="section-header">
+                <h2>Team Performance</h2>
+                <div class="week-indicator" id="weekIndicator">Week of Loading...</div>
+            </div>
+
+            <div class="team-leaderboard">
+                <table class="scorecard-table">
+                    <thead>
+                        <tr>
+                            <th>Rep Name</th>
+                            <th>Disc Scheduled</th>
+                            <th>Disc Completed</th>
+                            <th>Onboarding</th>
+                            <th>Gone Live</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teamLeaderboardBody">
+                        <tr>
+                            <td colspan="5" class="loading-cell">Loading team data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="team-pipeline-section">
+                <h3>Team Pipeline Overview</h3>
+                <div id="teamPipelineStats">
+                    <p class="no-data">Loading team pipeline...</p>
+                </div>
+                <button class="btn btn-outline" onclick="viewAllTeamDeals()">View All Team Deals</button>
+            </div>
+        </div>
+
+        <!-- Tab 4: Tasks -->
+        <div class="tab-content" id="tab-tasks">
+            <div class="section-header">
+                <h2>My Tasks</h2>
+                <p class="subtitle">Track your action items and follow-ups</p>
+            </div>
+
+            <div class="tasks-container">
+                <div class="task-section">
+                    <h3 class="task-section-title overdue">⚠️ Overdue (<span id="overdueCount">0</span>)</h3>
+                    <div id="overdueTasks" class="task-list">
+                        <p class="no-data">No overdue tasks</p>
+                    </div>
+                </div>
+
+                <div class="task-section">
+                    <h3 class="task-section-title due-today">📅 Due Today (<span id="dueTodayCount">0</span>)</h3>
+                    <div id="dueTodayTasks" class="task-list">
+                        <p class="no-data">No tasks due today</p>
+                    </div>
+                </div>
+
+                <div class="task-section">
+                    <h3 class="task-section-title upcoming">📋 Upcoming (<span id="upcomingCount">0</span>)</h3>
+                    <div id="upcomingTasks" class="task-list">
+                        <p class="no-data">No upcoming tasks</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Configuration -->
+    <script src="config.js"></script>
+
+    <!-- Main Functions -->
+    <script src="sales-functions.js"></script>
+
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!sessionStorage.getItem('repAuthenticated')) {
+                // Not logged in, redirect to login
+                window.location.href = 'sales.html';
+                return;
+            }
+
+            // Load rep name
+            const repName = sessionStorage.getItem('repName');
+            document.getElementById('repNameDisplay').textContent = repName || 'Rep';
+
+            // Initialize dashboard
+            initializeDashboard();
+        });
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.clear();
+                window.location.href = 'sales.html';
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to selected tab and content
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // Load tab-specific data
+            loadTabData(tabName);
+        }
+
+        // Load tab-specific data
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'pipeline':
+                    loadMyPipeline();
+                    break;
+                case 'scorecard':
+                    loadMyScorecard();
+                    break;
+                case 'team':
+                    loadTeamData();
+                    break;
+                case 'tasks':
+                    loadMyTasks();
+                    break;
+            }
+        }
+
+        // Initialize dashboard (load default tab)
+        function initializeDashboard() {
+            loadMyPipeline();
+        }
+
+        // Placeholder functions (will be implemented in sales-functions.js)
+        function loadMyPipeline() {
+            console.log('Loading my pipeline...');
+            // Will be implemented
+        }
+
+        function loadMyScorecard() {
+            console.log('Loading my scorecard...');
+            // Will be implemented
+        }
+
+        function loadTeamData() {
+            console.log('Loading team data...');
+            // Will be implemented
+        }
+
+        function loadMyTasks() {
+            console.log('Loading my tasks...');
+            // Will be implemented
+        }
+
+        function openNewDealModal() {
+            alert('New Deal Modal - Coming soon!');
+        }
+
+        function openLogActivityModal() {
+            alert('Log Activity Modal - Coming soon!');
+        }
+
+        function viewAllTeamDeals() {
+            alert('Team Deals View - Coming soon!');
+        }
+    </script>
+</body>
+</html>

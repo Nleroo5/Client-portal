@@ -1,11 +1,11 @@
 // Firebase Configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyC6nhisBnue09mvJuFzBb7m6zcMtqBRZEQ",
-    authDomain: "client-portal-2fa80.firebaseapp.com",
-    projectId: "client-portal-2fa80",
-    storageBucket: "client-portal-2fa80.firebasestorage.app",
-    messagingSenderId: "417272730660",
-    appId: "1:417272730660:web:9530a097347fbbf72f5771"
+    apiKey: "AIzaSyDV7180vzQwQrx0TeDqODDZKBhs_B6SATI",
+    authDomain: "drive-lead-media-crm.firebaseapp.com",
+    projectId: "drive-lead-media-crm",
+    storageBucket: "drive-lead-media-crm.firebasestorage.app",
+    messagingSenderId: "876210797921",
+    appId: "1:876210797921:web:a8583d957f7c2136569920"
 };
 
 // Initialize Firebase
