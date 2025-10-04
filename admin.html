@@ -1115,6 +1115,7 @@
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <!-- Configuration -->
     <script src="config.js"></script>
@@ -1193,6 +1194,9 @@
         // Firebase is initialized in config.js
 
         // CRITICAL SECURITY: Verify Firebase Authentication on page load
+        // Wait for Firebase to be fully loaded
+        let isAuthChecked = false;
+
         firebase.auth().onAuthStateChanged((user) => {
             if (!user || user.email !== 'admin@driveleadmedia.com') {
                 // Not authenticated or not admin - redirect to login
@@ -1200,8 +1204,13 @@
                 window.location.href = 'index.html';
                 return;
             }
+
             // User is authenticated admin - allow access
             console.log('Admin authenticated:', user.email);
+            isAuthChecked = true;
+
+            // Now that we're authenticated, load the initial data
+            loadClients();
         });
 
         // Your portal URL
@@ -2150,9 +2159,9 @@
             }
         };
 
-        // Load clients on page load
+        // Load clients on page load (removed - now called after auth check)
         document.addEventListener('DOMContentLoaded', () => {
-            loadClients();
+            // loadClients(); // Moved to onAuthStateChanged callback
 
             // Attach deal form event listener after DOM is loaded
             const dealForm = document.getElementById('dealForm');
