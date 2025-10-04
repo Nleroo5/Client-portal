@@ -9,32 +9,47 @@
 }
 
 :root {
-    --primary: #0EA5E9 !important;
-    --primary-hover: #0284C7 !important;
-    --secondary: #10B981 !important;
-    --secondary-hover: #059669 !important;
-    --bg-main: #F8FAFC;
-    --bg-card: #FFFFFF;
-    --text-primary: #1E293B;
-    --text-secondary: #64748B;
+    /* Drive Lead Media Brand Colors */
+    --primary: #05908C !important;        /* DLM Teal - Main brand color */
+    --primary-hover: #047a72 !important;  /* DLM Teal Dark - Hover state */
+    --secondary: #85C7B3 !important;      /* DLM Mint - Accent color */
+    --secondary-hover: #6bb39e !important;
+    --dark-teal: #012E40 !important;      /* DLM Deep Teal - Dark accent */
+    --light-mint: #EEF4D9 !important;     /* DLM Light - Subtle highlight */
+
+    /* Backgrounds */
+    --bg-main: #F9FAFB;                   /* Soft gray background */
+    --bg-card: #FFFFFF;                   /* Pure white cards */
+
+    /* Text Colors */
+    --text-primary: #012E40;              /* DLM Deep Teal for headings */
+    --text-secondary: #6b7280;            /* Muted gray for body text */
     --text-muted: #94A3B8;
-    --border: #E2E8F0;
+
+    /* Borders */
+    --border: #E5E7EB;
     --border-light: #F1F5F9;
-    --shadow-sm: 0 1px 2px rgba(30, 41, 59, 0.04);
-    --shadow-md: 0 4px 6px rgba(30, 41, 59, 0.06);
-    --shadow-lg: 0 10px 15px rgba(30, 41, 59, 0.08);
-    --success: #10B981;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(1, 46, 64, 0.04);
+    --shadow-md: 0 4px 6px rgba(1, 46, 64, 0.06);
+    --shadow-lg: 0 10px 15px rgba(1, 46, 64, 0.08);
+
+    /* Status Colors */
+    --success: #85C7B3;                   /* Use DLM mint for success */
     --warning: #F59E0B;
-    --error: #EF4444;
+    --error: #c33;                        /* DLM error red */
 }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    background: var(--bg-main);
+    background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+    background-attachment: fixed;
     color: var(--text-primary);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
 }
 
 /* Dashboard Header */
