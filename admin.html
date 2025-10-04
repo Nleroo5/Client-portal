@@ -644,20 +644,6 @@
 </head>
 <body>
     <!-- Password Protection Overlay -->
-    <div id="passwordOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); display: flex; align-items: center; justify-content: center; z-index: 999999;">
-        <div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);">
-            <h1 style="font-family: 'Young Serif', serif; color: #012E40; margin-bottom: 10px;">Admin Access</h1>
-            <p style="color: #05908C; margin-bottom: 25px;">Enter password to continue</p>
-            <input type="password" id="adminPassword" placeholder="Enter password" style="width: 100%; padding: 12px; border: 2px solid #85C7B3; border-radius: 8px; font-size: 1rem; margin-bottom: 15px;">
-            <button onclick="checkPassword()" style="width: 100%; padding: 12px 24px; background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: #EEF4D9; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer;">
-                Unlock Dashboard
-            </button>
-            <div id="passwordError" style="color: #ff6b6b; margin-top: 15px; display: none; font-weight: 600;">
-                ❌ Incorrect password
-            </div>
-        </div>
-    </div>
-
     <div class="admin-header">
         <h1>Admin Dashboard</h1>
         <p>Manage Client Portals - Drive Lead Media</p>
@@ -1119,75 +1105,10 @@
 
     <!-- Configuration -->
     <script src="config.js"></script>
+    <script src="validation.js"></script>
+    <script src="toast.js"></script>
 
     <script>
-        // ============================================
-        // PASSWORD PROTECTION (Server-Side Verification)
-        // ============================================
-        const PASSWORD_ENDPOINT = 'https://portal.driveleadmedia.com/admin-password.json';
-
-        async function checkPassword() {
-            const passwordInput = document.getElementById('adminPassword');
-            const passwordError = document.getElementById('passwordError');
-            const passwordOverlay = document.getElementById('passwordOverlay');
-            const unlockButton = passwordOverlay.querySelector('button');
-
-            // Disable button and show loading state
-            unlockButton.disabled = true;
-            unlockButton.textContent = 'Checking...';
-
-            try {
-                // Fetch password from server
-                const response = await fetch(PASSWORD_ENDPOINT);
-
-                if (!response.ok) {
-                    throw new Error('Failed to verify password');
-                }
-
-                const data = await response.json();
-                const correctPassword = data.password;
-
-                if (passwordInput.value === correctPassword) {
-                    // Correct password - hide overlay and store session
-                    passwordOverlay.style.display = 'none';
-                    sessionStorage.setItem('adminAuthenticated', 'true');
-                    passwordError.style.display = 'none';
-                } else {
-                    // Wrong password - show error
-                    passwordError.textContent = '❌ Incorrect password';
-                    passwordError.style.display = 'block';
-                    passwordInput.value = '';
-                    passwordInput.focus();
-                }
-            } catch (error) {
-                console.error('Password verification error:', error);
-                passwordError.textContent = '⚠️ Unable to verify password. Check your connection.';
-                passwordError.style.display = 'block';
-            } finally {
-                // Re-enable button
-                unlockButton.disabled = false;
-                unlockButton.textContent = 'Unlock Dashboard';
-            }
-        }
-
-        // Allow Enter key to submit password
-        document.addEventListener('DOMContentLoaded', function() {
-            const passwordInput = document.getElementById('adminPassword');
-            if (passwordInput) {
-                passwordInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        checkPassword();
-                    }
-                });
-                passwordInput.focus();
-            }
-
-            // Check if already authenticated in this session
-            if (sessionStorage.getItem('adminAuthenticated') === 'true') {
-                document.getElementById('passwordOverlay').style.display = 'none';
-            }
-        });
-
         // ============================================
         // FIREBASE CONFIGURATION & AUTH CHECK
         // ============================================
@@ -1221,14 +1142,8 @@
 
         // Show alert message
         function showAlert(message, type = 'success') {
-            const alertDiv = document.getElementById('alertMessage');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.textContent = message;
-            alertDiv.style.display = 'block';
-
-            setTimeout(() => {
-                alertDiv.style.display = 'none';
-            }, 5000);
+            // Use toast notifications instead of inline alerts
+            showToast(message, type);
         }
 
         // Switch between admin tabs
@@ -1571,7 +1486,27 @@
         // Create new client
         document.getElementById('createClientForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
+            // Validate email
+            const emailInput = document.getElementById('clientEmail');
+            if (emailInput.value && !validateField(emailInput, isValidEmail, 'Please enter a valid email address')) {
+                return;
+            }
+
+            // Validate URLs
+            const urlInputs = [
+                'googleDriveLink', 'creativeLink', 'dpaLink', 'service6Link', 'service12Link',
+                'stripe6Monthly', 'stripe6Upfront', 'stripe12Monthly', 'stripe12Upfront',
+                'm2mServiceAgreementLink', 'm2mDpaLink', 'm2mInvoiceLink'
+            ];
+
+            for (const inputId of urlInputs) {
+                const input = document.getElementById(inputId);
+                if (input && input.value && !validateField(input, isValidURL, 'Please enter a valid URL')) {
+                    return;
+                }
+            }
+
             const clientId = generateClientId();
             const portalType = document.getElementById('portalType').value;
 

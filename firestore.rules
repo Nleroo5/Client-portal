@@ -29,9 +29,12 @@ service cloud.firestore {
     // Deals collection - Admin can do anything, reps can only read/write their own deals
     match /deals/{dealId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update, delete: if isAdmin() ||
-        (isAuthenticated() && resource.data.assignedTo == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.assignedTo == request.auth.uid;
+      allow update: if isAdmin() ||
+        (isAuthenticated() &&
+         resource.data.assignedTo == request.auth.uid &&
+         request.resource.data.assignedTo == request.auth.uid); // Can't reassign deals
+      allow delete: if isAdmin();
     }
 
     // Scorecard collection - Reps can read/write their own, admin can read all

@@ -402,37 +402,18 @@
                     return;
                 }
 
-                // Try Firebase Authentication first
-                try {
-                    const userCredential = await firebase.auth().signInWithEmailAndPassword(
-                        data.email,
-                        password
-                    );
+                // Firebase Authentication
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(
+                    data.email,
+                    password
+                );
 
-                    // Success - Firebase Auth handles the session
-                    sessionStorage.setItem('repAuthenticated', 'true');
-                    sessionStorage.setItem('repId', userCredential.user.uid);
-                    sessionStorage.setItem('repName', data.name);
-                    sessionStorage.setItem('repRole', data.role);
-                    window.location.href = 'sales-dashboard.html';
-                } catch (authError) {
-                    // If Firebase Auth fails, fall back to legacy password check (temporary)
-                    if (authError.code === 'auth/user-not-found' && data.password === password) {
-                        // Legacy login - successful but warn user
-                        showError('rep', 'Login successful. Your account needs migration - contact admin.');
-                        setTimeout(() => {
-                            sessionStorage.setItem('repAuthenticated', 'true');
-                            sessionStorage.setItem('repId', repId);
-                            sessionStorage.setItem('repName', data.name);
-                            sessionStorage.setItem('repRole', data.role);
-                            window.location.href = 'sales-dashboard.html';
-                        }, 2000);
-                    } else {
-                        // Wrong password
-                        showError('rep', 'Incorrect password. Please try again.');
-                        document.getElementById('rep-password').value = '';
-                    }
-                }
+                // Success - Firebase Auth handles the session
+                sessionStorage.setItem('repAuthenticated', 'true');
+                sessionStorage.setItem('repId', userCredential.user.uid);
+                sessionStorage.setItem('repName', data.name);
+                sessionStorage.setItem('repRole', data.role);
+                window.location.href = 'sales-dashboard.html';
             } catch (error) {
                 console.error('Login error:', error);
                 showError('rep', 'Login failed. Please try again.');
