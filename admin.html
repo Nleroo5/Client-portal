@@ -1188,9 +1188,21 @@
         });
 
         // ============================================
-        // FIREBASE CONFIGURATION
+        // FIREBASE CONFIGURATION & AUTH CHECK
         // ============================================
         // Firebase is initialized in config.js
+
+        // CRITICAL SECURITY: Verify Firebase Authentication on page load
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user || user.email !== 'admin@driveleadmedia.com') {
+                // Not authenticated or not admin - redirect to login
+                console.warn('Unauthorized access attempt to admin dashboard');
+                window.location.href = 'index.html';
+                return;
+            }
+            // User is authenticated admin - allow access
+            console.log('Admin authenticated:', user.email);
+        });
 
         // Your portal URL
         const PORTAL_BASE_URL = 'https://portal.driveleadmedia.com';
@@ -1343,7 +1355,9 @@
                 // Populate form with existing data
                 document.getElementById('repName').value = data.name;
                 document.getElementById('repEmail').value = data.email;
-                document.getElementById('repPassword').value = data.password;
+                // Don't populate password - it's managed by Firebase Auth
+                document.getElementById('repPassword').value = '';
+                document.getElementById('repPassword').placeholder = 'Leave blank to keep current password';
                 document.getElementById('repRole').value = data.role;
                 document.getElementById('targetDiscoveryScheduled').value = data.weeklyTargets.discoveryCallsScheduled;
                 document.getElementById('targetDiscoveryCompleted').value = data.weeklyTargets.discoveryCallsCompleted;
@@ -1400,18 +1414,64 @@
             }
         }
 
+        // Helper function to create Firebase Auth user
+        async function createFirebaseAuthUser(email, password, displayName) {
+            try {
+                // Use Firebase Client SDK to create user
+                // We'll use a secondary auth instance to avoid signing out the admin
+                const secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
+
+                const userCredential = await secondaryApp.auth().createUserWithEmailAndPassword(email, password);
+                const uid = userCredential.user.uid;
+
+                // Update display name
+                await userCredential.user.updateProfile({
+                    displayName: displayName
+                });
+
+                // Sign out from secondary app (don't affect admin session)
+                await secondaryApp.auth().signOut();
+
+                // Delete the secondary app instance
+                await secondaryApp.delete();
+
+                return uid;
+            } catch (error) {
+                console.error('Error creating Firebase Auth user:', error);
+                throw error;
+            }
+        }
+
         // Modify addRepForm submit handler to support both create and update
         document.getElementById('addRepForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
             const editingRepId = form.dataset.editingRepId;
 
+            const name = document.getElementById('repName').value;
+            const email = document.getElementById('repEmail').value;
+            const password = document.getElementById('repPassword').value;
+            const role = document.getElementById('repRole').value;
+
+            // Validate email is provided
+            if (!email || !email.includes('@')) {
+                showAlert('Please provide a valid email address for the sales rep.', 'error');
+                return;
+            }
+
+            // Validate password
+            if (!editingRepId && (!password || password.length < 6)) {
+                showAlert('Password must be at least 6 characters long.', 'error');
+                return;
+            }
+
             const repData = {
-                name: document.getElementById('repName').value,
-                email: document.getElementById('repEmail').value,
-                password: document.getElementById('repPassword').value,
-                role: document.getElementById('repRole').value,
+                name: name,
+                email: email,
+                role: role,
                 active: true,
                 weeklyTargets: {
                     discoveryCallsScheduled: parseInt(document.getElementById('targetDiscoveryScheduled').value),
@@ -1421,28 +1481,58 @@
                 }
             };
 
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = editingRepId ? 'Updating...' : 'Creating...';
+
             try {
                 if (editingRepId) {
-                    // Update existing rep
+                    // Update existing rep (don't update password via Firestore)
                     repData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection('salesReps').doc(editingRepId).update(repData);
                     showAlert('Sales rep updated successfully!');
 
                     // Reset form to add mode
                     delete form.dataset.editingRepId;
-                    form.querySelector('button[type="submit"]').textContent = 'Add Sales Rep';
+                    submitBtn.textContent = 'Create Sales Rep';
                 } else {
-                    // Create new rep
+                    // Create new rep with Firebase Authentication
+                    submitBtn.textContent = 'Creating Firebase Auth user...';
+
+                    // Step 1: Create Firebase Auth user
+                    const uid = await createFirebaseAuthUser(email, password, name);
+
+                    submitBtn.textContent = 'Saving to database...';
+
+                    // Step 2: Create Firestore document with UID as document ID
                     repData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    await db.collection('salesReps').add(repData);
-                    showAlert('Sales rep added successfully!');
+                    // Don't store plaintext password in Firestore - Firebase Auth handles it
+                    await db.collection('salesReps').doc(uid).set(repData);
+
+                    showAlert('Sales rep created successfully! They can now login with their email and password.', 'success');
                 }
 
                 document.getElementById('addRepForm').reset();
                 loadReps();
             } catch (error) {
                 console.error('Error saving rep:', error);
-                showAlert('Error saving sales rep: ' + error.message, 'error');
+
+                // Provide helpful error messages
+                let errorMessage = 'Error saving sales rep: ';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage += 'This email is already registered. Please use a different email.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage += 'Invalid email format.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage += 'Password is too weak. Use at least 6 characters.';
+                } else {
+                    errorMessage += error.message;
+                }
+
+                showAlert(errorMessage, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         });
         

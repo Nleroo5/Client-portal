@@ -179,27 +179,57 @@
     <script src="sales-functions.js"></script>
 
     <script>
-        // Check authentication on page load
+        // CRITICAL SECURITY: Check Firebase Authentication on page load
         document.addEventListener('DOMContentLoaded', () => {
-            if (!sessionStorage.getItem('repAuthenticated')) {
-                // Not logged in, redirect to login
-                window.location.href = 'sales.html';
-                return;
-            }
+            // Verify Firebase Authentication
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (!user) {
+                    // Not authenticated - redirect to login
+                    console.warn('Unauthorized access attempt to sales dashboard');
+                    sessionStorage.clear();
+                    window.location.href = 'index.html';
+                    return;
+                }
 
-            // Load rep name
-            const repName = sessionStorage.getItem('repName');
-            document.getElementById('repNameDisplay').textContent = repName || 'Rep';
+                // User is authenticated - verify they are a sales rep
+                try {
+                    const repDoc = await db.collection('salesReps').doc(user.uid).get();
+                    if (!repDoc.exists) {
+                        console.error('User is not a sales rep');
+                        await firebase.auth().signOut();
+                        sessionStorage.clear();
+                        window.location.href = 'index.html';
+                        return;
+                    }
 
-            // Initialize dashboard
-            initializeDashboard();
+                    const repData = repDoc.data();
+
+                    // Store rep info in session for quick access
+                    sessionStorage.setItem('repAuthenticated', 'true');
+                    sessionStorage.setItem('repId', user.uid);
+                    sessionStorage.setItem('repName', repData.name);
+                    sessionStorage.setItem('repRole', repData.role);
+
+                    // Load rep name in header
+                    document.getElementById('repNameDisplay').textContent = repData.name || 'Rep';
+
+                    // Initialize dashboard
+                    initializeDashboard();
+                } catch (error) {
+                    console.error('Error verifying rep:', error);
+                    await firebase.auth().signOut();
+                    sessionStorage.clear();
+                    window.location.href = 'index.html';
+                }
+            });
         });
 
         // Logout function
-        function logout() {
+        async function logout() {
             if (confirm('Are you sure you want to logout?')) {
+                await firebase.auth().signOut();
                 sessionStorage.clear();
-                window.location.href = 'sales.html';
+                window.location.href = 'index.html';
             }
         }
 
