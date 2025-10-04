@@ -12,14 +12,15 @@ Both portals share the same Firebase database and are managed through a single a
 
 ```
 Client-Portal/
-├── index.html          # Contract portal (6/12-month clients)
-├── index-m2m.html      # Month-to-month portal
-├── admin.html          # Unified admin dashboard (manages both portal types)
-├── config.js           # Shared Firebase config & default links
-├── functions.js        # Contract portal JavaScript logic
-├── functions-m2m.js    # Month-to-month portal JavaScript logic
-├── styles.css          # Shared CSS styles (used by both portals)
-└── README.md           # This guide
+├── index.html              # Admin dashboard (portal.driveleadmedia.com)
+├── index-contract.html     # Contract portal (6/12-month clients)
+├── index-m2m.html          # Month-to-month portal
+├── admin-password.json     # Server-side password storage
+├── config.js               # Shared Firebase config & default links
+├── functions.js            # Contract portal JavaScript logic
+├── functions-m2m.js        # Month-to-month portal JavaScript logic
+├── styles.css              # Shared CSS styles (used by both portals)
+└── README.md               # This guide
 ```
 
 ## 🎯 Quick File Reference
@@ -33,35 +34,50 @@ Client-Portal/
 | **DocuSign links (default)** | `config.js` | Lines 18-23 |
 | **Stripe payment links (default)** | `config.js` | Lines 26-36 |
 | **Google Drive upload link** | `config.js` | Line ~39 |
-| **Contract portal content** | `index.html` | Main portal file |
+| **Admin dashboard** | `index.html` | Main admin interface |
+| **Contract portal content** | `index-contract.html` | 6/12-month portal |
 | **M2M portal content** | `index-m2m.html` | Month-to-month portal |
 | **Button colors** | `styles.css` | Lines 575-689 |
 | **Background colors** | `styles.css` | Lines 7-30 |
 
 ## 🔒 Admin Dashboard Security
 
-The admin dashboard is password-protected to prevent unauthorized access.
+The admin dashboard is password-protected with **server-side verification** to prevent unauthorized access.
 
 **Default Password:** `DLM2024!`
 
 **⚠️ IMPORTANT: Change this password immediately!**
 
-To change the password:
-1. Open [admin.html](admin.html) in a text editor
-2. Find line 683: `const ADMIN_PASSWORD = "DLM2024!";`
-3. Change `"DLM2024!"` to your new password
-4. Save the file
+### **To Change the Password:**
 
-**How it works:**
-- Password is required on first visit
+1. Open [admin-password.json](admin-password.json) in a text editor
+2. Change the password value:
+   ```json
+   {
+     "password": "YourNewSecurePassword123!",
+     "note": "Change this password to secure your admin dashboard"
+   }
+   ```
+3. Save and upload to your server at `https://portal.driveleadmedia.com/admin-password.json`
+
+### **How it Works:**
+- Password stored in `admin-password.json` on your server
+- Admin dashboard fetches password from `https://portal.driveleadmedia.com/admin-password.json`
+- Password verified server-side (more secure than client-side)
 - Stays logged in for the browser session
 - Closing the browser tab requires re-entering password
+
+### **Setup Requirements:**
+Upload `admin-password.json` to your server at:
+```
+https://portal.driveleadmedia.com/admin-password.json
+```
 
 ## 🎛️ Using the Unified Admin Dashboard
 
 ### **Creating a New Client Portal**
 
-1. Open `admin.html` in your browser (enter password when prompted)
+1. Go to `portal.driveleadmedia.com` (enter password when prompted)
 2. Fill in the client details:
    - Client/Business Name
    - Client Email (optional)
@@ -77,7 +93,7 @@ To change the password:
 
 | Feature | Contract Portal | Month-to-Month Portal |
 |---------|----------------|----------------------|
-| **URL** | `portal.driveleadmedia.com?c=ID` | `portal.driveleadmedia.com/index-m2m.html?c=ID` |
+| **URL** | `portal.driveleadmedia.com/index-contract.html?c=ID` | `portal.driveleadmedia.com/index-m2m.html?c=ID` |
 | **Step 1** | Sign DPA + Choose 6/12-month agreement | Sign DPA + Service Agreement |
 | **Step 2** | Select payment plan (monthly/upfront with 5% discount) | Pay first invoice |
 | **Stripe Links** | 4 links (6-month monthly/upfront, 12-month monthly/upfront) | 1 invoice link |

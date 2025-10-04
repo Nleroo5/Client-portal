@@ -3,459 +3,1110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Launch Portal - Drive Lead Media (Contract)</title>
+    <title>Admin Dashboard - Drive Lead Media</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Young+Serif:wght@400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #012E40;
+            background: linear-gradient(135deg, #F0F9F7 0%, #DFF5F3 100%);
+            min-height: 100vh;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+            color: #EEF4D9;
+            padding: 30px 20px;
+            box-shadow: 0 4px 20px rgba(1, 46, 64, 0.2);
+        }
+        
+        .admin-header h1 {
+            font-family: 'Young Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .admin-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .admin-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(5, 144, 140, 0.1);
+            border: 1px solid #85C7B3;
+        }
+        
+        .admin-section h2 {
+            color: #05908C;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #85C7B3;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #012E40;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #85C7B3;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #F2A922;
+            box-shadow: 0 0 0 3px rgba(242, 169, 34, 0.2);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background: #05908C;
+            color: #EEF4D9;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            margin-right: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .btn:hover {
+            background: #012E40;
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background: #F2A922;
+            color: #012E40;
+        }
+        
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #85C7B3;
+            color: #012E40;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+        
+        .client-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .client-table th {
+            background: #05908C;
+            color: #EEF4D9;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .client-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .client-table tr:hover {
+            background: #F0F9F7;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        
+        .status-inactive {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+        
+        .progress-mini {
+            display: flex;
+            gap: 4px;
+            margin-top: 5px;
+        }
+        
+        .progress-step {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .progress-step.complete {
+            background: #22c55e;
+            color: white;
+        }
+        
+        .portal-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #05908C;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .portal-link:hover {
+            text-decoration: underline;
+        }
+        
+        .copy-btn {
+            padding: 4px 8px;
+            background: #85C7B3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .copy-btn:hover {
+            background: #05908C;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+        }
+        
+        .alert-error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+        
+        .link-section {
+            background: #F0F9F7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .link-section h3 {
+            color: #05908C;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Edit Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #85C7B3;
+        }
+        
+        .modal-header h2 {
+            color: #05908C;
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #85C7B3;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-btn:hover {
+            background: #F0F9F7;
+            color: #05908C;
+        }
+        
+        .progress-controls {
+            background: #DFF5F3;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .progress-controls h3 {
+            color: #05908C;
+            margin-bottom: 15px;
+        }
+        
+        .progress-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #85C7B3;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .client-table {
+                font-size: 0.9rem;
+            }
+            
+            .client-table th,
+            .client-table td {
+                padding: 8px;
+            }
+            
+            .modal {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .progress-checkboxes {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); display: flex; align-items: center; justify-content: center; z-index: 999999;">
-        <div style="text-align: center; color: #EEF4D9;">
-            <h2 style="font-family: 'Young Serif', serif; margin-bottom: 20px;">Loading Portal...</h2>
-            <div style="width: 50px; height: 50px; border: 3px solid #EEF4D9; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+    <!-- Password Protection Overlay -->
+    <div id="passwordOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); display: flex; align-items: center; justify-content: center; z-index: 999999;">
+        <div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);">
+            <h1 style="font-family: 'Young Serif', serif; color: #012E40; margin-bottom: 10px;">Admin Access</h1>
+            <p style="color: #05908C; margin-bottom: 25px;">Enter password to continue</p>
+            <input type="password" id="adminPassword" placeholder="Enter password" style="width: 100%; padding: 12px; border: 2px solid #85C7B3; border-radius: 8px; font-size: 1rem; margin-bottom: 15px;">
+            <button onclick="checkPassword()" style="width: 100%; padding: 12px 24px; background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: #EEF4D9; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer;">
+                Unlock Dashboard
+            </button>
+            <div id="passwordError" style="color: #ff6b6b; margin-top: 15px; display: none; font-weight: 600;">
+                ❌ Incorrect password
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-header">
+        <h1>Admin Dashboard</h1>
+        <p>Manage Client Portals - Drive Lead Media</p>
+    </div>
+
+    <div class="admin-container">
+        <!-- Alert Messages -->
+        <div id="alertMessage" style="display: none;"></div>
+        
+        <!-- Create New Client -->
+        <div class="admin-section">
+            <h2>Create New Client Portal</h2>
+            <form id="createClientForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientName">Client/Business Name *</label>
+                        <input type="text" id="clientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientEmail">Client Email</label>
+                        <input type="email" id="clientEmail">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="portalType">Portal Type *</label>
+                        <select id="portalType" required>
+                            <option value="contract">Contract (6/12-Month Agreement)</option>
+                            <option value="m2m">Month-to-Month</option>
+                        </select>
+                    </div>
+                    <div></div>
+                </div>
+
+                <!-- Contract Portal Links (shown by default) -->
+                <div id="contractLinks">
+                <div class="link-section">
+                    <h3>DocuSign Links (Optional - Leave blank for defaults)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dpaLink">Custom DPA Link</label>
+                            <input type="url" id="dpaLink" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="service6Link">Custom 6-Month Service Agreement</label>
+                            <input type="url" id="service6Link" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="service12Link">Custom 12-Month Service Agreement</label>
+                        <input type="url" id="service12Link" placeholder="Leave blank for default">
+                    </div>
+                </div>
+                
+                <div class="link-section">
+                    <h3>Stripe Payment Links (Optional)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stripe6Monthly">6-Month Monthly Payment</label>
+                            <input type="url" id="stripe6Monthly" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="stripe6Upfront">6-Month Upfront Payment</label>
+                            <input type="url" id="stripe6Upfront" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stripe12Monthly">12-Month Monthly Payment</label>
+                            <input type="url" id="stripe12Monthly" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="stripe12Upfront">12-Month Upfront Payment</label>
+                            <input type="url" id="stripe12Upfront" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <!-- End Contract Portal Links -->
+
+                <!-- Month-to-Month Portal Links (hidden by default) -->
+                <div id="m2mLinks" style="display: none;">
+                <div class="link-section">
+                    <h3>Month-to-Month DocuSign Links (Optional)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="m2mServiceAgreementLink">Custom Service Agreement Link</label>
+                            <input type="url" id="m2mServiceAgreementLink" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="m2mDpaLink">Custom DPA Link</label>
+                            <input type="url" id="m2mDpaLink" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="link-section">
+                    <h3>Month-to-Month Payment Link (Optional)</h3>
+                    <div class="form-group">
+                        <label for="m2mInvoiceLink">Stripe Invoice/Payment Link</label>
+                        <input type="url" id="m2mInvoiceLink" placeholder="Leave blank for default">
+                    </div>
+                </div>
+                </div>
+                <!-- End Month-to-Month Portal Links -->
+
+                <div class="link-section">
+                    <h3>Other Links (Optional - Shared by Both Portals)</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="googleDriveLink">Google Drive Upload Link</label>
+                            <input type="url" id="googleDriveLink" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="creativeLink">Creative Preview Link</label>
+                            <input type="url" id="creativeLink" placeholder="Add later when creatives are ready">
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Create Client Portal</button>
+            </form>
+        </div>
+        
+        <!-- Existing Clients -->
+        <div class="admin-section">
+            <h2>Existing Clients</h2>
+            <table class="client-table">
+                <thead>
+                    <tr>
+                        <th>Client Name</th>
+                        <th>Status</th>
+                        <th>Progress</th>
+                        <th>Portal Link</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="clientsTableBody">
+                    <!-- Clients will be loaded here -->
+                </tbody>
+            </table>
         </div>
     </div>
     
-    <style>
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
-
-    <!-- Floating Progress Sidebar -->
-    <div class="floating-progress-sidebar" id="floatingProgressSidebar">
-        <div class="sidebar-progress-header">
-            <div class="progress-percentage-circle">
-                <svg>
-                    <circle class="background" cx="25" cy="25" r="20"></circle>
-                    <circle class="progress" id="sidebarProgressCircle" cx="25" cy="25" r="20" 
-                            stroke-dasharray="126" stroke-dashoffset="126"></circle>
-                </svg>
-                <div class="progress-percentage-text" id="sidebarProgressPercent">0%</div>
+    <!-- Edit Client Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Edit Client Portal</h2>
+                <button type="button" class="close-btn" onclick="closeEditModal()">&times;</button>
             </div>
-            <div class="progress-message" id="sidebarProgressMessage">Let's get started!</div>
-        </div>
-        <div class="sidebar-steps-track">
-            <div class="sidebar-step-item">
-                <div class="sidebar-step-bubble upcoming" id="sidebarBubble1">1</div>
-                <div class="sidebar-step-info">
-                    <div class="sidebar-step-label">Agreements</div>
-                </div>
-            </div>
-            <div class="sidebar-step-item">
-                <div class="sidebar-step-bubble upcoming" id="sidebarBubble2">2</div>
-                <div class="sidebar-step-info">
-                    <div class="sidebar-step-label">Payment</div>
-                </div>
-            </div>
-            <div class="sidebar-step-item">
-                <div class="sidebar-step-bubble upcoming" id="sidebarBubble3">3</div>
-                <div class="sidebar-step-info">
-                    <div class="sidebar-step-label">Meta Setup</div>
-                </div>
-            </div>
-            <div class="sidebar-step-item">
-                <div class="sidebar-step-bubble upcoming" id="sidebarBubble4">4</div>
-                <div class="sidebar-step-info">
-                    <div class="sidebar-step-label">Tracking</div>
-                </div>
-            </div>
-            <div class="sidebar-step-item">
-                <div class="sidebar-step-bubble upcoming" id="sidebarBubble5">5</div>
-                <div class="sidebar-step-info">
-                    <div class="sidebar-step-label">Approval</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="portal-container">
-        <!-- Hero Section -->
-        <div class="hero">
-            <h1>Client Launch Portal</h1>
-            <p>Complete each step. We'll handle the rest.</p>
             
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div class="progress-text">
-                    <span id="progressText">0 of 5 steps completed</span>
-                    <span id="progressPercent">0%</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Success Message -->
-        <div class="success-message" id="successMessage" style="display: none;">
-            <h3>🎉 Launch Complete!</h3>
-            <p>All steps completed successfully. Your campaign will be live within 24-48 hours.</p>
-        </div>
-
-        <!-- Step 1: Sign Agreements -->
-        <div class="step" id="step1">
-            <div class="step-header">
-                <div>
-                    <h2>Sign Your Agreements</h2>
-                    <div class="step-note">You'll receive copies automatically by email.</div>
-                </div>
-                <div class="step-number">1</div>
-            </div>
-            <div class="step-content">
-                <div style="margin-bottom: 20px;">
-                    <a href="#" class="btn" id="dpaBtn" target="_blank" rel="noopener">
-                        Sign DPA (Data Processing Agreement)
-                    </a>
-                </div>
-                <div class="radio-group">
-                    <div class="radio-item">
-                        <input type="radio" id="service6" name="serviceTerm" value="6" checked>
-                        <label for="service6">6-month service agreement</label>
-                    </div>
-                    <div class="radio-item">
-                        <input type="radio" id="service12" name="serviceTerm" value="12">
-                        <label for="service12">12-month service agreement</label>
-                    </div>
-                </div>
-                <a href="#" class="btn" id="serviceBtn" target="_blank" rel="noopener">
-                    Sign Service Agreement (6-month)
-                </a>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(1)">Mark Step 1 Complete</button>
-            </div>
-        </div>
-
-        <!-- Step 2: Set Up Payment -->
-        <div class="step locked" id="step2">
-            <div class="step-header">
-                <div>
-                    <h2>Set Up Payment</h2>
-                    <div class="step-note">Secure payment processing via Stripe. All major payment methods accepted.</div>
-                </div>
-                <div class="step-number">2</div>
-            </div>
-            <div class="step-content">
-                <div class="payment-term-display">
-                    <h4 style="color: #012E40; margin: 0;">
-                        <span id="paymentTermText">6-Month</span> Payment Options
-                    </h4>
-                </div>
+            <form id="editClientForm">
+                <input type="hidden" id="editClientId">
                 
-                <div class="radio-group" style="margin-bottom: 20px;">
-                    <div class="radio-item">
-                        <input type="radio" id="paymentMonthly" name="paymentType" value="monthly" checked>
-                        <label for="paymentMonthly">Pay Monthly</label>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editClientName">Client/Business Name *</label>
+                        <input type="text" id="editClientName" required>
                     </div>
-                    <div class="radio-item">
-                        <input type="radio" id="paymentUpfront" name="paymentType" value="upfront">
-                        <label for="paymentUpfront">Pay All Upfront <span class="discount-tag">5% Discount</span></label>
+                    <div class="form-group">
+                        <label for="editClientEmail">Client Email</label>
+                        <input type="email" id="editClientEmail">
                     </div>
                 </div>
                 
-                <a href="#" class="btn" id="stripeBtn" target="_blank" rel="noopener">
-                    Set Up Monthly Payment
-                </a>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(2)">Mark Step 2 Complete</button>
-            </div>
-        </div>
-
-        <!-- Step 3: Meta Access & Brand Kit -->
-        <div class="step locked" id="step3">
-            <div class="step-header">
-                <div>
-                    <h2>Meta Access & Brand Kit</h2>
-                </div>
-                <div class="step-number">3</div>
-            </div>
-            <div class="step-content">
-                <div style="margin-bottom: 25px;">
-                    <h4 style="color: #012E40; margin-bottom: 15px;">Meta Business Suite Setup</h4>
-                    <p style="color: #012E40; margin-bottom: 15px;">Let's handle this together - I'll walk you through the setup step-by-step.</p>
-                    
-                    <div style="background: #DFF5F3; padding: 25px; border-radius: 12px; border: 2px solid #85C7B3; text-align: center; max-width: 450px; margin: 0 auto;">
-                        <img src="https://www.driveleadmedia.com/s/IMG_1337.png" 
-                             alt="Nicolas - Drive Lead Media" 
-                             style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #05908C;">
-                        
-                        <h5 style="color: #012E40; margin-bottom: 10px;">Call Nicolas</h5>
-                        
-                        <div style="background: #05908C; color: #EEF4D9; padding: 12px 20px; border-radius: 8px; margin: 15px 0; font-size: 1.1rem; font-weight: 700;">
-                            <a href="tel:+16786506411" style="color: #EEF4D9; text-decoration: none;">
-                                (678) 650-6411
-                            </a>
-                        </div>
-                        
-                        <div style="color: #012E40; font-size: 0.9rem; line-height: 1.5;">
-                            <p style="margin-bottom: 5px;"><strong>Available:</strong> 9am - 5pm, Mon-Sat</p>
-                            <p style="margin-bottom: 10px;"><strong>Call Duration:</strong> ~15 minutes</p>
-                            
-                            <div style="background: rgba(242, 169, 34, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #F2A922; margin-top: 10px;">
-                                <p style="margin: 0; font-size: 0.85rem;">
-                                    If I don't answer, shoot me a text or leave a voicemail - I'll get right back to you.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Brand Kit Upload Section -->
-                <div style="margin: 30px 0 20px 0; border-top: 2px solid rgba(133, 199, 179, 0.3); padding-top: 25px;">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
-                        <h4 style="color: #012E40; margin: 0;">📁 Brand Kit Upload:</h4>
-                        <button class="btn btn-small btn-outline" id="brandKitInfoBtn" style="font-size: 0.8rem; padding: 4px 12px;" onclick="window.toggleBrandKitInfo()">
-                            What is a brand kit?
-                        </button>
-                    </div>
-                    
-                    <!-- Brand Kit Explanation (hidden initially) -->
-                    <div id="brandKitInfo" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
-                        <h5 style="color: #012E40; margin-bottom: 10px;">Your Brand Kit Should Include:</h5>
-                        <div class="brand-kit-grid">
-                            <div>
-                                <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">🎨 Logo Files:</h6>
-                                <ul style="margin-left: 15px; color: #012E40; line-height: 1.5;">
-                                    <li>High-resolution logo PNG (transparent background)</li>
-                                    <li>Logo variations (if available)</li>
-                                </ul>
-                                <p style="color: #012E40; margin-top: 8px; font-size: 0.9rem; font-style: italic;">
-                                    We can work with whatever you have, but the more options you provide, the more creative flexibility we'll have to make your ads stand out
-                                </p>
-                            </div>
-                            <div>
-                                <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">🌈 Color Palette:</h6>
-                                <ul style="margin-left: 15px; color: #012E40; line-height: 1.5;">
-                                    <li>Brand colors (hex codes like #012E40)</li>
-                                    <li>Color palette document or screenshot</li>
-                                    <li>Brand guidelines PDF (if available)</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div style="background: #DFF5F3; padding: 15px; border-radius: 6px; border-left: 3px solid #05908C;">
-                            <p style="color: #012E40; margin: 0; font-size: 0.9rem;">
-                                <strong>💡 Don't have all of these?</strong> No worries! Upload whatever you have. Even just a logo PNG and your main brand colors will help us create ads that match your brand perfectly.
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <p style="color: #012E40; margin-bottom: 15px;">Upload your logos, brand guidelines, fonts, and any existing creative assets so we can create ads that perfectly match your brand.</p>
-                    <a href="https://drive.google.com/drive/folders/1jds7K6SdV6G_SwTyZZjxqjuftqIHiaPY?usp=sharing" 
-                       class="btn btn-outline" id="uploadBtn" target="_blank" rel="noopener">
-                        Upload Brand Assets
-                    </a>
-                </div>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(3)">Mark Step 3 Complete</button>
-            </div>
-        </div>
-
-        <!-- Step 4: Website Access for Tracking -->
-        <div class="step locked" id="step4">
-            <div class="step-header">
-                <div>
-                    <h2>Website Access for Tracking</h2>
-                    <div class="step-note">We install GA4 and Meta Pixel (no PHI). We handle all technical setup - you just provide access.</div>
-                </div>
-                <div class="step-number">4</div>
-            </div>
-            <div class="step-content">
-                <div style="margin-bottom: 25px;">
-                    <h4 style="color: #012E40; margin-bottom: 15px;">🖥️ Website Access Needed</h4>
-                    <p style="color: #012E40; margin-bottom: 15px;">Choose the easiest option for you:</p>
-                    
-                    <div class="radio-group">
-                        <div class="radio-item">
-                            <input type="radio" id="connectWebAdmin" name="websiteAccess" value="connect" checked>
-                            <label for="connectWebAdmin">Connect us with your website admin/developer</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="tempAccess" name="websiteAccess" value="temporary">
-                            <label for="tempAccess">Grant us temporary website access</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Connect with website admin -->
-                <div id="connectAdminForm" style="background: #DFF5F3; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #85C7B3;">
-                    <h5 style="color: #012E40; margin-bottom: 10px;">Website Admin Contact:</h5>
+                <div class="form-row">
                     <div class="form-group">
-                        <label for="adminName">Admin/Developer Name</label>
-                        <input type="text" id="adminName">
-                    </div>
-                    <div class="form-group">
-                        <label for="adminEmail">Admin Email *</label>
-                        <input type="email" id="adminEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="adminPhone">Admin Phone </label>
-                        <input type="tel" id="adminPhone">
-                    </div>
-                    <div class="form-group">
-                        <label for="websitePlatform">Website Platform</label>
-                        <select id="websitePlatform">
-                            <option value="">Select platform</option>
-                            <option value="wordpress">WordPress</option>
-                            <option value="squarespace">Squarespace</option>
-                            <option value="wix">Wix</option>
-                            <option value="shopify">Shopify</option>
-                            <option value="webflow">Webflow</option>
-                            <option value="other">Other</option>
+                        <label for="editClientStatus">Status</label>
+                        <select id="editClientStatus">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
                         </select>
-                        <input type="text" id="websitePlatformOther" placeholder="Please specify..." style="display: none; margin-top: 10px;">
                     </div>
-                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
-                        <strong>We'll contact them directly</strong> to coordinate tracking installation.
-                    </p>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-secondary btn-small" onclick="window.emailAdminDetails()">Email Admin Details to Us</button>
-                    </div>
-                </div>
-
-                <!-- Temporary access form (hidden by default) -->
-                <div id="tempAccessForm" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
-                    <h5 style="color: #012E40; margin-bottom: 10px;">Temporary Website Access:</h5>
-                    <div class="form-group">
-                        <label for="websiteUrl">Website URL *</label>
-                        <input type="url" id="websiteUrl" placeholder="https://yourwebsite.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginUrl">Login URL</label>
-                        <input type="url" id="loginUrl" placeholder="https://yourwebsite.com/wp-admin">
-                    </div>
-                    <div class="form-group">
-                        <label for="tempUsername">Admin Username *</label>
-                        <input type="text" id="tempUsername" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tempPassword">Admin Password *</label>
-                        <input type="password" id="tempPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="sitePlatform">Website Platform</label>
-                        <select id="sitePlatform">
-                            <option value="">Select platform</option>
-                            <option value="wordpress">WordPress</option>
-                            <option value="squarespace">Squarespace</option>
-                            <option value="wix">Wix</option>
-                            <option value="shopify">Shopify</option>
-                            <option value="webflow">Webflow</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <input type="text" id="sitePlatformOther" placeholder="Please specify..." style="display: none; margin-top: 10px;">
-                    </div>
-                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
-                        <strong>🔒 Secure:</strong> We'll install tracking and remove our access immediately. You can change the password afterward.
-                    </p>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-secondary btn-small" onclick="window.emailAccessDetails()">Send Access Details Securely</button>
-                    </div>
-                </div>
-
-                <div style="margin-top: 25px; background: #F0F9F7; padding: 15px; border-radius: 8px;">
-                    <div class="info-header">
-                        <h5>What We Install:</h5>
-                        <button class="btn-info" onclick="window.toggleGA4Info()">What is GA4?</button>
-                        <button class="btn-info" onclick="window.togglePixelInfo()">What is Meta Pixel?</button>
-                    </div>
-                    
-                    <!-- GA4 Explanation (hidden initially) -->
-                    <div id="ga4Info" class="info-box">
-                        <h6>Google Analytics 4 (GA4):</h6>
-                        <p>
-                            GA4 tracks how people find and use your website. It shows us which ads bring the most visitors, what pages they look at, and what actions they take (like calling your office or filling out forms). This helps us improve your ads to get better results. <strong>No personal health information is tracked.</strong>
-                        </p>
-                    </div>
-
-                    <!-- Meta Pixel Explanation (hidden initially) -->
-                    <div id="pixelInfo" class="info-box warning">
-                        <h6>Meta Pixel (Facebook/Instagram):</h6>
-                        <p>
-                            Meta Pixel tracks when people visit your website after seeing your Facebook or Instagram ads. It helps us find more people similar to your best customers and shows ads to people who visited your website but didn't book an appointment yet. <strong>No personal health information is tracked.</strong>
-                        </p>
-                    </div>
-
-                    <ul style="margin-left: 20px; color: #012E40; line-height: 1.6;">
-                        <li>✓ Google Analytics 4 (GA4) tracking code</li>
-                        <li>✓ Meta Pixel tracking code</li>
-                        <li>✓ Conversion tracking setup</li>
-                        <li>✓ Testing to ensure everything works</li>
-                    </ul>
-                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
-                        <strong>Timeline:</strong> Completed within 24-48 hours of receiving access.
-                    </p>
-                </div>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(4)">Mark Step 4 Complete</button>
-            </div>
-        </div>
-
-        <!-- Step 5: Creative Approval -->
-        <div class="step locked" id="step5">
-            <div class="step-header">
-                <div>
-                    <h2>Creative Approval</h2>
-                    <div class="step-note">Your Launch Bundle: 1 actor video, 1 animated video, 2 image ads.</div>
-                </div>
-                <div class="step-number">5</div>
-            </div>
-            <div class="step-content">
-                <div class="gallery-placeholder" id="galleryPlaceholder">
-                    <p>Creative previews will be shared via secure link</p>
-                    <p style="font-size: 0.9rem; color: #85C7B3; margin-top: 10px;">
-                        Links will be provided once creatives are ready for review
-                    </p>
+                    <div></div>
                 </div>
                 
-                <div style="margin: 20px 0;">
-                    <button class="btn btn-secondary" onclick="window.approveCreatives()">
-                        🚀 Approve to Launch
-                    </button>
-                    <button class="btn btn-outline" onclick="window.requestRevisions()">
-                        Request Revisions
-                    </button>
+                <div class="progress-controls">
+                    <h3>Progress Control</h3>
+                    <div class="progress-checkboxes">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editStep1">
+                            <label for="editStep1">Step 1: Agreements</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editStep2">
+                            <label for="editStep2">Step 2: Payment</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editStep3">
+                            <label for="editStep3">Step 3: Meta Setup</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editStep4">
+                            <label for="editStep4">Step 4: Tracking</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editStep5">
+                            <label for="editStep5">Step 5: Approval</label>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <button type="button" class="btn btn-secondary btn-small" onclick="resetAllSteps()">Reset All Steps</button>
+                        <button type="button" class="btn btn-success btn-small" onclick="completeAllSteps()">Complete All Steps</button>
+                    </div>
                 </div>
                 
-                <!-- Revision Form (hidden) -->
-                <div id="revisionForm" style="display: none; background: #DFF5F3; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #85C7B3;">
-                    <h4 style="color: #012E40;">Request Revisions</h4>
-                    <div class="form-group">
-                        <label for="revisionNotes">Revision Notes</label>
-                        <textarea id="revisionNotes" rows="4" placeholder="Please describe the changes..."></textarea>
+                <div class="link-section">
+                    <h3>DocuSign Links</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editDpaLink">Custom DPA Link</label>
+                            <input type="url" id="editDpaLink" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="editService6Link">Custom 6-Month Service Agreement</label>
+                            <input type="url" id="editService6Link" placeholder="Leave blank for default">
+                        </div>
                     </div>
-                    <button class="btn" onclick="window.submitRevisions()">Submit Revisions</button>
+                    <div class="form-group">
+                        <label for="editService12Link">Custom 12-Month Service Agreement</label>
+                        <input type="url" id="editService12Link" placeholder="Leave blank for default">
+                    </div>
                 </div>
-            </div>
-            <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(5)">Mark Step 5 Complete</button>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="portal-footer">
-            <p>Drive Lead Media — We never process PHI. All analytics used solely for advertising performance.</p>
-            <div class="footer-links">
-                <span id="contactEmail">Nicolas@driveleadmedia.com</span>
-                <span>•</span>
-                <span id="contactPhone">(678) 650-6411</span>
-            </div>
+                
+                <div class="link-section">
+                    <h3>Stripe Payment Links</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editStripe6Monthly">6-Month Monthly Payment</label>
+                            <input type="url" id="editStripe6Monthly" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="editStripe6Upfront">6-Month Upfront Payment</label>
+                            <input type="url" id="editStripe6Upfront" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editStripe12Monthly">12-Month Monthly Payment</label>
+                            <input type="url" id="editStripe12Monthly" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="editStripe12Upfront">12-Month Upfront Payment</label>
+                            <input type="url" id="editStripe12Upfront" placeholder="Leave blank for default">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="link-section">
+                    <h3>Other Links</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editGoogleDriveLink">Google Drive Upload Link</label>
+                            <input type="url" id="editGoogleDriveLink" placeholder="Leave blank for default">
+                        </div>
+                        <div class="form-group">
+                            <label for="editCreativeLink">Creative Preview Link</label>
+                            <input type="url" id="editCreativeLink" placeholder="Add when creatives are ready">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 2px solid #85C7B3;">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteClient()" style="margin-left: 20px;">Delete Client</button>
+                </div>
+            </form>
         </div>
     </div>
-
+    
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
-    <!-- Configuration -->
-    <script src="config.js"></script>
-    
-    <!-- Main Functions -->
-    <script src="functions.js"></script>
+    <script>
+        // ============================================
+        // PASSWORD PROTECTION (Server-Side Verification)
+        // ============================================
+        const PASSWORD_ENDPOINT = 'https://portal.driveleadmedia.com/admin-password.json';
+
+        async function checkPassword() {
+            const passwordInput = document.getElementById('adminPassword');
+            const passwordError = document.getElementById('passwordError');
+            const passwordOverlay = document.getElementById('passwordOverlay');
+            const unlockButton = passwordOverlay.querySelector('button');
+
+            // Disable button and show loading state
+            unlockButton.disabled = true;
+            unlockButton.textContent = 'Checking...';
+
+            try {
+                // Fetch password from server
+                const response = await fetch(PASSWORD_ENDPOINT);
+
+                if (!response.ok) {
+                    throw new Error('Failed to verify password');
+                }
+
+                const data = await response.json();
+                const correctPassword = data.password;
+
+                if (passwordInput.value === correctPassword) {
+                    // Correct password - hide overlay and store session
+                    passwordOverlay.style.display = 'none';
+                    sessionStorage.setItem('adminAuthenticated', 'true');
+                    passwordError.style.display = 'none';
+                } else {
+                    // Wrong password - show error
+                    passwordError.textContent = '❌ Incorrect password';
+                    passwordError.style.display = 'block';
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            } catch (error) {
+                console.error('Password verification error:', error);
+                passwordError.textContent = '⚠️ Unable to verify password. Check your connection.';
+                passwordError.style.display = 'block';
+            } finally {
+                // Re-enable button
+                unlockButton.disabled = false;
+                unlockButton.textContent = 'Unlock Dashboard';
+            }
+        }
+
+        // Allow Enter key to submit password
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('adminPassword');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkPassword();
+                    }
+                });
+                passwordInput.focus();
+            }
+
+            // Check if already authenticated in this session
+            if (sessionStorage.getItem('adminAuthenticated') === 'true') {
+                document.getElementById('passwordOverlay').style.display = 'none';
+            }
+        });
+
+        // ============================================
+        // FIREBASE CONFIGURATION
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6nhisBnue09mvJuFzBb7m6zcMtqBRZEQ",
+            authDomain: "client-portal-2fa80.firebaseapp.com",
+            projectId: "client-portal-2fa80",
+            storageBucket: "client-portal-2fa80.firebasestorage.app",
+            messagingSenderId: "417272730660",
+            appId: "1:417272730660:web:9530a097347fbbf72f5771"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Your portal URL
+        const PORTAL_BASE_URL = 'https://portal.driveleadmedia.com';
+
+        // Current client being edited
+        let currentEditingClient = null;
+        
+        // Show alert message
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.getElementById('alertMessage');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Generate unique client ID
+        function generateClientId() {
+            return 'client_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Toggle portal type fields
+        function togglePortalTypeFields() {
+            const portalType = document.getElementById('portalType').value;
+            const contractLinks = document.getElementById('contractLinks');
+            const m2mLinks = document.getElementById('m2mLinks');
+
+            if (portalType === 'm2m') {
+                contractLinks.style.display = 'none';
+                m2mLinks.style.display = 'block';
+            } else {
+                contractLinks.style.display = 'block';
+                m2mLinks.style.display = 'none';
+            }
+        }
+
+        // Initialize portal type toggle
+        document.getElementById('portalType').addEventListener('change', togglePortalTypeFields);
+
+        // Create new client
+        document.getElementById('createClientForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const clientId = generateClientId();
+            const portalType = document.getElementById('portalType').value;
+
+            // Base client data (common to both portal types)
+            const clientData = {
+                clientId: clientId,
+                clientName: document.getElementById('clientName').value,
+                clientEmail: document.getElementById('clientEmail').value || null,
+                portalType: portalType, // NEW: Store portal type
+                active: true,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+
+                // Progress tracking
+                step1Complete: false,
+                step2Complete: false,
+                step3Complete: false,
+                step4Complete: false,
+                step5Complete: false,
+
+                // Shared links
+                googleDriveLink: document.getElementById('googleDriveLink').value || null,
+                creativeLink: document.getElementById('creativeLink').value || null
+            };
+
+            // Add portal-specific links
+            if (portalType === 'contract') {
+                // Contract portal (6/12 month) links
+                clientData.dpaLink = document.getElementById('dpaLink').value || null;
+                clientData.service6Link = document.getElementById('service6Link').value || null;
+                clientData.service12Link = document.getElementById('service12Link').value || null;
+                clientData.stripe6Monthly = document.getElementById('stripe6Monthly').value || null;
+                clientData.stripe6Upfront = document.getElementById('stripe6Upfront').value || null;
+                clientData.stripe12Monthly = document.getElementById('stripe12Monthly').value || null;
+                clientData.stripe12Upfront = document.getElementById('stripe12Upfront').value || null;
+            } else if (portalType === 'm2m') {
+                // Month-to-month portal links
+                clientData.serviceAgreementLink = document.getElementById('m2mServiceAgreementLink').value || null;
+                clientData.dpaLink = document.getElementById('m2mDpaLink').value || null;
+                clientData.invoiceLink = document.getElementById('m2mInvoiceLink').value || null;
+            }
+
+            try {
+                await db.collection('clients').doc(clientId).set(clientData);
+
+                // Generate correct portal URL based on type
+                const portalUrl = portalType === 'm2m' ?
+                    `${PORTAL_BASE_URL}/index-m2m.html?c=${clientId}` :
+                    `${PORTAL_BASE_URL}/index-contract.html?c=${clientId}`;
+
+                showAlert(`${portalType === 'm2m' ? 'Month-to-Month' : 'Contract'} portal created successfully! Portal link: ${portalUrl}`);
+                document.getElementById('createClientForm').reset();
+                togglePortalTypeFields(); // Reset UI to default
+                loadClients();
+            } catch (error) {
+                console.error('Error creating client:', error);
+                showAlert('Error creating client portal. Please try again.', 'error');
+            }
+        });
+        
+        // Load existing clients
+        async function loadClients() {
+            try {
+                const snapshot = await db.collection('clients').orderBy('createdAt', 'desc').get();
+                const tbody = document.getElementById('clientsTableBody');
+                tbody.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    // Generate correct portal link based on portal type
+                    const portalType = data.portalType || 'contract'; // Default to contract for old clients
+                    const portalLink = portalType === 'm2m' ?
+                        `${PORTAL_BASE_URL}/index-m2m.html?c=${data.clientId}` :
+                        `${PORTAL_BASE_URL}/index-contract.html?c=${data.clientId}`;
+
+                    const portalTypeBadge = portalType === 'm2m' ?
+                        '<span style="background: #F2A922; color: #012E40; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 8px;">M2M</span>' :
+                        '<span style="background: #05908C; color: #EEF4D9; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 8px;">Contract</span>';
+
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${data.clientName}${portalTypeBadge}</td>
+                        <td>
+                            <span class="status-badge status-${data.active ? 'active' : 'inactive'}">
+                                ${data.active ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="progress-mini">
+                                <div class="progress-step ${data.step1Complete ? 'complete' : ''}">1</div>
+                                <div class="progress-step ${data.step2Complete ? 'complete' : ''}">2</div>
+                                <div class="progress-step ${data.step3Complete ? 'complete' : ''}">3</div>
+                                <div class="progress-step ${data.step4Complete ? 'complete' : ''}">4</div>
+                                <div class="progress-step ${data.step5Complete ? 'complete' : ''}">5</div>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" value="${portalLink}" id="link-${data.clientId}" readonly style="width: 200px; padding: 4px; margin-right: 5px;">
+                            <button class="copy-btn" onclick="copyLink('${data.clientId}')">Copy</button>
+                        </td>
+                        <td>
+                            <button class="btn btn-success btn-small" onclick="toggleStatus('${data.clientId}', ${!data.active})">
+                                ${data.active ? 'Deactivate' : 'Activate'}
+                            </button>
+                            <button class="btn btn-small" onclick="editClient('${data.clientId}')">Edit</button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading clients:', error);
+                showAlert('Error loading clients', 'error');
+            }
+        }
+        
+        // Copy portal link
+        function copyLink(clientId) {
+            const input = document.getElementById(`link-${clientId}`);
+            input.select();
+            document.execCommand('copy');
+            showAlert('Portal link copied to clipboard!');
+        }
+        
+        // Toggle client status
+        async function toggleStatus(clientId, activate) {
+            try {
+                await db.collection('clients').doc(clientId).update({
+                    active: activate,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showAlert(`Client ${activate ? 'activated' : 'deactivated'} successfully`);
+                loadClients();
+            } catch (error) {
+                console.error('Error updating status:', error);
+                showAlert('Error updating client status', 'error');
+            }
+        }
+        
+        // Edit client - Open modal with current data
+        async function editClient(clientId) {
+            try {
+                const doc = await db.collection('clients').doc(clientId).get();
+                if (!doc.exists) {
+                    showAlert('Client not found', 'error');
+                    return;
+                }
+                
+                const data = doc.data();
+                currentEditingClient = clientId;
+                
+                // Populate form with current data
+                document.getElementById('editClientId').value = clientId;
+                document.getElementById('editClientName').value = data.clientName || '';
+                document.getElementById('editClientEmail').value = data.clientEmail || '';
+                document.getElementById('editClientStatus').value = data.active ? 'true' : 'false';
+                
+                // Progress checkboxes
+                document.getElementById('editStep1').checked = data.step1Complete || false;
+                document.getElementById('editStep2').checked = data.step2Complete || false;
+                document.getElementById('editStep3').checked = data.step3Complete || false;
+                document.getElementById('editStep4').checked = data.step4Complete || false;
+                document.getElementById('editStep5').checked = data.step5Complete || false;
+                
+                // DocuSign links
+                document.getElementById('editDpaLink').value = data.dpaLink || '';
+                document.getElementById('editService6Link').value = data.service6Link || '';
+                document.getElementById('editService12Link').value = data.service12Link || '';
+                
+                // Stripe links
+                document.getElementById('editStripe6Monthly').value = data.stripe6Monthly || '';
+                document.getElementById('editStripe6Upfront').value = data.stripe6Upfront || '';
+                document.getElementById('editStripe12Monthly').value = data.stripe12Monthly || '';
+                document.getElementById('editStripe12Upfront').value = data.stripe12Upfront || '';
+                
+                // Other links
+                document.getElementById('editGoogleDriveLink').value = data.googleDriveLink || '';
+                document.getElementById('editCreativeLink').value = data.creativeLink || '';
+                
+                // Show modal
+                document.getElementById('editModal').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error loading client data:', error);
+                showAlert('Error loading client data', 'error');
+            }
+        }
+        
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditingClient = null;
+        }
+        
+        // Reset all steps
+        function resetAllSteps() {
+            if (confirm('Reset all progress steps for this client? This cannot be undone.')) {
+                document.getElementById('editStep1').checked = false;
+                document.getElementById('editStep2').checked = false;
+                document.getElementById('editStep3').checked = false;
+                document.getElementById('editStep4').checked = false;
+                document.getElementById('editStep5').checked = false;
+            }
+        }
+        
+        // Complete all steps
+        function completeAllSteps() {
+            if (confirm('Mark all steps as complete for this client?')) {
+                document.getElementById('editStep1').checked = true;
+                document.getElementById('editStep2').checked = true;
+                document.getElementById('editStep3').checked = true;
+                document.getElementById('editStep4').checked = true;
+                document.getElementById('editStep5').checked = true;
+            }
+        }
+        
+        // Save client changes
+        document.getElementById('editClientForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentEditingClient) return;
+            
+            const updateData = {
+                clientName: document.getElementById('editClientName').value,
+                clientEmail: document.getElementById('editClientEmail').value || null,
+                active: document.getElementById('editClientStatus').value === 'true',
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                
+                // Progress tracking
+                step1Complete: document.getElementById('editStep1').checked,
+                step2Complete: document.getElementById('editStep2').checked,
+                step3Complete: document.getElementById('editStep3').checked,
+                step4Complete: document.getElementById('editStep4').checked,
+                step5Complete: document.getElementById('editStep5').checked,
+                
+                // DocuSign links (null if empty)
+                dpaLink: document.getElementById('editDpaLink').value || null,
+                service6Link: document.getElementById('editService6Link').value || null,
+                service12Link: document.getElementById('editService12Link').value || null,
+                
+                // Stripe links (null if empty)
+                stripe6Monthly: document.getElementById('editStripe6Monthly').value || null,
+                stripe6Upfront: document.getElementById('editStripe6Upfront').value || null,
+                stripe12Monthly: document.getElementById('editStripe12Monthly').value || null,
+                stripe12Upfront: document.getElementById('editStripe12Upfront').value || null,
+                
+                // Other links (null if empty)
+                googleDriveLink: document.getElementById('editGoogleDriveLink').value || null,
+                creativeLink: document.getElementById('editCreativeLink').value || null
+            };
+            
+            try {
+                await db.collection('clients').doc(currentEditingClient).update(updateData);
+                showAlert('Client updated successfully!');
+                closeEditModal();
+                loadClients();
+            } catch (error) {
+                console.error('Error updating client:', error);
+                showAlert('Error updating client. Please try again.', 'error');
+            }
+        });
+        
+        // Delete client
+        async function deleteClient() {
+            if (!currentEditingClient) return;
+            
+            const clientName = document.getElementById('editClientName').value;
+            const confirmText = `Are you sure you want to PERMANENTLY DELETE the client portal for "${clientName}"?\n\nThis action cannot be undone and will:\n- Delete all client data\n- Break their portal link\n- Remove all progress tracking\n\nType "DELETE" to confirm:`;
+            
+            const userInput = prompt(confirmText);
+            
+            if (userInput === 'DELETE') {
+                try {
+                    await db.collection('clients').doc(currentEditingClient).delete();
+                    showAlert(`Client "${clientName}" deleted successfully`);
+                    closeEditModal();
+                    loadClients();
+                } catch (error) {
+                    console.error('Error deleting client:', error);
+                    showAlert('Error deleting client. Please try again.', 'error');
+                }
+            } else if (userInput !== null) {
+                showAlert('Deletion cancelled - incorrect confirmation text', 'error');
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('editModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('editModal')) {
+                closeEditModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('editModal').style.display === 'flex') {
+                closeEditModal();
+            }
+        });
+        
+        // Load clients on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadClients();
+        });
+    </script>
 </body>
 </html>
