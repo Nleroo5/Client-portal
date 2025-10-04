@@ -39,6 +39,10 @@
     --success: #85C7B3;                   /* Use DLM mint for success */
     --warning: #F59E0B;
     --error: #c33;                        /* DLM error red */
+
+    /* Accent Colors */
+    --accent-orange: #F2A922;             /* DLM Orange/Yellow - from portal gradient */
+    --deal-card-bg: #EEF4D9;              /* Light mint for deal cards */
 }
 
 body {
@@ -256,19 +260,20 @@ body {
 
 /* Deal Cards */
 .deal-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: var(--deal-card-bg);
+    border: 1px solid var(--secondary);
     border-radius: 8px;
     padding: 16px;
     cursor: pointer;
     transition: all 0.15s ease-out;
-    border-left: 3px solid var(--primary);
+    border-left: 4px solid var(--accent-orange);
 }
 
 .deal-card:hover {
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 8px 20px rgba(242, 169, 34, 0.15);
     transform: translateY(-2px);
-    border-left-color: var(--primary-hover);
+    border-left-color: var(--primary);
+    background: #FFFFFF;
 }
 
 /* Tables */
@@ -386,7 +391,7 @@ textarea:focus {
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     letter-spacing: -0.025em;
-    color: var(--text-primary);
+    color: var(--accent-orange);
 }
 
 p {

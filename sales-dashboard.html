@@ -562,7 +562,7 @@
                             <!-- Edit & Delete Controls -->
                             <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
                                 <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #0F172A; font-weight: 600;" title="Edit deal">Edit</button>
-                                <button onclick="archiveDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #dc2626; font-weight: 600;" title="Archive deal">Archive</button>
+                                <button onclick="confirmLostDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #dc2626; font-weight: 600;" title="Mark as lost">Lost</button>
                             </div>
 
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; padding-right: 120px;">
@@ -1399,20 +1399,22 @@
             }
         }
 
-        // Archive/delete deal
-        async function archiveDeal(dealId) {
-            if (!confirm('Are you sure you want to archive this deal?')) return;
+        // Mark deal as lost with confirmation
+        async function confirmLostDeal(dealId) {
+            if (!confirm('Mark this deal as LOST? This will archive the deal.')) return;
 
             try {
                 await db.collection('deals').doc(dealId).update({
                     stage: 'closed-lost',
+                    archived: true,
+                    archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
                 // Show success
                 const toast = document.createElement('div');
-                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #0EA5E9; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
-                toast.textContent = 'Deal archived!';
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #05908C; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                toast.textContent = 'Deal marked as lost and archived';
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
 
@@ -1570,6 +1572,9 @@
                         </li>
                         <li style="margin-bottom: 8px;">
                             <a href="resources.html" style="color: #64748B; text-decoration: none; font-size: 0.875rem; transition: color 0.15s;">Resources</a>
+                        </li>
+                        <li style="margin-bottom: 8px;">
+                            <a href="archived.html" style="color: #64748B; text-decoration: none; font-size: 0.875rem; transition: color 0.15s;">Archived Deals</a>
                         </li>
                     </ul>
                 </div>
