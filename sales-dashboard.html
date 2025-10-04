@@ -131,11 +131,12 @@
                         <tr>
                             <th style="width: 60px;">Rank</th>
                             <th>Rep Name</th>
-                            <th>Disc Sched</th>
-                            <th>Disc Comp</th>
-                            <th>Onboarding</th>
-                            <th>Gone Live</th>
-                            <th>Total Points</th>
+                            <th>Calls</th>
+                            <th>Emails</th>
+                            <th>Disc</th>
+                            <th>Onboard</th>
+                            <th>Live</th>
+                            <th>Points</th>
                         </tr>
                     </thead>
                     <tbody id="teamLeaderboardBody">
@@ -156,6 +157,17 @@
             <div style="margin-bottom: 24px;">
                 <h2 style="margin-bottom: 4px;">Action Items</h2>
                 <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">What needs your attention right now</p>
+            </div>
+
+            <!-- Stuck Deals (New Priority Section) -->
+            <div style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: #dc2626; margin: 0;">🔥 Stuck Deals (>7 Days)</h3>
+                    <span id="stuckDealsCount" style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;">0</span>
+                </div>
+                <div id="stuckDeals" style="background: white; border-radius: 12px; border: 1px solid #e5e7eb;">
+                    <p class="no-data" style="padding: 24px; text-align: center; color: #9ca3af;">No stuck deals</p>
+                </div>
             </div>
 
             <!-- Overdue -->
@@ -750,12 +762,14 @@
                         scorecard = scorecardDoc.data();
                     }
 
-                    // Calculate total points (you can adjust point values)
+                    // Calculate total points (activity + results)
                     const totalPoints =
-                        (scorecard.discoveryScheduled || 0) * 1 +
-                        (scorecard.discoveryCompleted || 0) * 2 +
-                        (scorecard.dealsToOnboarding || 0) * 5 +
-                        (scorecard.dealsLive || 0) * 10;
+                        (scorecard.callsMade || 0) * 0.1 +         // 0.1 pt per call
+                        (scorecard.emailsSent || 0) * 0.1 +        // 0.1 pt per email
+                        (scorecard.discoveryScheduled || 0) * 3 +  // 3 pts per scheduled
+                        (scorecard.discoveryCompleted || 0) * 5 +  // 5 pts per completed
+                        (scorecard.dealsToOnboarding || 0) * 10 +  // 10 pts to onboarding
+                        (scorecard.dealsLive || 0) * 20;           // 20 pts gone live
 
                     teamData.push({
                         id: repDoc.id,
@@ -813,11 +827,12 @@
                     <tr style="${rowStyle}">
                         <td style="text-align: center;">${rankBadge}</td>
                         <td>${rep.name}${isCurrentUser ? ' <span style="color: #05908C; font-size: 0.75rem;">(You)</span>' : ''}</td>
-                        <td style="text-align: center;">${rep.scorecard.discoveryScheduled || 0}</td>
+                        <td style="text-align: center;">${rep.scorecard.callsMade || 0}</td>
+                        <td style="text-align: center;">${rep.scorecard.emailsSent || 0}</td>
                         <td style="text-align: center;">${rep.scorecard.discoveryCompleted || 0}</td>
                         <td style="text-align: center;">${rep.scorecard.dealsToOnboarding || 0}</td>
                         <td style="text-align: center;">${rep.scorecard.dealsLive || 0}</td>
-                        <td style="text-align: center; font-weight: 700;">${rep.totalPoints}</td>
+                        <td style="text-align: center; font-weight: 700;">${Math.round(rep.totalPoints)}</td>
                     </tr>
                 `;
             });
@@ -861,6 +876,7 @@
                     .get();
 
                 const actionItems = [];
+                const stuckDeals = [];
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
@@ -901,6 +917,17 @@
                         dueDate.setDate(dueDate.getDate() + 14);
                     }
 
+                    // Check if deal is stuck (>7 days in stage)
+                    const daysSinceUpdate = Math.floor((today - lastUpdated) / (1000 * 60 * 60 * 24));
+                    if (daysSinceUpdate > 7) {
+                        stuckDeals.push({
+                            id: doc.id,
+                            companyName: data.companyName,
+                            stage: data.stage,
+                            daysStuck: daysSinceUpdate
+                        });
+                    }
+
                     if (actionText) {
                         actionItems.push({
                             id: doc.id,
@@ -937,7 +964,7 @@
                 upcoming.sort((a, b) => a.dueDate - b.dueDate);
 
                 // Render action items
-                renderActionItems(overdue, dueToday, upcoming);
+                renderActionItems(stuckDeals, overdue, dueToday, upcoming);
 
             } catch (error) {
                 console.error('Error loading action items:', error);
@@ -945,11 +972,46 @@
         }
 
         // Render action items
-        function renderActionItems(overdue, dueToday, upcoming) {
+        function renderActionItems(stuckDeals, overdue, dueToday, upcoming) {
             // Update counts
+            document.getElementById('stuckDealsCount').textContent = stuckDeals.length;
             document.getElementById('overdueCount').textContent = overdue.length;
             document.getElementById('dueTodayCount').textContent = dueToday.length;
             document.getElementById('upcomingCount').textContent = upcoming.length;
+
+            // Render stuck deals
+            if (stuckDeals.length === 0) {
+                document.getElementById('stuckDeals').innerHTML = '<p class="no-data" style="padding: 24px; text-align: center; color: #9ca3af; margin: 0;">No stuck deals - great job!</p>';
+            } else {
+                let html = '<div style="padding: 16px;">';
+                stuckDeals.forEach(deal => {
+                    const stageNames = {
+                        'qualified': 'Qualified',
+                        'cold-outreach': 'Cold Outreach',
+                        'follow-up': 'Follow-Up',
+                        'discovery-scheduled': 'Discovery Scheduled',
+                        'discovery-completed': 'Discovery Completed',
+                        'onboarding-portal': 'Onboarding Portal',
+                        'campaign-live': 'Campaign Live',
+                        'follow-up-resell': 'Follow-Up & Resell'
+                    };
+
+                    html += `
+                        <div style="padding: 12px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #012E40; margin-bottom: 4px;">${deal.companyName || 'Unnamed Deal'}</div>
+                                <div style="font-size: 0.85rem; color: #dc2626;">${deal.daysStuck} days in ${stageNames[deal.stage] || deal.stage}</div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="padding: 6px 12px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.85rem; cursor: pointer; color: #374151;">📞 Call</button>
+                                <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="padding: 6px 12px; background: #05908C; border: none; border-radius: 4px; font-size: 0.85rem; cursor: pointer; color: white;">→ Next</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                document.getElementById('stuckDeals').innerHTML = html;
+            }
 
             // Render overdue
             if (overdue.length === 0) {
