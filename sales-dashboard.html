@@ -43,7 +43,7 @@
         <!-- Tab 1: My Deals -->
         <div class="tab-content active" id="tab-deals">
             <!-- Focus Zone -->
-            <div id="focusZone" style="background: #FFFFFF; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(1, 46, 64, 0.12); border: 2px solid #85C7B3;">
+            <div id="focusZone" style="background: linear-gradient(135deg, #EEF4D9 0%, #FFFFFF 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 8px 16px rgba(1, 46, 64, 0.15); border: 2px solid #F2A922;">
                 <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: #F2A922;">
                     Today's Focus
                 </h3>
@@ -53,7 +53,7 @@
             </div>
 
             <!-- Pipeline Header -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: #FFFFFF; padding: 20px; border-radius: 8px; border: 2px solid #85C7B3; box-shadow: 0 4px 6px rgba(1, 46, 64, 0.12);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: linear-gradient(135deg, #EEF4D9 0%, #FFFFFF 100%); padding: 20px; border-radius: 12px; border: 2px solid #F2A922; box-shadow: 0 8px 16px rgba(1, 46, 64, 0.15);">
                 <div>
                     <div style="font-size: 1.25rem; font-weight: 700; color: #F2A922;">My Pipeline</div>
                     <div style="font-size: 0.9rem; color: #012E40; margin-top: 4px;"><span id="totalDealsCount">0</span> active deals</div>
@@ -535,10 +535,10 @@
             stages.forEach(stage => {
                 const stageDeals = dealsByStage[stage.id] || [];
                 html += `
-                    <div class="stage-column" data-stage="${stage.id}" ondrop="handleDrop(event, '${stage.id}')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" style="background: #FFFFFF; border-radius: 8px; padding: 18px; min-height: 400px; border: 2px solid #85C7B3; transition: all 0.2s ease;">
+                    <div class="stage-column" data-stage="${stage.id}" ondrop="handleDrop(event, '${stage.id}')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" style="background: linear-gradient(180deg, rgba(238, 244, 217, 0.4) 0%, rgba(255, 255, 255, 0.8) 100%); backdrop-filter: blur(8px); border-radius: 12px; padding: 18px; min-height: 400px; border: 2px solid #85C7B3; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(1, 46, 64, 0.1);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #F2A922;">
                             <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #012E40; margin: 0;">${stage.name}</h3>
-                            <span style="background: #05908C; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">${stageDeals.length}</span>
+                            <span style="background: linear-gradient(135deg, #05908C 0%, #85C7B3 100%); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; box-shadow: 0 2px 6px rgba(5, 144, 140, 0.3);">${stageDeals.length}</span>
                         </div>
                         <div class="stage-cards">
                 `;
@@ -563,7 +563,7 @@
                     if (isCompressed) {
                         // COMPRESSED VIEW - Only show company and contact name, click to expand
                         html += `
-                            <div class="deal-card" id="deal-${deal.id}" draggable="true" ondragstart="handleDragStart(event, '${deal.id}')" ondragend="handleDragEnd(event)" onclick="toggleExpandCard('${deal.id}', event)" style="background: #EEF4D9; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; border-left: 4px solid #F2A922; cursor: pointer; transition: all 0.15s ease; border: 1px solid #85C7B3;">
+                            <div class="deal-card" id="deal-${deal.id}" draggable="true" ondragstart="handleDragStart(event, '${deal.id}')" ondragend="handleDragEnd(event)" onclick="toggleExpandCard('${deal.id}', event)" style="background: linear-gradient(135deg, #EEF4D9 0%, #FFFFFF 100%); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; border-left: 4px solid #F2A922; cursor: pointer; transition: all 0.15s ease; border: 2px solid #85C7B3; box-shadow: 0 2px 6px rgba(1, 46, 64, 0.08);">
                                 <div class="card-summary">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
                                         <div>
@@ -610,7 +610,7 @@
                     } else {
                         // FULL VIEW - Show all details when only one deal
                         html += `
-                            <div class="deal-card" id="deal-${deal.id}" draggable="true" ondragstart="handleDragStart(event, '${deal.id}')" ondragend="handleDragEnd(event)" style="background: #FFFFFF; border-radius: 6px; padding: 12px; margin-bottom: 12px; border-left: 4px solid #F2A922; box-shadow: 0 4px 6px rgba(1, 46, 64, 0.12); border: 2px solid #85C7B3; position: relative; cursor: move;">
+                            <div class="deal-card" id="deal-${deal.id}" draggable="true" ondragstart="handleDragStart(event, '${deal.id}')" ondragend="handleDragEnd(event)" style="background: linear-gradient(135deg, #FFFFFF 0%, #EEF4D9 100%); border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 4px solid #F2A922; box-shadow: 0 6px 12px rgba(1, 46, 64, 0.12); border: 2px solid #85C7B3; position: relative; cursor: move;">
                                 <!-- Edit & Delete Controls -->
                                 <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
                                     <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #012E40; font-weight: 600;" title="Edit deal">Edit</button>
@@ -1492,7 +1492,7 @@
             if (detailsDiv) {
                 const isExpanded = detailsDiv.style.display !== 'none';
                 detailsDiv.style.display = isExpanded ? 'none' : 'block';
-                card.style.background = isExpanded ? '#EEF4D9' : '#FFFFFF';
+                card.style.background = isExpanded ? 'linear-gradient(135deg, #EEF4D9 0%, #FFFFFF 100%)' : 'linear-gradient(135deg, #FFFFFF 0%, #EEF4D9 100%)';
             }
         }
 
@@ -1519,8 +1519,9 @@
             // Highlight the drop zone
             const column = event.currentTarget;
             if (column.classList.contains('stage-column')) {
-                column.style.background = '#EEF4D9';
+                column.style.background = 'linear-gradient(180deg, rgba(242, 169, 34, 0.2) 0%, rgba(238, 244, 217, 0.6) 100%)';
                 column.style.borderColor = '#F2A922';
+                column.style.boxShadow = '0 8px 20px rgba(242, 169, 34, 0.3)';
             }
 
             return false;
@@ -1529,8 +1530,9 @@
         function handleDragLeave(event) {
             const column = event.currentTarget;
             if (column.classList.contains('stage-column')) {
-                column.style.background = '#FFFFFF';
+                column.style.background = 'linear-gradient(180deg, rgba(238, 244, 217, 0.4) 0%, rgba(255, 255, 255, 0.8) 100%)';
                 column.style.borderColor = '#85C7B3';
+                column.style.boxShadow = '0 4px 12px rgba(1, 46, 64, 0.1)';
             }
         }
 
@@ -1541,8 +1543,9 @@
 
             // Reset column styling
             const column = event.currentTarget;
-            column.style.background = '#FFFFFF';
+            column.style.background = 'linear-gradient(180deg, rgba(238, 244, 217, 0.4) 0%, rgba(255, 255, 255, 0.8) 100%)';
             column.style.borderColor = '#85C7B3';
+            column.style.boxShadow = '0 4px 12px rgba(1, 46, 64, 0.1)';
 
             if (!draggedDealId) return false;
 
@@ -1705,7 +1708,7 @@
     </script>
 
     <!-- Footer -->
-    <footer style="background: #012E40; border-top: 3px solid #F2A922; padding: 32px 0; margin-top: 60px;">
+    <footer style="background: #012E40; padding: 32px 0; margin-top: 60px;">
         <div style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; margin-bottom: 24px;">
                 <!-- Quick Links -->
