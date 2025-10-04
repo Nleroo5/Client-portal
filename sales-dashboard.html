@@ -535,12 +535,12 @@
             stages.forEach(stage => {
                 const stageDeals = dealsByStage[stage.id] || [];
                 html += `
-                    <div style="background: #FFFFFF; border-radius: 8px; padding: 18px; min-height: 400px; border: 2px solid #85C7B3;">
+                    <div class="stage-column" data-stage="${stage.id}" ondrop="handleDrop(event, '${stage.id}')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" style="background: #FFFFFF; border-radius: 8px; padding: 18px; min-height: 400px; border: 2px solid #85C7B3; transition: all 0.2s ease;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #F2A922;">
                             <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #012E40; margin: 0;">${stage.name}</h3>
                             <span style="background: #05908C; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">${stageDeals.length}</span>
                         </div>
-                        <div>
+                        <div class="stage-cards">
                 `;
 
                 // Check if multiple deals in this stage
@@ -561,22 +561,56 @@
                                            `${daysInStage} days ago`;
 
                     if (isCompressed) {
-                        // COMPRESSED VIEW - Only show company and contact name
+                        // COMPRESSED VIEW - Only show company and contact name, click to expand
                         html += `
-                            <div class="deal-card" onclick="expandDeal('${deal.id}')" style="background: #EEF4D9; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; border-left: 4px solid #F2A922; cursor: pointer; transition: all 0.15s ease; border: 1px solid #85C7B3;">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <div>
-                                        <div style="font-weight: 600; color: #012E40; font-size: 0.9rem;">${deal.companyName || 'Unnamed Deal'}</div>
-                                        <div style="font-size: 0.8rem; color: #05908C; margin-top: 2px;">${deal.contactName || 'No contact'}</div>
+                            <div class="deal-card" id="deal-${deal.id}" draggable="true" ondragstart="handleDragStart(event, '${deal.id}')" ondragend="handleDragEnd(event)" onclick="toggleExpandCard('${deal.id}', event)" style="background: #EEF4D9; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; border-left: 4px solid #F2A922; cursor: pointer; transition: all 0.15s ease; border: 1px solid #85C7B3;">
+                                <div class="card-summary">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <div style="font-weight: 600; color: #012E40; font-size: 0.9rem;">${deal.companyName || 'Unnamed Deal'}</div>
+                                            <div style="font-size: 0.8rem; color: #05908C; margin-top: 2px;">${deal.contactName || 'No contact'}</div>
+                                        </div>
+                                        ${isStalling ? '<span style="background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">!</span>' : ''}
                                     </div>
-                                    ${isStalling ? '<span style="background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">!</span>' : ''}
+                                </div>
+                                <div class="card-details" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 2px solid #85C7B3;">
+                                    <!-- Edit & Delete Controls -->
+                                    <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+                                        <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #012E40; font-weight: 600;" title="Edit deal">Edit</button>
+                                        <button onclick="confirmLostDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #fef2f2; border: 2px solid #fecaca; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #dc2626; font-weight: 600;" title="Mark as lost">Lost</button>
+                                    </div>
+
+                                    <!-- Quick Stage Change -->
+                                    <div style="margin-bottom: 8px;">
+                                        <select onchange="changeStage('${deal.id}', this.value); event.stopPropagation();" style="width: 100%; padding: 6px 8px; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.8rem; background: #FFFFFF; cursor: pointer; color: #012E40;">
+                                            <option value="" disabled selected>Move to stage...</option>
+                                            <option value="qualified" ${deal.stage === 'qualified' ? 'disabled' : ''}>Qualified</option>
+                                            <option value="cold-outreach" ${deal.stage === 'cold-outreach' ? 'disabled' : ''}>Cold Outreach</option>
+                                            <option value="follow-up" ${deal.stage === 'follow-up' ? 'disabled' : ''}>Follow-Up</option>
+                                            <option value="discovery-scheduled" ${deal.stage === 'discovery-scheduled' ? 'disabled' : ''}>Discovery Scheduled</option>
+                                            <option value="discovery-completed" ${deal.stage === 'discovery-completed' ? 'disabled' : ''}>Discovery Completed</option>
+                                            <option value="onboarding-portal" ${deal.stage === 'onboarding-portal' ? 'disabled' : ''}>Onboarding Portal</option>
+                                            <option value="campaign-live" ${deal.stage === 'campaign-live' ? 'disabled' : ''}>Campaign Live</option>
+                                            <option value="follow-up-resell" ${deal.stage === 'follow-up-resell' ? 'disabled' : ''}>Follow-Up & Resell</option>
+                                        </select>
+                                    </div>
+
+                                    <div style="display: flex; gap: 12px; font-size: 0.75rem; margin-bottom: 10px;">
+                                        <span style="color: ${stageColor};">${daysInStage} days in stage</span>
+                                        <span style="color: #05908C;">Last: ${lastActivityText}</span>
+                                    </div>
+                                    <div style="display: flex; gap: 6px;">
+                                        <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #012E40;">Call</button>
+                                        <button onclick="logActivity('${deal.id}', 'email'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #012E40;">Email</button>
+                                        <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #05908C; border: 2px solid #05908C; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">Next</button>
+                                    </div>
                                 </div>
                             </div>
                         `;
                     } else {
                         // FULL VIEW - Show all details when only one deal
                         html += `
-                            <div class="deal-card" style="background: #FFFFFF; border-radius: 6px; padding: 12px; margin-bottom: 12px; border-left: 4px solid #F2A922; box-shadow: 0 4px 6px rgba(1, 46, 64, 0.12); border: 2px solid #85C7B3; position: relative;">
+                            <div class="deal-card" id="deal-${deal.id}" draggable="true" ondragstart="handleDragStart(event, '${deal.id}')" ondragend="handleDragEnd(event)" style="background: #FFFFFF; border-radius: 6px; padding: 12px; margin-bottom: 12px; border-left: 4px solid #F2A922; box-shadow: 0 4px 6px rgba(1, 46, 64, 0.12); border: 2px solid #85C7B3; position: relative; cursor: move;">
                                 <!-- Edit & Delete Controls -->
                                 <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
                                     <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #012E40; font-weight: 600;" title="Edit deal">Edit</button>
@@ -1445,9 +1479,96 @@
             }
         }
 
-        // Expand deal - open edit modal when clicking compressed card
-        function expandDeal(dealId) {
-            openEditDeal(dealId);
+        // Toggle expand/collapse for compressed cards
+        function toggleExpandCard(dealId, event) {
+            if (event.target.tagName === 'BUTTON' || event.target.tagName === 'SELECT') {
+                return; // Don't toggle if clicking on buttons or select
+            }
+
+            const card = document.getElementById('deal-' + dealId);
+            if (!card) return;
+
+            const detailsDiv = card.querySelector('.card-details');
+            if (detailsDiv) {
+                const isExpanded = detailsDiv.style.display !== 'none';
+                detailsDiv.style.display = isExpanded ? 'none' : 'block';
+                card.style.background = isExpanded ? '#EEF4D9' : '#FFFFFF';
+            }
+        }
+
+        // Drag and Drop Variables
+        let draggedDealId = null;
+
+        function handleDragStart(event, dealId) {
+            draggedDealId = dealId;
+            event.target.style.opacity = '0.5';
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/html', event.target.innerHTML);
+        }
+
+        function handleDragEnd(event) {
+            event.target.style.opacity = '1';
+        }
+
+        function handleDragOver(event) {
+            if (event.preventDefault) {
+                event.preventDefault();
+            }
+            event.dataTransfer.dropEffect = 'move';
+
+            // Highlight the drop zone
+            const column = event.currentTarget;
+            if (column.classList.contains('stage-column')) {
+                column.style.background = '#EEF4D9';
+                column.style.borderColor = '#F2A922';
+            }
+
+            return false;
+        }
+
+        function handleDragLeave(event) {
+            const column = event.currentTarget;
+            if (column.classList.contains('stage-column')) {
+                column.style.background = '#FFFFFF';
+                column.style.borderColor = '#85C7B3';
+            }
+        }
+
+        async function handleDrop(event, targetStage) {
+            if (event.stopPropagation) {
+                event.stopPropagation();
+            }
+
+            // Reset column styling
+            const column = event.currentTarget;
+            column.style.background = '#FFFFFF';
+            column.style.borderColor = '#85C7B3';
+
+            if (!draggedDealId) return false;
+
+            // Update the deal stage in Firestore
+            try {
+                await db.collection('deals').doc(draggedDealId).update({
+                    stage: targetStage,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Show success toast
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #05908C; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(1, 46, 64, 0.12);';
+                toast.textContent = 'Deal moved successfully!';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2000);
+
+                // Reload pipeline
+                loadMyPipeline();
+            } catch (error) {
+                console.error('Error moving deal:', error);
+                alert('Error moving deal. Please try again.');
+            }
+
+            draggedDealId = null;
+            return false;
         }
 
         // Deal Modal Functions
