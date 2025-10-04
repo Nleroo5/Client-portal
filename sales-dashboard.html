@@ -43,25 +43,25 @@
         <!-- Tab 1: My Deals -->
         <div class="tab-content active" id="tab-deals">
             <!-- Focus Zone -->
-            <div id="focusZone" style="background: linear-gradient(135deg, #012E40 0%, #05908C 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; color: white;">
-                <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                    🔥 Today's Focus
+            <div id="focusZone" style="background: #FFFFFF; padding: 20px; border-radius: 8px; margin-bottom: 20px; color: #0F172A; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06); border: 1px solid #E2E8F0;">
+                <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: #0F172A;">
+                    Today's Focus
                 </h3>
                 <div id="focusItems" style="display: grid; gap: 10px;">
-                    <div style="text-align: center; padding: 20px; opacity: 0.7;">Loading priorities...</div>
+                    <div style="text-align: center; padding: 20px; opacity: 0.7; color: #64748B;">Loading priorities...</div>
                 </div>
             </div>
 
             <!-- Pipeline Header -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: #FFFFFF; padding: 20px; border-radius: 8px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
                 <div>
-                    <div style="font-size: 1.25rem; font-weight: 700; color: #012E40;">My Pipeline</div>
-                    <div style="font-size: 0.9rem; color: #6b7280; margin-top: 4px;"><span id="totalDealsCount">0</span> active deals</div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #0F172A;">My Pipeline</div>
+                    <div style="font-size: 0.9rem; color: #64748B; margin-top: 4px;"><span id="totalDealsCount">0</span> active deals</div>
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center;">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 16px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px 16px; background: #F8FAFC; border-radius: 6px; border: 1px solid #E2E8F0;">
                         <input type="checkbox" id="filterActionNeeded" onchange="loadMyPipeline()" style="width: 18px; height: 18px; cursor: pointer;">
-                        <span style="font-size: 0.9rem; font-weight: 600; color: #012E40;">Action needed today</span>
+                        <span style="font-size: 0.9rem; font-weight: 600; color: #0F172A;">Action needed today</span>
                     </label>
                     <button class="btn btn-primary" onclick="openNewDealModal()">+ New Deal</button>
                 </div>
@@ -80,34 +80,34 @@
             <!-- Week Header -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div>
-                    <h2 style="margin-bottom: 4px;">This Week's Progress</h2>
-                    <p style="color: #6b7280; font-size: 0.9rem; margin: 0;" id="weekDates">Loading...</p>
+                    <h2 style="margin-bottom: 4px; color: #0F172A;">This Week's Progress</h2>
+                    <p style="color: #64748B; font-size: 0.9rem; margin: 0;" id="weekDates">Loading...</p>
                 </div>
                 <div style="text-align: right;">
-                    <div style="font-size: 2rem; font-weight: 700; color: #000;" id="daysLeft">0</div>
-                    <div style="font-size: 0.85rem; color: #6b7280;">days left</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: #0F172A;" id="daysLeft">0</div>
+                    <div style="font-size: 0.85rem; color: #64748B;">days left</div>
                 </div>
             </div>
 
             <!-- Metrics Grid -->
             <div id="weeklyMetrics" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px;">
                 <!-- Metrics will be loaded here -->
-                <div style="text-align: center; padding: 40px; background: white; border-radius: 12px; grid-column: 1/-1;">
+                <div style="text-align: center; padding: 40px; background: #FFFFFF; border-radius: 8px; grid-column: 1/-1; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
                     <div class="spinner"></div>
-                    <p>Loading your weekly metrics...</p>
+                    <p style="color: #64748B;">Loading your weekly metrics...</p>
                 </div>
             </div>
 
             <!-- Quick Log Buttons -->
-            <div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e5e7eb;">
-                <h3 style="font-size: 1rem; font-weight: 600; color: #012E40; margin-bottom: 16px;">Quick Log Activity</h3>
+            <div style="background: #FFFFFF; padding: 24px; border-radius: 8px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
+                <h3 style="font-size: 1rem; font-weight: 600; color: #0F172A; margin-bottom: 16px;">Quick Log Activity</h3>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <button class="btn btn-outline" onclick="quickLog('call', event)">📞 Call Made</button>
-                    <button class="btn btn-outline" onclick="quickLog('email', event)">✉️ Email Sent</button>
-                    <button class="btn btn-outline" onclick="quickLog('discovery-scheduled', event)">✓ Discovery Scheduled</button>
-                    <button class="btn btn-outline" onclick="quickLog('discovery-completed', event)">✓ Discovery Completed</button>
-                    <button class="btn btn-outline" onclick="quickLog('onboarding', event)">✓ To Onboarding</button>
-                    <button class="btn btn-outline" onclick="quickLog('live', event)">✓ Gone Live</button>
+                    <button class="btn btn-outline" onclick="quickLog('call', event)">Call Made</button>
+                    <button class="btn btn-outline" onclick="quickLog('email', event)">Email Sent</button>
+                    <button class="btn btn-outline" onclick="quickLog('discovery-scheduled', event)">Discovery Scheduled</button>
+                    <button class="btn btn-outline" onclick="quickLog('discovery-completed', event)">Discovery Completed</button>
+                    <button class="btn btn-outline" onclick="quickLog('onboarding', event)">To Onboarding</button>
+                    <button class="btn btn-outline" onclick="quickLog('live', event)">Gone Live</button>
                 </div>
             </div>
         </div>
@@ -116,12 +116,12 @@
         <div class="tab-content" id="tab-team">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div>
-                    <h2 style="margin-bottom: 4px;">Team Leaderboard</h2>
-                    <p style="color: #6b7280; font-size: 0.9rem; margin: 0;" id="teamWeekDates">Week of Loading...</p>
+                    <h2 style="margin-bottom: 4px; color: #0F172A;">Team Leaderboard</h2>
+                    <p style="color: #64748B; font-size: 0.9rem; margin: 0;" id="teamWeekDates">Week of Loading...</p>
                 </div>
                 <div style="text-align: right;" id="yourRankDisplay">
-                    <div style="font-size: 1.5rem; font-weight: 700; color: #000;">—</div>
-                    <div style="font-size: 0.85rem; color: #6b7280;">Your rank</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #0F172A;">—</div>
+                    <div style="font-size: 0.85rem; color: #64748B;">Your rank</div>
                 </div>
             </div>
 
@@ -147,59 +147,59 @@
                 </table>
             </div>
 
-            <div style="margin-top: 20px; padding: 16px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #05908C;" id="gapToFirst" style="display: none;">
-                <p style="margin: 0; font-size: 0.9rem; color: #012E40;"><strong>Gap to #1:</strong> <span id="gapText">—</span></p>
+            <div style="margin-top: 20px; padding: 16px; background: #F8FAFC; border-radius: 8px; border-left: 4px solid #14B8A6; display: none;" id="gapToFirst">
+                <p style="margin: 0; font-size: 0.9rem; color: #0F172A;"><strong>Gap to #1:</strong> <span id="gapText">—</span></p>
             </div>
         </div>
 
         <!-- Tab 4: Action Items -->
         <div class="tab-content" id="tab-actions">
             <div style="margin-bottom: 24px;">
-                <h2 style="margin-bottom: 4px;">Action Items</h2>
-                <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">What needs your attention right now</p>
+                <h2 style="margin-bottom: 4px; color: #0F172A;">Action Items</h2>
+                <p style="color: #64748B; font-size: 0.9rem; margin: 0;">What needs your attention right now</p>
             </div>
 
             <!-- Stuck Deals (New Priority Section) -->
             <div style="margin-bottom: 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: #dc2626; margin: 0;">🔥 Stuck Deals (>7 Days)</h3>
-                    <span id="stuckDealsCount" style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;">0</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: #dc2626; margin: 0;">Stuck Deals (>7 Days)</h3>
+                    <span id="stuckDealsCount" style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">0</span>
                 </div>
-                <div id="stuckDeals" style="background: white; border-radius: 12px; border: 1px solid #e5e7eb;">
-                    <p class="no-data" style="padding: 24px; text-align: center; color: #9ca3af;">No stuck deals</p>
+                <div id="stuckDeals" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
+                    <p class="no-data" style="padding: 24px; text-align: center; color: #64748B;">No stuck deals</p>
                 </div>
             </div>
 
             <!-- Overdue -->
             <div style="margin-bottom: 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: #dc2626; margin: 0;">🔴 Overdue</h3>
-                    <span id="overdueCount" style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;">0</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: #dc2626; margin: 0;">Overdue</h3>
+                    <span id="overdueCount" style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">0</span>
                 </div>
-                <div id="overdueTasks" style="background: white; border-radius: 12px; border: 1px solid #e5e7eb;">
-                    <p class="no-data" style="padding: 24px; text-align: center; color: #9ca3af;">No overdue items</p>
+                <div id="overdueTasks" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
+                    <p class="no-data" style="padding: 24px; text-align: center; color: #64748B;">No overdue items</p>
                 </div>
             </div>
 
             <!-- Due Today -->
             <div style="margin-bottom: 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: #f59e0b; margin: 0;">🟡 Due Today</h3>
-                    <span id="dueTodayCount" style="background: #f59e0b; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;">0</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: #f59e0b; margin: 0;">Due Today</h3>
+                    <span id="dueTodayCount" style="background: #f59e0b; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">0</span>
                 </div>
-                <div id="dueTodayTasks" style="background: white; border-radius: 12px; border: 1px solid #e5e7eb;">
-                    <p class="no-data" style="padding: 24px; text-align: center; color: #9ca3af;">No tasks due today</p>
+                <div id="dueTodayTasks" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
+                    <p class="no-data" style="padding: 24px; text-align: center; color: #64748B;">No tasks due today</p>
                 </div>
             </div>
 
             <!-- Upcoming -->
             <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: #6b7280; margin: 0;">⚪ Upcoming</h3>
-                    <span id="upcomingCount" style="background: #6b7280; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;">0</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: #64748B; margin: 0;">Upcoming</h3>
+                    <span id="upcomingCount" style="background: #64748B; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">0</span>
                 </div>
-                <div id="upcomingTasks" style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; max-height: 400px; overflow-y: auto;">
-                    <p class="no-data" style="padding: 24px; text-align: center; color: #9ca3af;">No upcoming tasks</p>
+                <div id="upcomingTasks" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #E2E8F0; max-height: 400px; overflow-y: auto; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
+                    <p class="no-data" style="padding: 24px; text-align: center; color: #64748B;">No upcoming tasks</p>
                 </div>
             </div>
         </div>
@@ -208,34 +208,34 @@
 
     <!-- Deal Modal -->
     <div id="dealModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: white; border-radius: 12px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 0;">
-            <div style="padding: 24px; border-bottom: 1px solid #e5e7eb;">
-                <h2 id="dealModalTitle" style="margin: 0; color: #012E40;">Add New Deal</h2>
+        <div style="background: #FFFFFF; border-radius: 8px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 0; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
+            <div style="padding: 24px; border-bottom: 1px solid #E2E8F0;">
+                <h2 id="dealModalTitle" style="margin: 0; color: #0F172A;">Add New Deal</h2>
             </div>
             <form id="dealForm" style="padding: 24px;">
                 <input type="hidden" id="dealId" value="">
                 <div style="display: grid; gap: 16px;">
                     <div>
-                        <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #012E40;">Company Name *</label>
-                        <input type="text" id="dealCompanyName" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #0F172A;">Company Name *</label>
+                        <input type="text" id="dealCompanyName" required style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.95rem; color: #0F172A;">
                     </div>
                     <div>
-                        <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #012E40;">Contact Name</label>
-                        <input type="text" id="dealContactName" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #0F172A;">Contact Name</label>
+                        <input type="text" id="dealContactName" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.95rem; color: #0F172A;">
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div>
-                            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #012E40;">Email</label>
-                            <input type="email" id="dealEmail" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #0F172A;">Email</label>
+                            <input type="email" id="dealEmail" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.95rem; color: #0F172A;">
                         </div>
                         <div>
-                            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #012E40;">Phone</label>
-                            <input type="tel" id="dealPhone" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #0F172A;">Phone</label>
+                            <input type="tel" id="dealPhone" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.95rem; color: #0F172A;">
                         </div>
                     </div>
                     <div>
-                        <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #012E40;">Stage *</label>
-                        <select id="dealStage" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #0F172A;">Stage *</label>
+                        <select id="dealStage" required style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.95rem; color: #0F172A;">
                             <option value="qualified">Qualified</option>
                             <option value="cold-outreach">Cold Outreach</option>
                             <option value="follow-up">Follow-Up</option>
@@ -247,7 +247,7 @@
                         </select>
                     </div>
                 </div>
-                <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+                <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 24px; border-top: 1px solid #E2E8F0;">
                     <button type="button" onclick="closeDealModal()" class="btn btn-outline" style="flex: 1;">Cancel</button>
                     <button type="submit" class="btn btn-primary" style="flex: 1;" id="dealSubmitBtn">Create Deal</button>
                 </div>
@@ -389,19 +389,19 @@
                 let html = '<div style="display: grid; gap: 8px;">';
 
                 if (stuckDeals > 0) {
-                    html += `<div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">🔴 <strong>${stuckDeals}</strong> stalled deal${stuckDeals !== 1 ? 's' : ''} (>7 days in stage)</div>`;
+                    html += `<div style="background: #F8FAFC; padding: 12px; border-radius: 6px; border: 1px solid #E2E8F0; color: #0F172A;"><strong>${stuckDeals}</strong> stalled deal${stuckDeals !== 1 ? 's' : ''} (>7 days in stage)</div>`;
                 }
 
                 if (discoveryToday > 0) {
-                    html += `<div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">📅 <strong>${discoveryToday}</strong> discovery call${discoveryToday !== 1 ? 's' : ''} scheduled</div>`;
+                    html += `<div style="background: #F8FAFC; padding: 12px; border-radius: 6px; border: 1px solid #E2E8F0; color: #0F172A;"><strong>${discoveryToday}</strong> discovery call${discoveryToday !== 1 ? 's' : ''} scheduled</div>`;
                 }
 
                 if (quickWins.length > 0) {
-                    html += `<div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px;">✨ Quick Win: <strong>${quickWins[0]}</strong> is ready to close!</div>`;
+                    html += `<div style="background: #F8FAFC; padding: 12px; border-radius: 6px; border: 1px solid #E2E8F0; color: #0F172A;">Quick Win: <strong>${quickWins[0]}</strong> is ready to close!</div>`;
                 }
 
                 if (stuckDeals === 0 && discoveryToday === 0 && quickWins.length === 0) {
-                    html = '<div style="text-align: center; padding: 12px; opacity: 0.8;">✅ You\'re all caught up! Add more deals to your pipeline.</div>';
+                    html = '<div style="text-align: center; padding: 12px; opacity: 0.8; color: #64748B;">You\'re all caught up! Add more deals to your pipeline.</div>';
                 }
 
                 html += '</div>';
@@ -469,10 +469,9 @@
             // Render empty state if no deals
             if (deals.length === 0) {
                 pipelineBoard.innerHTML = `
-                    <div style="text-align: center; padding: 60px 20px; background: white; border-radius: 12px;">
-                        <div style="font-size: 3rem; margin-bottom: 16px; opacity: 0.3;">📊</div>
-                        <h3 style="color: #6b7280; font-weight: 500; margin-bottom: 8px;">No Deals Yet</h3>
-                        <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 20px;">Start tracking your sales pipeline by adding your first deal.</p>
+                    <div style="text-align: center; padding: 60px 20px; background: #FFFFFF; border-radius: 8px; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
+                        <h3 style="color: #64748B; font-weight: 500; margin-bottom: 8px;">No Deals Yet</h3>
+                        <p style="color: #64748B; font-size: 0.9rem; margin-bottom: 20px;">Start tracking your sales pipeline by adding your first deal.</p>
                         <button class="btn btn-primary" onclick="openNewDealModal()">+ Add First Deal</button>
                     </div>
                 `;
@@ -485,10 +484,10 @@
             stages.forEach(stage => {
                 const stageDeals = dealsByStage[stage.id] || [];
                 html += `
-                    <div style="background: #f9fafb; border-radius: 12px; padding: 18px; min-height: 400px; border: 1px solid #e5e7eb;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #000;">
-                            <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #333; margin: 0;">${stage.name}</h3>
-                            <span style="background: #000; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">${stageDeals.length}</span>
+                    <div style="background: #F8FAFC; border-radius: 8px; padding: 18px; min-height: 400px; border: 1px solid #E2E8F0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #0F172A;">
+                            <h3 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #0F172A; margin: 0;">${stage.name}</h3>
+                            <span style="background: #0F172A; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">${stageDeals.length}</span>
                         </div>
                         <div>
                 `;
@@ -508,22 +507,22 @@
                                            `${daysInStage} days ago`;
 
                     html += `
-                        <div class="deal-card" style="background: white; border-radius: 8px; padding: 12px; margin-bottom: 12px; border-left: 3px solid #000; box-shadow: 0 1px 3px rgba(0,0,0,0.06); position: relative;">
+                        <div class="deal-card" style="background: #FFFFFF; border-radius: 6px; padding: 12px; margin-bottom: 12px; border-left: 3px solid #14B8A6; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06); position: relative;">
                             <!-- Edit & Delete Controls -->
                             <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
-                                <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #374151; font-weight: 600;" title="Edit deal">✏️</button>
-                                <button onclick="archiveDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #dc2626; font-weight: 600;" title="Archive deal">🗑️</button>
+                                <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #0F172A; font-weight: 600;" title="Edit deal">Edit</button>
+                                <button onclick="archiveDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #dc2626; font-weight: 600;" title="Archive deal">Archive</button>
                             </div>
 
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; padding-right: 60px;">
-                                <div style="font-weight: 700; color: #012E40;">${deal.companyName || 'Unnamed Deal'}</div>
-                                ${isStalling ? '<span style="background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">🔥 STALLING</span>' : ''}
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; padding-right: 120px;">
+                                <div style="font-weight: 700; color: #0F172A;">${deal.companyName || 'Unnamed Deal'}</div>
+                                ${isStalling ? '<span style="background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">STALLING</span>' : ''}
                             </div>
-                            <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 8px;">${deal.contactName || 'No contact'}</div>
+                            <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 8px;">${deal.contactName || 'No contact'}</div>
 
                             <!-- Quick Stage Change -->
                             <div style="margin-bottom: 8px;">
-                                <select onchange="changeStage('${deal.id}', this.value); event.stopPropagation();" style="width: 100%; padding: 6px 8px; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.8rem; background: #f9fafb; cursor: pointer;">
+                                <select onchange="changeStage('${deal.id}', this.value); event.stopPropagation();" style="width: 100%; padding: 6px 8px; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.8rem; background: #F8FAFC; cursor: pointer; color: #0F172A;">
                                     <option value="" disabled selected>Move to stage...</option>
                                     <option value="qualified" ${deal.stage === 'qualified' ? 'disabled' : ''}>Qualified</option>
                                     <option value="cold-outreach" ${deal.stage === 'cold-outreach' ? 'disabled' : ''}>Cold Outreach</option>
@@ -537,13 +536,13 @@
                             </div>
 
                             <div style="display: flex; gap: 12px; font-size: 0.75rem;">
-                                <span style="color: ${stageColor};">📅 ${daysInStage} days in stage</span>
-                                <span style="color: #6b7280;">⏱️ Last: ${lastActivityText}</span>
+                                <span style="color: ${stageColor};">${daysInStage} days in stage</span>
+                                <span style="color: #64748B;">Last: ${lastActivityText}</span>
                             </div>
-                            <div style="display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f3f4f6;">
-                                <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #374151;">📞 Call</button>
-                                <button onclick="logActivity('${deal.id}', 'email'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #374151;">✉️ Email</button>
-                                <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #05908C; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">→ Next</button>
+                            <div style="display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #F8FAFC;">
+                                <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #0F172A;">Call</button>
+                                <button onclick="logActivity('${deal.id}', 'email'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #0F172A;">Email</button>
+                                <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #14B8A6; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">Next</button>
                             </div>
                         </div>
                     `;
@@ -641,43 +640,37 @@
                     id: 'callsMade',
                     label: 'Calls Made',
                     actual: scorecard.callsMade || 0,
-                    target: targets.callsMade || 50,
-                    icon: '📞'
+                    target: targets.callsMade || 50
                 },
                 {
                     id: 'emailsSent',
                     label: 'Emails Sent',
                     actual: scorecard.emailsSent || 0,
-                    target: targets.emailsSent || 30,
-                    icon: '✉️'
+                    target: targets.emailsSent || 30
                 },
                 {
                     id: 'discoveryScheduled',
                     label: 'Discovery Calls Scheduled',
                     actual: scorecard.discoveryScheduled || 0,
-                    target: targets.discoveryScheduled || 0,
-                    icon: '📅'
+                    target: targets.discoveryScheduled || 0
                 },
                 {
                     id: 'discoveryCompleted',
                     label: 'Discovery Calls Completed',
                     actual: scorecard.discoveryCompleted || 0,
-                    target: targets.discoveryCompleted || 0,
-                    icon: '✅'
+                    target: targets.discoveryCompleted || 0
                 },
                 {
                     id: 'dealsToOnboarding',
                     label: 'Deals to Onboarding',
                     actual: scorecard.dealsToOnboarding || 0,
-                    target: targets.dealsToOnboarding || 0,
-                    icon: '🎯'
+                    target: targets.dealsToOnboarding || 0
                 },
                 {
                     id: 'dealsLive',
                     label: 'Deals Gone Live',
                     actual: scorecard.dealsLive || 0,
-                    target: targets.dealsLive || 0,
-                    icon: '🚀'
+                    target: targets.dealsLive || 0
                 }
             ];
 
@@ -705,15 +698,15 @@
                 const needMore = Math.max(0, metric.target - metric.actual);
 
                 html += `
-                    <div style="background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb;">
-                        <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 8px;">${metric.label}</div>
+                    <div style="background: #FFFFFF; border-radius: 8px; padding: 20px; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
+                        <div style="font-size: 0.75rem; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 8px;">${metric.label}</div>
                         <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
                             <div style="font-size: 2rem; font-weight: 700; color: ${statusColor};">${metric.actual}</div>
-                            <div style="font-size: 0.9rem; color: #6b7280;">of ${metric.target}</div>
+                            <div style="font-size: 0.9rem; color: #64748B;">of ${metric.target}</div>
                         </div>
 
                         <!-- Progress Bar -->
-                        <div style="background: #e5e7eb; border-radius: 8px; height: 8px; overflow: hidden; margin-bottom: 12px;">
+                        <div style="background: #E2E8F0; border-radius: 6px; height: 8px; overflow: hidden; margin-bottom: 12px;">
                             <div style="background: ${statusColor}; height: 100%; width: ${percentage}%; transition: width 0.3s ease;"></div>
                         </div>
 
@@ -721,12 +714,12 @@
                         ${metric.target > 0 ? `
                             <div style="background: ${statusBg}; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; color: ${statusColor}; font-weight: 600;">
                                 ${percentage >= 100
-                                    ? '✓ Target hit!'
+                                    ? 'Target hit!'
                                     : `You need ${needMore} more to hit target`
                                 }
                             </div>
                         ` : `
-                            <div style="background: #f3f4f6; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; color: #6b7280;">
+                            <div style="background: #F8FAFC; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; color: #64748B;">
                                 No target set
                             </div>
                         `}
@@ -833,23 +826,23 @@
                 // Rank badge styling
                 let rankBadge = '';
                 if (rank === 1) {
-                    rankBadge = '<span style="font-size: 1.2rem;">🥇</span>';
+                    rankBadge = '<span style="font-size: 1.2rem; font-weight: 700; color: #14B8A6;">#1</span>';
                 } else if (rank === 2) {
-                    rankBadge = '<span style="font-size: 1.2rem;">🥈</span>';
+                    rankBadge = '<span style="font-size: 1.2rem; font-weight: 700; color: #64748B;">#2</span>';
                 } else if (rank === 3) {
-                    rankBadge = '<span style="font-size: 1.2rem;">🥉</span>';
+                    rankBadge = '<span style="font-size: 1.2rem; font-weight: 700; color: #64748B;">#3</span>';
                 } else {
-                    rankBadge = `<span style="color: #6b7280; font-weight: 600;">#${rank}</span>`;
+                    rankBadge = `<span style="color: #64748B; font-weight: 600;">#${rank}</span>`;
                 }
 
                 const rowStyle = isCurrentUser
-                    ? 'background: #e0f2f1; border-left: 4px solid #05908C; font-weight: 600;'
+                    ? 'background: #F8FAFC; border-left: 4px solid #14B8A6; font-weight: 600;'
                     : '';
 
                 html += `
                     <tr style="${rowStyle}">
                         <td style="text-align: center;">${rankBadge}</td>
-                        <td>${rep.name}${isCurrentUser ? ' <span style="color: #05908C; font-size: 0.75rem;">(You)</span>' : ''}</td>
+                        <td>${rep.name}${isCurrentUser ? ' <span style="color: #14B8A6; font-size: 0.75rem;">(You)</span>' : ''}</td>
                         <td style="text-align: center;">${rep.scorecard.callsMade || 0}</td>
                         <td style="text-align: center;">${rep.scorecard.emailsSent || 0}</td>
                         <td style="text-align: center;">${rep.scorecard.discoveryCompleted || 0}</td>
@@ -865,13 +858,13 @@
             // Update rank display
             if (currentUserRank === 1) {
                 document.getElementById('yourRankDisplay').innerHTML = `
-                    <div style="font-size: 1.5rem;">🥇</div>
-                    <div style="font-size: 0.85rem; color: #6b7280;">You're #1!</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #14B8A6;">#1</div>
+                    <div style="font-size: 0.85rem; color: #64748B;">You're #1!</div>
                 `;
             } else {
                 document.getElementById('yourRankDisplay').innerHTML = `
-                    <div style="font-size: 1.5rem; font-weight: 700; color: #000;">#${currentUserRank}</div>
-                    <div style="font-size: 0.85rem; color: #6b7280;">Your rank</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: #0F172A;">#${currentUserRank}</div>
+                    <div style="font-size: 0.85rem; color: #64748B;">Your rank</div>
                 `;
             }
 
@@ -1003,7 +996,7 @@
 
             // Render stuck deals
             if (stuckDeals.length === 0) {
-                document.getElementById('stuckDeals').innerHTML = '<p class="no-data" style="padding: 24px; text-align: center; color: #9ca3af; margin: 0;">No stuck deals - great job!</p>';
+                document.getElementById('stuckDeals').innerHTML = '<p class="no-data" style="padding: 24px; text-align: center; color: #64748B; margin: 0;">No stuck deals - great job!</p>';
             } else {
                 let html = '<div style="padding: 16px;">';
                 stuckDeals.forEach(deal => {
@@ -1019,14 +1012,14 @@
                     };
 
                     html += `
-                        <div style="padding: 12px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="padding: 12px; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: #012E40; margin-bottom: 4px;">${deal.companyName || 'Unnamed Deal'}</div>
+                                <div style="font-weight: 600; color: #0F172A; margin-bottom: 4px;">${deal.companyName || 'Unnamed Deal'}</div>
                                 <div style="font-size: 0.85rem; color: #dc2626;">${deal.daysStuck} days in ${stageNames[deal.stage] || deal.stage}</div>
                             </div>
                             <div style="display: flex; gap: 8px;">
-                                <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="padding: 6px 12px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 0.85rem; cursor: pointer; color: #374151;">📞 Call</button>
-                                <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="padding: 6px 12px; background: #05908C; border: none; border-radius: 4px; font-size: 0.85rem; cursor: pointer; color: white;">→ Next</button>
+                                <button onclick="logActivity('${deal.id}', 'call'); event.stopPropagation();" style="padding: 6px 12px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.85rem; cursor: pointer; color: #0F172A;">Call</button>
+                                <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="padding: 6px 12px; background: #14B8A6; border: none; border-radius: 4px; font-size: 0.85rem; cursor: pointer; color: white;">Next</button>
                             </div>
                         </div>
                     `;
@@ -1037,19 +1030,19 @@
 
             // Render overdue
             if (overdue.length === 0) {
-                document.getElementById('overdueTasks').innerHTML = '<p class="no-data" style="padding: 24px; text-align: center; color: #9ca3af; margin: 0;">No overdue items</p>';
+                document.getElementById('overdueTasks').innerHTML = '<p class="no-data" style="padding: 24px; text-align: center; color: #64748B; margin: 0;">No overdue items</p>';
             } else {
                 let html = '<div style="padding: 16px;">';
                 overdue.forEach(item => {
                     const daysOverdue = Math.floor((new Date() - item.dueDate) / (1000 * 60 * 60 * 24));
                     html += `
-                        <div style="padding: 12px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="padding: 12px; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: #012E40; margin-bottom: 4px;">${item.text}</div>
+                                <div style="font-weight: 600; color: #0F172A; margin-bottom: 4px;">${item.text}</div>
                                 <div style="font-size: 0.85rem; color: #dc2626;">${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue</div>
                             </div>
                             <div style="display: flex; gap: 8px;">
-                                <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;" onclick="markDone('${item.id}')">✓ Done</button>
+                                <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;" onclick="markDone('${item.id}')">Done</button>
                                 <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;" onclick="snoozeTask('${item.id}')">Snooze</button>
                             </div>
                         </div>
@@ -1061,18 +1054,18 @@
 
             // Render due today
             if (dueToday.length === 0) {
-                document.getElementById('dueTodayTasks').innerHTML = '<p class="no-data" style="padding: 24px; text-align: center; color: #9ca3af; margin: 0;">No tasks due today</p>';
+                document.getElementById('dueTodayTasks').innerHTML = '<p class="no-data" style="padding: 24px; text-align: center; color: #64748B; margin: 0;">No tasks due today</p>';
             } else {
                 let html = '<div style="padding: 16px;">';
                 dueToday.forEach(item => {
                     html += `
-                        <div style="padding: 12px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="padding: 12px; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: #012E40; margin-bottom: 4px;">${item.text}</div>
+                                <div style="font-weight: 600; color: #0F172A; margin-bottom: 4px;">${item.text}</div>
                                 <div style="font-size: 0.85rem; color: #f59e0b;">Due today</div>
                             </div>
                             <div style="display: flex; gap: 8px;">
-                                <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;" onclick="markDone('${item.id}')">✓ Done</button>
+                                <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;" onclick="markDone('${item.id}')">Done</button>
                                 <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;" onclick="snoozeTask('${item.id}')">Snooze</button>
                             </div>
                         </div>
@@ -1084,19 +1077,19 @@
 
             // Render upcoming (limit to 10)
             if (upcoming.length === 0) {
-                document.getElementById('upcomingTasks').innerHTML = '<p class="no-data" style="padding: 24px; text-align: center; color: #9ca3af; margin: 0;">No upcoming tasks</p>';
+                document.getElementById('upcomingTasks').innerHTML = '<p class="no-data" style="padding: 24px; text-align: center; color: #64748B; margin: 0;">No upcoming tasks</p>';
             } else {
                 let html = '<div style="padding: 16px;">';
                 upcoming.slice(0, 10).forEach(item => {
                     const dueDate = item.dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                     html += `
-                        <div style="padding: 12px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="padding: 12px; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: #012E40; margin-bottom: 4px;">${item.text}</div>
-                                <div style="font-size: 0.85rem; color: #6b7280;">Due ${dueDate}</div>
+                                <div style="font-weight: 600; color: #0F172A; margin-bottom: 4px;">${item.text}</div>
+                                <div style="font-size: 0.85rem; color: #64748B;">Due ${dueDate}</div>
                             </div>
                             <div style="display: flex; gap: 8px;">
-                                <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;" onclick="markDone('${item.id}')">✓ Done</button>
+                                <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;" onclick="markDone('${item.id}')">Done</button>
                                 <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem;" onclick="snoozeTask('${item.id}')">Snooze</button>
                             </div>
                         </div>
@@ -1115,9 +1108,9 @@
                 });
 
                 // Show feedback
-                event.target.textContent = '✓ Done!';
-                event.target.style.background = '#059669';
-                event.target.style.borderColor = '#059669';
+                event.target.textContent = 'Done!';
+                event.target.style.background = '#14B8A6';
+                event.target.style.borderColor = '#14B8A6';
                 event.target.style.color = 'white';
 
                 setTimeout(() => {
@@ -1144,8 +1137,8 @@
 
                 // Show feedback
                 event.target.textContent = `Snoozed ${days}d`;
-                event.target.style.background = '#6b7280';
-                event.target.style.borderColor = '#6b7280';
+                event.target.style.background = '#64748B';
+                event.target.style.borderColor = '#64748B';
                 event.target.style.color = 'white';
 
                 setTimeout(() => {
@@ -1202,9 +1195,9 @@
                 // Quick visual feedback
                 const btn = event.target;
                 const originalText = btn.textContent;
-                btn.textContent = '✓ Logged!';
-                btn.style.background = '#059669';
-                btn.style.borderColor = '#059669';
+                btn.textContent = 'Logged!';
+                btn.style.background = '#14B8A6';
+                btn.style.borderColor = '#14B8A6';
                 btn.style.color = 'white';
 
                 setTimeout(() => {
@@ -1254,9 +1247,9 @@
                 }
 
                 // Show success feedback
-                const msg = activityType === 'call' ? '📞 Call logged!' : '✉️ Email logged!';
+                const msg = activityType === 'call' ? 'Call logged!' : 'Email logged!';
                 const toast = document.createElement('div');
-                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #059669; color: white; padding: 12px 20px; border-radius: 8px; z-index: 9999;';
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
                 toast.textContent = msg;
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
@@ -1287,8 +1280,8 @@
 
                 // Show success
                 const toast = document.createElement('div');
-                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #059669; color: white; padding: 12px 20px; border-radius: 8px; z-index: 9999;';
-                toast.textContent = '✓ Deal moved to next stage!';
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                toast.textContent = 'Deal moved to next stage!';
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
 
@@ -1311,8 +1304,8 @@
 
                 // Show success
                 const toast = document.createElement('div');
-                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #059669; color: white; padding: 12px 20px; border-radius: 8px; z-index: 9999;';
-                toast.textContent = '✓ Stage updated!';
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                toast.textContent = 'Stage updated!';
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
 
@@ -1367,8 +1360,8 @@
 
                 // Show success
                 const toast = document.createElement('div');
-                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #059669; color: white; padding: 12px 20px; border-radius: 8px; z-index: 9999;';
-                toast.textContent = '✓ Deal archived!';
+                toast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                toast.textContent = 'Deal archived!';
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
 
@@ -1417,8 +1410,8 @@
 
                     // Show success message
                     const successDiv = document.createElement('div');
-                    successDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #059669; color: white; padding: 16px 24px; border-radius: 8px; z-index: 9999;';
-                    successDiv.textContent = '✓ Deal updated successfully!';
+                    successDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 16px 24px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                    successDiv.textContent = 'Deal updated successfully!';
                     document.body.appendChild(successDiv);
                     setTimeout(() => successDiv.remove(), 3000);
                 } else {
@@ -1428,8 +1421,8 @@
 
                     // Show success message
                     const successDiv = document.createElement('div');
-                    successDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #059669; color: white; padding: 16px 24px; border-radius: 8px; z-index: 9999;';
-                    successDiv.textContent = '✓ Deal created successfully!';
+                    successDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #14B8A6; color: white; padding: 16px 24px; border-radius: 6px; z-index: 9999; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);';
+                    successDiv.textContent = 'Deal created successfully!';
                     document.body.appendChild(successDiv);
                     setTimeout(() => successDiv.remove(), 3000);
                 }
@@ -1444,36 +1437,36 @@
     </script>
 
     <!-- Footer -->
-    <footer style="background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 32px 0; margin-top: 60px;">
+    <footer style="background: #FFFFFF; border-top: 1px solid #E2E8F0; padding: 32px 0; margin-top: 60px;">
         <div style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; margin-bottom: 24px;">
                 <!-- Quick Links -->
                 <div>
-                    <h4 style="color: #f1f5f9; font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Quick Links</h4>
+                    <h4 style="color: #0F172A; font-size: 0.75rem; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Quick Links</h4>
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         <li style="margin-bottom: 8px;">
-                            <a href="#" onclick="alert('FAQ section coming soon!'); return false;" style="color: #94a3b8; text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">📚 FAQ</a>
+                            <a href="#" onclick="alert('FAQ section coming soon!'); return false;" style="color: #64748B; text-decoration: none; font-size: 0.875rem; transition: color 0.15s;">FAQ</a>
                         </li>
                         <li style="margin-bottom: 8px;">
-                            <a href="#" onclick="alert('Resources section coming soon!'); return false;" style="color: #94a3b8; text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">📖 Resources</a>
+                            <a href="#" onclick="alert('Resources section coming soon!'); return false;" style="color: #64748B; text-decoration: none; font-size: 0.875rem; transition: color 0.15s;">Resources</a>
                         </li>
                     </ul>
                 </div>
 
                 <!-- Support -->
                 <div>
-                    <h4 style="color: #f1f5f9; font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Support</h4>
+                    <h4 style="color: #0F172A; font-size: 0.75rem; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Support</h4>
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         <li style="margin-bottom: 8px;">
-                            <a href="mailto:support@driveleadmedia.com" style="color: #94a3b8; text-decoration: none; font-size: 0.95rem; transition: color 0.2s;">✉️ Contact Support</a>
+                            <a href="mailto:support@driveleadmedia.com" style="color: #64748B; text-decoration: none; font-size: 0.875rem; transition: color 0.15s;">Contact Support</a>
                         </li>
                     </ul>
                 </div>
             </div>
 
             <!-- Copyright -->
-            <div style="text-align: center; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
-                <p style="color: #64748b; font-size: 0.85rem; margin: 0;">© 2025 Drive Lead Media. All rights reserved.</p>
+            <div style="text-align: center; padding-top: 24px; border-top: 1px solid #E2E8F0;">
+                <p style="color: #94A3B8; font-size: 0.75rem; margin: 0;">© 2025 Drive Lead Media. All rights reserved.</p>
             </div>
         </div>
     </footer>
