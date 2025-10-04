@@ -563,7 +563,7 @@
                     if (isCompressed) {
                         // COMPRESSED VIEW - Only show company and contact name, click to expand
                         html += `
-                            <div class="deal-card" id="deal-${deal.id}" draggable="true" ondragstart="handleDragStart(event, '${deal.id}')" ondragend="handleDragEnd(event)" onclick="toggleExpandCard('${deal.id}', event)" style="background: linear-gradient(135deg, #EEF4D9 0%, #FFFFFF 100%); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; border-left: 4px solid #F2A922; cursor: pointer; transition: all 0.15s ease; border: 2px solid #85C7B3; box-shadow: 0 2px 6px rgba(1, 46, 64, 0.08);">
+                            <div class="deal-card" id="deal-${deal.id}" draggable="true" ondragstart="handleDragStart(event, '${deal.id}')" ondragend="handleDragEnd(event)" onclick="toggleExpandCard('${deal.id}', event)" style="background: linear-gradient(135deg, #EEF4D9 0%, #FFFFFF 100%); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; border-left: 4px solid #F2A922; cursor: pointer; transition: all 0.15s ease; border: 2px solid #000000; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);">
                                 <div class="card-summary">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
                                         <div>
@@ -610,7 +610,7 @@
                     } else {
                         // FULL VIEW - Show all details when only one deal
                         html += `
-                            <div class="deal-card" id="deal-${deal.id}" draggable="true" ondragstart="handleDragStart(event, '${deal.id}')" ondragend="handleDragEnd(event)" style="background: linear-gradient(135deg, #FFFFFF 0%, #EEF4D9 100%); border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 4px solid #F2A922; box-shadow: 0 6px 12px rgba(1, 46, 64, 0.12); border: 2px solid #85C7B3; position: relative; cursor: move;">
+                            <div class="deal-card" id="deal-${deal.id}" draggable="true" ondragstart="handleDragStart(event, '${deal.id}')" ondragend="handleDragEnd(event)" style="background: linear-gradient(135deg, #FFFFFF 0%, #EEF4D9 100%); border-radius: 10px; padding: 14px; margin-bottom: 12px; border-left: 4px solid #F2A922; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); border: 2px solid #000000; position: relative; cursor: move;">
                                 <!-- Edit & Delete Controls -->
                                 <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
                                     <button onclick="openEditDeal('${deal.id}'); event.stopPropagation();" style="padding: 4px 8px; background: #EEF4D9; border: 2px solid #85C7B3; border-radius: 4px; font-size: 0.7rem; cursor: pointer; color: #012E40; font-weight: 600;" title="Edit deal">Edit</button>
