@@ -1173,7 +1173,7 @@
         // Wait for Firebase to be fully loaded
         let isAuthChecked = false;
 
-        firebase.auth().onAuthStateChanged((user) => {
+        firebase.auth().onAuthStateChanged(async (user) => {
             if (!user || user.email !== 'admin@driveleadmedia.com') {
                 // Not authenticated or not admin - redirect to login
                 console.warn('Unauthorized access attempt to admin dashboard');
@@ -1181,11 +1181,39 @@
                 return;
             }
 
-            // User is authenticated admin - allow access
+            // User is authenticated admin - verify salesReps document
             console.log('Admin authenticated:', user.email);
+            console.log('Admin UID:', user.uid);
+
+            // Check if salesReps document exists with admin role
+            try {
+                const adminDoc = await db.collection('salesReps').doc(user.uid).get();
+                if (!adminDoc.exists) {
+                    console.error('CRITICAL: Admin user document does not exist in salesReps collection');
+                    console.error('Expected document at: salesReps/' + user.uid);
+                    alert('Admin account not properly configured. Please create a salesReps document with role: "admin" for UID: ' + user.uid);
+                    return;
+                }
+
+                const adminData = adminDoc.data();
+                console.log('Admin document data:', adminData);
+
+                if (adminData.role !== 'admin') {
+                    console.error('CRITICAL: User document exists but role is not "admin". Current role:', adminData.role);
+                    alert('Admin permissions not configured correctly. Role must be "admin" but is: ' + adminData.role);
+                    return;
+                }
+
+                console.log('✓ Admin verification successful - role:', adminData.role);
+            } catch (error) {
+                console.error('Error verifying admin document:', error);
+                alert('Error verifying admin permissions: ' + error.message);
+                return;
+            }
+
             isAuthChecked = true;
 
-            // Now that we're authenticated, load the initial data
+            // Now that we're authenticated and verified, load the initial data
             loadClients();
         });
 
