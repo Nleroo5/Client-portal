@@ -1425,29 +1425,43 @@
             }
 
             try {
-                // Delete the rep
-                await db.collection('salesReps').doc(repId).delete();
-
-                // Archive their deals (set rep to null and move to archive)
+                // First, archive their deals BEFORE deleting the rep
+                console.log('Archiving deals for rep:', repId);
                 const dealsSnapshot = await db.collection('deals')
                     .where('assignedTo', '==', repId)
                     .get();
 
-                const batch = db.batch();
-                dealsSnapshot.forEach(doc => {
-                    batch.update(doc.ref, {
-                        assignedTo: null,
-                        stage: 'closed-lost',
-                        archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        notes: (doc.data().notes || '') + `\n[Auto-archived: Rep ${repName} was deleted]`
+                console.log('Found', dealsSnapshot.size, 'deals to archive');
+
+                if (!dealsSnapshot.empty) {
+                    const batch = db.batch();
+                    dealsSnapshot.forEach(doc => {
+                        const dealData = doc.data();
+                        batch.update(doc.ref, {
+                            assignedTo: null,
+                            stage: 'closed-lost',
+                            archived: true,
+                            archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            stageWhenLost: dealData.stage || 'unknown',
+                            notes: (dealData.notes || '') + `\n[Auto-archived: Rep ${repName} was deleted]`,
+                            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                        });
                     });
-                });
-                await batch.commit();
+                    await batch.commit();
+                    console.log('Deals archived successfully');
+                }
+
+                // Now delete the rep
+                console.log('Deleting rep:', repId);
+                await db.collection('salesReps').doc(repId).delete();
+                console.log('Rep deleted successfully');
 
                 showAlert(`Sales rep ${repName} deleted and their deals archived.`);
                 loadReps();
             } catch (error) {
                 console.error('Error deleting rep:', error);
+                console.error('Error code:', error.code);
+                console.error('Error details:', error);
                 showAlert('Error deleting sales rep: ' + error.message, 'error');
             }
         }
