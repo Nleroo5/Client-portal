@@ -1366,19 +1366,19 @@
                             <div style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 600;">Weekly Targets</div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                                 <div>
-                                    <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Discovery Scheduled</div>
+                                    <div style="font-size: 0.75rem; color: #000000; margin-bottom: 2px;">Discovery Scheduled</div>
                                     <div style="font-size: 1.25rem; font-weight: 700; color: #05908C;">${weeklyTargets.discoveryCallsScheduled || 0}</div>
                                 </div>
                                 <div>
-                                    <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Discovery Completed</div>
+                                    <div style="font-size: 0.75rem; color: #000000; margin-bottom: 2px;">Discovery Completed</div>
                                     <div style="font-size: 1.25rem; font-weight: 700; color: #05908C;">${weeklyTargets.discoveryCallsCompleted || 0}</div>
                                 </div>
                                 <div>
-                                    <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Onboarding</div>
+                                    <div style="font-size: 0.75rem; color: #000000; margin-bottom: 2px;">Onboarding</div>
                                     <div style="font-size: 1.25rem; font-weight: 700; color: #47a5a3;">${weeklyTargets.dealsOnboarding || 0}</div>
                                 </div>
                                 <div>
-                                    <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Gone Live</div>
+                                    <div style="font-size: 0.75rem; color: #000000; margin-bottom: 2px;">Gone Live</div>
                                     <div style="font-size: 1.25rem; font-weight: 700; color: #47a5a3;">${weeklyTargets.dealsLive || 0}</div>
                                 </div>
                             </div>
@@ -1386,7 +1386,7 @@
 
                         <div style="display: flex; gap: 8px;">
                             <button class="btn-edit" onclick="editRep('${doc.id}')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Edit</button>
-                            <button class="btn-delete" onclick="deleteRep('${doc.id}', '${data.name}')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Delete</button>
+                            ${isAdmin ? '' : '<button class="btn-delete" onclick="deleteRep(\'' + doc.id + '\', \'' + data.name + '\')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Delete</button>'}
                         </div>
                     `;
 
