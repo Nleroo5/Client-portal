@@ -1360,10 +1360,19 @@
                 document.getElementById('repPassword').value = '';
                 document.getElementById('repPassword').placeholder = 'Leave blank to keep current password';
                 document.getElementById('repRole').value = data.role;
-                document.getElementById('targetDiscoveryScheduled').value = data.weeklyTargets.discoveryCallsScheduled;
-                document.getElementById('targetDiscoveryCompleted').value = data.weeklyTargets.discoveryCallsCompleted;
-                document.getElementById('targetOnboarding').value = data.weeklyTargets.dealsOnboarding;
-                document.getElementById('targetLive').value = data.weeklyTargets.dealsLive;
+
+                // Handle missing weeklyTargets with defaults
+                const weeklyTargets = data.weeklyTargets || {
+                    discoveryCallsScheduled: 0,
+                    discoveryCallsCompleted: 0,
+                    dealsOnboarding: 0,
+                    dealsLive: 0
+                };
+
+                document.getElementById('targetDiscoveryScheduled').value = weeklyTargets.discoveryCallsScheduled || 0;
+                document.getElementById('targetDiscoveryCompleted').value = weeklyTargets.discoveryCallsCompleted || 0;
+                document.getElementById('targetOnboarding').value = weeklyTargets.dealsOnboarding || 0;
+                document.getElementById('targetLive').value = weeklyTargets.dealsLive || 0;
 
                 // Change form to update mode
                 const form = document.getElementById('addRepForm');
