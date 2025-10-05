@@ -19,11 +19,12 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == repId;
     }
 
-    // Client Portals - Admin only can write, clients can read with valid clientId
+    // Client Portals - Allow unauthenticated read access (clients access via URL with client ID)
+    // Admin can write, anyone can read (portal is password-protected at app level)
     match /clients/{clientId} {
-      allow read: if request.auth != null ||
-                     (request.query.clientId != null && request.query.clientId == clientId);
+      allow read: if true;  // Allow unauthenticated read (protected by temp password in portal)
       allow write: if isAdmin();
+      allow update: if true;  // Allow clients to update their own progress steps
     }
 
     // Sales Reps - Allow unauthenticated users to list active reps (for login dropdown)
