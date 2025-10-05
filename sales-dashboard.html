@@ -30,10 +30,10 @@
             This Week
         </button>
         <button class="nav-tab" data-tab="team" onclick="switchTab('team')">
-            Team
+            Leaderboard
         </button>
         <button class="nav-tab" data-tab="actions" onclick="switchTab('actions')">
-            Action Items
+            Tasks
         </button>
     </div>
 
@@ -114,11 +114,11 @@
             </div>
         </div>
 
-        <!-- Tab 3: Team -->
+        <!-- Tab 3: Leaderboard -->
         <div class="tab-content" id="tab-team">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div>
-                    <h2 style="font-family: 'Bitter', serif; font-size: 2rem; font-weight: 700; margin-bottom: 4px; color: #000000;">Team Leaderboard</h2>
+                    <h2 style="font-family: 'Bitter', serif; font-size: 2rem; font-weight: 700; margin-bottom: 4px; color: #000000;">Leaderboard</h2>
                     <p style="color: #EEF4D9; font-size: 1rem; margin: 0;" id="teamWeekDates">Week of Loading...</p>
                 </div>
                 <div style="text-align: right;" id="yourRankDisplay">
@@ -154,10 +154,10 @@
             </div>
         </div>
 
-        <!-- Tab 4: Action Items -->
+        <!-- Tab 4: Tasks -->
         <div class="tab-content" id="tab-actions">
             <div style="margin-bottom: 24px;">
-                <h2 style="font-family: 'Bitter', serif; font-size: 2rem; font-weight: 700; margin-bottom: 4px; color: #FFFFFF;">Action Items</h2>
+                <h2 style="font-family: 'Bitter', serif; font-size: 2rem; font-weight: 700; margin-bottom: 4px; color: #FFFFFF;">Tasks</h2>
                 <p style="color: #EEF4D9; font-size: 1rem; margin: 0;">What needs your attention right now</p>
             </div>
 
@@ -949,7 +949,7 @@
             }
         }
 
-        // Tab 3: Team
+        // Tab 3: Leaderboard
         async function loadTeamLeaderboard() {
             console.log('Loading Team tab...');
             const currentRepId = sessionStorage.getItem('repId');
@@ -1098,9 +1098,9 @@
             }
         }
 
-        // Tab 4: Action Items
+        // Tab 4: Tasks
         async function loadActionItems() {
-            console.log('Loading Action Items tab...');
+            console.log('Loading Tasks tab...');
             const repId = sessionStorage.getItem('repId');
             if (!repId) return;
 
