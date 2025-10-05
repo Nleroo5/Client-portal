@@ -2063,6 +2063,9 @@
             }
         }
 
+        // Store reps data globally for pipeline
+        let repsMap = {};
+
         // Load and render CRM pipeline
         async function loadCRMPipeline() {
             try {
@@ -2072,6 +2075,13 @@
                     throw new Error('User not authenticated');
                 }
                 console.log('Loading CRM pipeline for user:', currentUser.uid, currentUser.email);
+
+                // Load all sales reps first to map names
+                const repsSnapshot = await db.collection('salesReps').get();
+                repsMap = {};
+                repsSnapshot.forEach(doc => {
+                    repsMap[doc.id] = doc.data().name;
+                });
 
                 // Fetch all deals
                 const snapshot = await db.collection('deals').get();
@@ -2124,6 +2134,67 @@
             }
         }
 
+        // Drag and drop handlers for admin pipeline
+        let draggedDealId = null;
+        let draggedDealStage = null;
+
+        function handleDealDragStart(event) {
+            draggedDealId = event.target.getAttribute('data-deal-id');
+            draggedDealStage = event.target.getAttribute('data-deal-stage');
+            event.target.style.opacity = '0.5';
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDealDragEnd(event) {
+            event.target.style.opacity = '1';
+        }
+
+        function handleDealDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            event.currentTarget.style.backgroundColor = '#e8f5e9';
+        }
+
+        function handleDealDragLeave(event) {
+            event.currentTarget.style.backgroundColor = '';
+        }
+
+        async function handleDealDrop(event) {
+            event.preventDefault();
+            event.currentTarget.style.backgroundColor = '';
+
+            const newStage = event.currentTarget.getAttribute('data-stage');
+
+            if (!draggedDealId || !newStage || draggedDealStage === newStage) {
+                return;
+            }
+
+            // Get stage names for confirmation
+            const oldStageName = PIPELINE_STAGES.find(s => s.id === draggedDealStage)?.name;
+            const newStageName = PIPELINE_STAGES.find(s => s.id === newStage)?.name;
+
+            // Confirm the move
+            if (!confirm(`Move this deal from "${oldStageName}" to "${newStageName}"?`)) {
+                return;
+            }
+
+            try {
+                // Update the deal in Firestore
+                await db.collection('deals').doc(draggedDealId).update({
+                    stage: newStage,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Reload the pipeline
+                await loadCRMPipeline();
+
+                showAlert(`Deal moved to ${newStageName}!`, 'success');
+            } catch (error) {
+                console.error('Error moving deal:', error);
+                showAlert('Error moving deal: ' + error.message, 'error');
+            }
+        }
+
         // Render pipeline board
         function renderPipelineBoard(deals) {
             const board = document.getElementById('crmPipelineBoard');
@@ -2145,7 +2216,12 @@
                         <h3 style="color: ${stage.color}; margin: 0; font-size: 1rem;">${stage.name}</h3>
                         <span style="background: ${stage.color}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;">${stageDeals.length}</span>
                     </div>
-                    <div class="pipeline-deals" data-stage="${stage.id}">
+                    <div class="pipeline-deals"
+                         data-stage="${stage.id}"
+                         ondragover="handleDealDragOver(event)"
+                         ondrop="handleDealDrop(event)"
+                         ondragleave="handleDealDragLeave(event)"
+                         style="min-height: 350px; transition: background-color 0.2s;">
                         ${stageDeals.map(deal => renderDealCard(deal)).join('')}
                     </div>
                 `;
@@ -2156,27 +2232,30 @@
 
         // Render deal card
         function renderDealCard(deal) {
-            const mrr = deal.mrr ? `$${deal.mrr.toLocaleString()}/mo` : 'No MRR';
-            const totalValue = deal.mrr && deal.contractLength ?
-                `$${(deal.mrr * deal.contractLength).toLocaleString()}` : '';
+            const repName = repsMap[deal.assignedTo] || 'Unassigned';
 
             return `
-                <div class="deal-card" data-deal-id="${deal.id}" style="
-                    background: white;
-                    border-radius: 8px;
-                    padding: 12px;
-                    margin-bottom: 10px;
-                    border-left: 4px solid ${PIPELINE_STAGES.find(s => s.id === deal.stage)?.color || '#ccc'};
-                    cursor: pointer;
-                    transition: transform 0.2s, box-shadow 0.2s;
-                " onclick="openDealModal('${deal.id}')"
-                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'"
-                onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                <div class="deal-card"
+                    draggable="true"
+                    data-deal-id="${deal.id}"
+                    data-deal-stage="${deal.stage}"
+                    ondragstart="handleDealDragStart(event)"
+                    ondragend="handleDealDragEnd(event)"
+                    style="
+                        background: white;
+                        border-radius: 8px;
+                        padding: 12px;
+                        margin-bottom: 10px;
+                        border-left: 4px solid ${PIPELINE_STAGES.find(s => s.id === deal.stage)?.color || '#ccc'};
+                        cursor: move;
+                        transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+                    " onclick="openDealModal('${deal.id}')"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'"
+                    onmouseout="this.style.transform=''; this.style.boxShadow=''">
                     <div style="font-weight: 700; color: #012E40; margin-bottom: 4px; font-size: 0.95rem;">${deal.companyName}</div>
                     <div style="font-size: 0.85rem; color: #666; margin-bottom: 8px;">${deal.contactName || 'No contact'}</div>
                     <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
-                        <span style="color: #05908C; font-weight: 600;">${mrr}</span>
-                        ${totalValue ? `<span style="color: #999; font-size: 0.8rem;">${totalValue} total</span>` : ''}
+                        <span style="color: #05908C; font-weight: 600;">👤 ${repName}</span>
                     </div>
                     ${deal.clientPortalId ? '<div style="margin-top: 6px; font-size: 0.75rem; color: #05908C;">🔗 Portal Linked</div>' : ''}
                 </div>
