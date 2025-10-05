@@ -23,10 +23,9 @@
         }
         
         .admin-header {
-            background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+            background: transparent;
             color: #EEF4D9;
-            padding: 30px 20px;
-            box-shadow: 0 4px 20px rgba(1, 46, 64, 0.2);
+            padding: 30px 20px 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -60,23 +59,22 @@
 
         /* Admin Navigation Tabs */
         .admin-nav-tabs {
-            background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+            background: transparent;
             display: flex;
             justify-content: center;
             gap: 16px;
             padding: 24px 32px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .admin-tab {
             background: linear-gradient(135deg, rgba(224, 242, 241, 0.3) 0%, rgba(255, 255, 255, 0.2) 100%);
-            border: 2px solid #000000;
+            border: 1px solid #000000;
             border-radius: 10px;
             padding: 14px 28px;
             font-size: 0.95rem;
             font-weight: 600;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: #000000;
+            color: #EEF4D9;
             cursor: pointer;
             transition: all 0.25s ease;
             position: relative;
@@ -85,7 +83,7 @@
 
         .admin-tab:hover {
             border-color: #000000;
-            color: #000000;
+            color: #EEF4D9;
             transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(5, 144, 140, 0.12);
             background: linear-gradient(135deg, rgba(224, 242, 241, 0.5) 0%, rgba(255, 255, 255, 0.3) 100%);
@@ -93,9 +91,9 @@
 
         .admin-tab.active {
             background: linear-gradient(135deg, rgba(224, 242, 241, 0.6) 0%, rgba(255, 255, 255, 0.4) 100%);
-            color: #000000;
-            border: 2px solid #000000;
-            box-shadow: 0 0 20px rgba(242, 169, 34, 0.6), 0 0 40px rgba(242, 169, 34, 0.3);
+            color: #EEF4D9;
+            border: 1px solid #000000;
+            box-shadow: 0 0 10px rgba(242, 169, 34, 0.4), 0 0 20px rgba(242, 169, 34, 0.2);
         }
 
         .admin-tab-content {
@@ -108,12 +106,12 @@
 
         .admin-container {
             max-width: 1400px;
-            margin: 40px auto;
-            padding: 0 30px;
+            margin: 0 auto;
+            padding: 40px 30px;
         }
 
         .admin-section {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(220, 230, 235, 0.95);
             border-radius: 16px;
             padding: 32px;
             margin-bottom: 28px;
@@ -134,7 +132,7 @@
             font-size: 1.4rem;
             margin-bottom: 24px;
             padding-bottom: 12px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #9ca3af;
             font-weight: 700;
             font-family: 'Bitter', serif;
         }
@@ -193,7 +191,7 @@
             padding: 11px 24px;
             background: #05908C;
             color: #000000;
-            border: none;
+            border: 1px solid #000000;
             border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
@@ -218,7 +216,7 @@
         .btn-primary {
             background: linear-gradient(135deg, #F2A922 0%, #e09819 100%);
             color: #000000;
-            border: 2px solid #000000;
+            border: 1px solid #000000;
         }
 
         .btn-primary:hover {
@@ -229,6 +227,7 @@
         .btn-danger {
             background: #ef4444;
             color: #000000;
+            border: 1px solid #000000;
         }
 
         .btn-danger:hover {
@@ -239,6 +238,7 @@
         .btn-success {
             background: #22c55e;
             color: #000000;
+            border: 1px solid #000000;
         }
 
         .btn-success:hover {
@@ -249,7 +249,7 @@
         .btn-secondary {
             background: #e5e7eb;
             color: #000000;
-            border: 2px solid #000000;
+            border: 1px solid #000000;
         }
 
         .btn-secondary:hover {
@@ -260,14 +260,14 @@
         .btn-small {
             padding: 8px 18px;
             font-size: 0.85rem;
-            border: 2px solid #000000;
+            border: 1px solid #000000;
         }
 
         .btn-edit {
-            background: #3b82f6;
+            background: #05908C;
             color: #000000;
             padding: 6px 14px;
-            border: 2px solid #000000;
+            border: 1px solid #000000;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.85rem;
@@ -277,15 +277,15 @@
         }
 
         .btn-edit:hover {
-            background: #2563eb;
+            background: #047a72;
             transform: translateY(-1px);
         }
 
         .btn-delete {
-            background: #ef4444;
+            background: #F2A922;
             color: #000000;
             padding: 6px 14px;
-            border: 2px solid #000000;
+            border: 1px solid #000000;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.85rem;
@@ -294,7 +294,7 @@
         }
 
         .btn-delete:hover {
-            background: #dc2626;
+            background: #e09819;
             transform: translateY(-1px);
         }
         
@@ -362,19 +362,19 @@
 
         .status-active, .badge-success {
             background: rgba(34, 197, 94, 0.15);
-            color: #16a34a;
+            color: #000000;
             border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
         .status-inactive, .badge-secondary {
             background: rgba(107, 114, 128, 0.15);
-            color: #4b5563;
+            color: #000000;
             border: 1px solid rgba(107, 114, 128, 0.3);
         }
 
         .badge-info {
             background: rgba(59, 130, 246, 0.15);
-            color: #2563eb;
+            color: #000000;
             border: 1px solid rgba(59, 130, 246, 0.3);
         }
 
@@ -424,7 +424,7 @@
             padding: 4px 8px;
             background: #85C7B3;
             color: #000000;
-            border: none;
+            border: 1px solid #000000;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.8rem;
@@ -454,14 +454,14 @@
         }
         
         .link-section {
-            background: #F0F9F7;
+            background: transparent;
             padding: 15px;
             border-radius: 8px;
             margin: 15px 0;
         }
-        
+
         .link-section h3 {
-            color: #05908C;
+            color: #000000;
             font-size: 1.1rem;
             margin-bottom: 10px;
         }
@@ -728,7 +728,7 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="portalType">Portal Type *</label>
+                        <label for="portalType">Contract Length *</label>
                         <select id="portalType" required>
                             <option value="contract">Contract (6/12-Month Agreement)</option>
                             <option value="m2m">Month-to-Month</option>
@@ -740,43 +740,43 @@
                 <!-- Contract Portal Links (shown by default) -->
                 <div id="contractLinks">
                 <div class="link-section">
-                    <h3>DocuSign Links (Optional - Leave blank for defaults)</h3>
+                    <h3>DocuSign Links</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="dpaLink">Custom DPA Link</label>
-                            <input type="url" id="dpaLink" placeholder="Leave blank for default">
+                            <input type="url" id="dpaLink" placeholder="">
                         </div>
                         <div class="form-group">
                             <label for="service6Link">Custom 6-Month Service Agreement</label>
-                            <input type="url" id="service6Link" placeholder="Leave blank for default">
+                            <input type="url" id="service6Link" placeholder="">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="service12Link">Custom 12-Month Service Agreement</label>
-                        <input type="url" id="service12Link" placeholder="Leave blank for default">
+                        <input type="url" id="service12Link" placeholder="">
                     </div>
                 </div>
                 
                 <div class="link-section">
-                    <h3>Stripe Payment Links (Optional)</h3>
+                    <h3>Stripe Payment Links</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="stripe6Monthly">6-Month Monthly Payment</label>
-                            <input type="url" id="stripe6Monthly" placeholder="Leave blank for default">
+                            <input type="url" id="stripe6Monthly" placeholder="">
                         </div>
                         <div class="form-group">
                             <label for="stripe6Upfront">6-Month Upfront Payment</label>
-                            <input type="url" id="stripe6Upfront" placeholder="Leave blank for default">
+                            <input type="url" id="stripe6Upfront" placeholder="">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="stripe12Monthly">12-Month Monthly Payment</label>
-                            <input type="url" id="stripe12Monthly" placeholder="Leave blank for default">
+                            <input type="url" id="stripe12Monthly" placeholder="">
                         </div>
                         <div class="form-group">
                             <label for="stripe12Upfront">12-Month Upfront Payment</label>
-                            <input type="url" id="stripe12Upfront" placeholder="Leave blank for default">
+                            <input type="url" id="stripe12Upfront" placeholder="">
                         </div>
                     </div>
                 </div>
@@ -786,35 +786,35 @@
                 <!-- Month-to-Month Portal Links (hidden by default) -->
                 <div id="m2mLinks" style="display: none;">
                 <div class="link-section">
-                    <h3>Month-to-Month DocuSign Links (Optional)</h3>
+                    <h3>Month-to-Month DocuSign Links</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="m2mServiceAgreementLink">Custom Service Agreement Link</label>
-                            <input type="url" id="m2mServiceAgreementLink" placeholder="Leave blank for default">
+                            <input type="url" id="m2mServiceAgreementLink" placeholder="">
                         </div>
                         <div class="form-group">
                             <label for="m2mDpaLink">Custom DPA Link</label>
-                            <input type="url" id="m2mDpaLink" placeholder="Leave blank for default">
+                            <input type="url" id="m2mDpaLink" placeholder="">
                         </div>
                     </div>
                 </div>
 
                 <div class="link-section">
-                    <h3>Month-to-Month Payment Link (Optional)</h3>
+                    <h3>Month-to-Month Payment Link</h3>
                     <div class="form-group">
                         <label for="m2mInvoiceLink">Stripe Invoice/Payment Link</label>
-                        <input type="url" id="m2mInvoiceLink" placeholder="Leave blank for default">
+                        <input type="url" id="m2mInvoiceLink" placeholder="">
                     </div>
                 </div>
                 </div>
                 <!-- End Month-to-Month Portal Links -->
 
                 <div class="link-section">
-                    <h3>Other Links (Optional - Shared by Both Portals)</h3>
+                    <h3>Other Links</h3>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="googleDriveLink">Google Drive Upload Link</label>
-                            <input type="url" id="googleDriveLink" placeholder="Leave blank for default">
+                            <input type="url" id="googleDriveLink" placeholder="">
                         </div>
                         <div class="form-group">
                             <label for="creativeLink">Creative Preview Link</label>
@@ -832,16 +832,16 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div>
                     <h2 style="margin-bottom: 4px; font-family: 'Bitter', serif; color: #000000;">Client Portals</h2>
-                    <p style="color: #374151; font-size: 0.9rem; margin: 0;">Manage active client onboarding portals</p>
+                    <p style="color: #000000; font-size: 0.9rem; margin: 0;">Manage active client onboarding portals</p>
                 </div>
                 <div style="display: flex; gap: 24px; align-items: center;">
                     <div style="text-align: center;">
                         <div style="font-size: 1.5rem; font-weight: 700; color: #05908C;" id="totalClientsCount">0</div>
-                        <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Total Clients</div>
+                        <div style="font-size: 0.75rem; color: #000000; text-transform: uppercase; letter-spacing: 0.5px;">Total Clients</div>
                     </div>
                     <div style="text-align: center;">
                         <div style="font-size: 1.5rem; font-weight: 700; color: #47a5a3;" id="activeClientsCount">0</div>
-                        <div style="font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Active</div>
+                        <div style="font-size: 0.75rem; color: #000000; text-transform: uppercase; letter-spacing: 0.5px;">Active</div>
                     </div>
                 </div>
             </div>
@@ -903,7 +903,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                     <div>
                         <h2 style="margin-bottom: 4px;">Sales Team</h2>
-                        <p style="color: #6b7280; font-size: 0.9rem; margin: 0;">Manage sales representatives and their targets</p>
+                        <p style="color: #000000; font-size: 0.9rem; margin: 0;">Manage sales representatives and their targets</p>
                     </div>
                     <div style="display: flex; gap: 24px; align-items: center;">
                         <div style="text-align: center;">
@@ -1068,16 +1068,16 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="editDpaLink">Custom DPA Link</label>
-                            <input type="url" id="editDpaLink" placeholder="Leave blank for default">
+                            <input type="url" id="editDpaLink" placeholder="">
                         </div>
                         <div class="form-group">
                             <label for="editService6Link">Custom 6-Month Service Agreement</label>
-                            <input type="url" id="editService6Link" placeholder="Leave blank for default">
+                            <input type="url" id="editService6Link" placeholder="">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="editService12Link">Custom 12-Month Service Agreement</label>
-                        <input type="url" id="editService12Link" placeholder="Leave blank for default">
+                        <input type="url" id="editService12Link" placeholder="">
                     </div>
                 </div>
                 
@@ -1086,21 +1086,21 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="editStripe6Monthly">6-Month Monthly Payment</label>
-                            <input type="url" id="editStripe6Monthly" placeholder="Leave blank for default">
+                            <input type="url" id="editStripe6Monthly" placeholder="">
                         </div>
                         <div class="form-group">
                             <label for="editStripe6Upfront">6-Month Upfront Payment</label>
-                            <input type="url" id="editStripe6Upfront" placeholder="Leave blank for default">
+                            <input type="url" id="editStripe6Upfront" placeholder="">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="editStripe12Monthly">12-Month Monthly Payment</label>
-                            <input type="url" id="editStripe12Monthly" placeholder="Leave blank for default">
+                            <input type="url" id="editStripe12Monthly" placeholder="">
                         </div>
                         <div class="form-group">
                             <label for="editStripe12Upfront">12-Month Upfront Payment</label>
-                            <input type="url" id="editStripe12Upfront" placeholder="Leave blank for default">
+                            <input type="url" id="editStripe12Upfront" placeholder="">
                         </div>
                     </div>
                 </div>
@@ -1110,7 +1110,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="editGoogleDriveLink">Google Drive Upload Link</label>
-                            <input type="url" id="editGoogleDriveLink" placeholder="Leave blank for default">
+                            <input type="url" id="editGoogleDriveLink" placeholder="">
                         </div>
                         <div class="form-group">
                             <label for="editCreativeLink">Creative Preview Link</label>
@@ -1282,9 +1282,15 @@
                 const grid = document.getElementById('repsGrid');
                 grid.innerHTML = '';
 
-                // Count active and inactive reps
-                const activeCount = snapshot.docs.filter(doc => doc.data().active).length;
-                const inactiveCount = snapshot.size - activeCount;
+                // Count active and inactive reps (excluding admins)
+                const activeCount = snapshot.docs.filter(doc => {
+                    const data = doc.data();
+                    return data.active && data.role !== 'admin';
+                }).length;
+                const inactiveCount = snapshot.docs.filter(doc => {
+                    const data = doc.data();
+                    return !data.active && data.role !== 'admin';
+                }).length;
 
                 const activeDisplay = document.getElementById('totalRepsCount');
                 const inactiveDisplay = document.getElementById('inactiveRepsCount');
@@ -1305,29 +1311,31 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
 
+                    // Skip admin users - don't show them in the sales team list
+                    if (data.role === 'admin') {
+                        return;
+                    }
+
                     const card = document.createElement('div');
-                    // Admin cards get a distinctive background color
-                    const isAdmin = data.role === 'admin';
-                    const cardBackground = isAdmin ? 'linear-gradient(135deg, #FFF8E6 0%, #FFECB3 100%)' : 'linear-gradient(135deg, #E0F2F1 0%, #FFFFFF 100%)';
-                    const borderColor = isAdmin ? '#F2A922' : (data.active ? '#05908C' : '#d1d5db');
-                    card.style.cssText = `background: ${cardBackground}; border-radius: 12px; padding: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: all 0.2s ease; border: 3px solid ${borderColor}`;
+                    const cardBackground = 'linear-gradient(135deg, #E0F2F1 0%, #FFFFFF 100%)';
+                    card.style.cssText = `background: ${cardBackground}; border-radius: 12px; padding: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transition: all 0.2s ease; border: 1px solid #000000`;
 
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
                             <div style="flex: 1;">
                                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
                                     <h3 style="font-size: 1.1rem; font-weight: 700; color: #012E40; margin: 0;">${data.name}</h3>
-                                    <span class="badge badge-${data.role === 'admin' ? 'warning' : (data.role === 'leadership' ? 'success' : 'info')}" style="font-size: 0.7rem;">${data.role === 'admin' ? 'Admin' : (data.role === 'leadership' ? 'Leadership' : 'Rep')}</span>
+                                    ${data.role === 'leadership' ? '<span class="badge badge-success" style="font-size: 0.7rem;">Leadership</span>' : ''}
                                 </div>
-                                <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">${data.email || 'No email provided'}</p>
-                                ${data.phone ? `<p style="color: #6b7280; font-size: 0.85rem; margin: 4px 0 0 0;">📞 ${data.phone}</p>` : ''}
+                                <p style="color: #000000; font-size: 0.85rem; margin: 0;">${data.email || 'No email provided'}</p>
+                                ${data.phone ? `<p style="color: #000000; font-size: 0.85rem; margin: 4px 0 0 0;">📞 ${data.phone}</p>` : ''}
                             </div>
                             <span class="badge badge-${data.active ? 'success' : 'secondary'}">${data.active ? 'Active' : 'Inactive'}</span>
                         </div>
 
                         <div style="display: flex; gap: 8px; margin-top: 16px;">
                             <button class="btn-edit" onclick="editRep('${doc.id}')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Edit</button>
-                            ${isAdmin ? '' : '<button class="btn-delete" onclick="deleteRep(\'' + doc.id + '\', \'' + data.name + '\')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Delete</button>'}
+                            <button class="btn-delete" onclick="deleteRep('${doc.id}', '${data.name}')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Delete</button>
                         </div>
                     `;
 
@@ -1726,7 +1734,7 @@
                     const progressPercent = (completedSteps / 5) * 100;
 
                     const card = document.createElement('div');
-                    card.style.cssText = 'background: rgba(255, 255, 255, 0.9); border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(1, 46, 64, 0.2); transition: all 0.2s ease; border: 2px solid rgba(5, 144, 140, 0.3); backdrop-filter: blur(8px);';
+                    card.style.cssText = 'background: rgba(255, 255, 255, 0.9); border-radius: 12px; padding: 20px; box-shadow: 0 6px 30px rgba(1, 46, 64, 0.3); transition: all 0.2s ease; border: 2px solid rgba(5, 144, 140, 0.3); backdrop-filter: blur(8px);';
 
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 14px;">
@@ -1749,18 +1757,18 @@
                                 <div style="background: linear-gradient(90deg, #05908C 0%, #47a5a3 100%); height: 100%; width: ${progressPercent}%; transition: width 0.3s ease;"></div>
                             </div>
                             <div style="display: flex; gap: 6px; margin-top: 10px;">
-                                <div class="progress-step ${data.step1Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step1Complete ? '#05908C' : '#f3f4f6'}; color: ${data.step1Complete ? 'white' : '#000000'};">1</div>
-                                <div class="progress-step ${data.step2Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step2Complete ? '#05908C' : '#f3f4f6'}; color: ${data.step2Complete ? 'white' : '#000000'};">2</div>
-                                <div class="progress-step ${data.step3Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step3Complete ? '#05908C' : '#f3f4f6'}; color: ${data.step3Complete ? 'white' : '#000000'};">3</div>
-                                <div class="progress-step ${data.step4Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step4Complete ? '#05908C' : '#f3f4f6'}; color: ${data.step4Complete ? 'white' : '#000000'};">4</div>
-                                <div class="progress-step ${data.step5Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step5Complete ? '#05908C' : '#f3f4f6'}; color: ${data.step5Complete ? 'white' : '#000000'};">5</div>
+                                <div class="progress-step ${data.step1Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step1Complete ? '#05908C' : '#d1d5db'}; color: ${data.step1Complete ? 'white' : '#000000'};">1</div>
+                                <div class="progress-step ${data.step2Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step2Complete ? '#05908C' : '#d1d5db'}; color: ${data.step2Complete ? 'white' : '#000000'};">2</div>
+                                <div class="progress-step ${data.step3Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step3Complete ? '#05908C' : '#d1d5db'}; color: ${data.step3Complete ? 'white' : '#000000'};">3</div>
+                                <div class="progress-step ${data.step4Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step4Complete ? '#05908C' : '#d1d5db'}; color: ${data.step4Complete ? 'white' : '#000000'};">4</div>
+                                <div class="progress-step ${data.step5Complete ? 'complete' : ''}" style="flex: 1; text-align: center; padding: 6px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: ${data.step5Complete ? '#05908C' : '#d1d5db'}; color: ${data.step5Complete ? 'white' : '#000000'};">5</div>
                             </div>
                         </div>
 
                         <div style="background: #f9fafb; border-radius: 8px; padding: 10px; margin-bottom: 14px;">
                             <div style="font-size: 0.7rem; color: #000000; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Portal Link</div>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <input type="text" value="${portalLink}" id="link-${docId}" readonly style="flex: 1; background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px; font-size: 0.8rem; color: #000000; font-family: monospace;">
+                                <input type="text" value="${portalLink}" id="link-${docId}" readonly style="flex: 1; background: white; border: 1px solid #9ca3af; border-radius: 6px; padding: 8px; font-size: 0.8rem; color: #000000; font-family: monospace;">
                                 <button class="copy-btn" onclick="copyLink('${docId}')" style="padding: 8px 16px; white-space: nowrap;">Copy</button>
                             </div>
                         </div>
