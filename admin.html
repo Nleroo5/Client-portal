@@ -1420,6 +1420,26 @@
 
         // Delete sales rep
         async function deleteRep(repId, repName) {
+            // CRITICAL: Prevent admin from deleting themselves
+            const currentUser = firebase.auth().currentUser;
+            if (currentUser && currentUser.uid === repId) {
+                showAlert('Error: You cannot delete your own admin account!', 'error');
+                return;
+            }
+
+            // CRITICAL: Prevent deleting any admin user
+            try {
+                const repDoc = await db.collection('salesReps').doc(repId).get();
+                if (repDoc.exists && repDoc.data().role === 'admin') {
+                    showAlert('Error: Cannot delete admin users. Please change their role first.', 'error');
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking rep role:', error);
+                showAlert('Error verifying rep permissions.', 'error');
+                return;
+            }
+
             if (!confirm(`Are you sure you want to delete ${repName}? This will also archive all their deals.`)) {
                 return;
             }
