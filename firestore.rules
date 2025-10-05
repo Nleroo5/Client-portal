@@ -2,55 +2,83 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check if user is authenticated admin
+    // Helper function to check if user is admin
     function isAdmin() {
-      return request.auth != null && request.auth.token.email == 'admin@driveleadmedia.com';
+      return request.auth != null &&
+             get(/databases/$(database)/documents/salesReps/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Helper function to check if user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
+    // Helper function to check if user is a sales rep
+    function isRep() {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/salesReps/$(request.auth.uid));
     }
 
-    // Clients collection - Admin only write, no public read
+    // Helper function to check if rep owns the resource
+    function isRepOwner(repId) {
+      return request.auth != null && request.auth.uid == repId;
+    }
+
+    // Client Portals - Admin only can write, clients can read with valid clientId
     match /clients/{clientId} {
-      allow read: if isAdmin();
+      allow read: if request.auth != null ||
+                     (request.query.clientId != null && request.query.clientId == clientId);
       allow write: if isAdmin();
     }
 
-    // Sales Reps collection - Public can read active reps (for login dropdown), Admin can manage
+    // Sales Reps - Admin only
     match /salesReps/{repId} {
-      // Allow anyone to read active sales reps (needed for login dropdown)
-      // Only name, email, and active status exposed - passwords are in Firebase Auth, not here
-      allow read: if resource.data.active == true || isAuthenticated();
-      allow create, update, delete: if isAdmin();
+      allow read: if isRep();
+      allow write: if isAdmin();
     }
 
-    // Deals collection - Admin can do anything, reps can only read/write their own deals
+    // Deals - Reps can read their own, update limited stages. Admins can do everything.
     match /deals/{dealId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && request.resource.data.assignedTo == request.auth.uid;
-      allow update: if isAdmin() ||
-        (isAuthenticated() &&
-         resource.data.assignedTo == request.auth.uid &&
-         request.resource.data.assignedTo == request.auth.uid); // Can't reassign deals
-      allow delete: if isAdmin();
+      // Reps can read deals assigned to them
+      allow read: if isRep() &&
+                     resource.data.assignedTo == request.auth.uid;
+
+      // Reps can create deals
+      allow create: if isRep() &&
+                       request.resource.data.assignedTo == request.auth.uid &&
+                       request.resource.data.stage in ['qualified', 'cold-outreach', 'follow-up', 'discovery-scheduled'];
+
+      // Reps can only update deals assigned to them and only to allowed stages
+      allow update: if isRep() &&
+                       resource.data.assignedTo == request.auth.uid &&
+                       (
+                         // Can only change stage to allowed stages
+                         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['stage']) ||
+                         request.resource.data.stage in ['qualified', 'cold-outreach', 'follow-up', 'discovery-scheduled']
+                       );
+
+      // Admins can do everything
+      allow read, write: if isAdmin();
     }
 
-    // Scorecard collection - Reps can read all (for team leaderboard), write their own, admin can read all
+    // Scorecard - Admins can write, reps can read their own
     match /scorecard/{scorecardId} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && request.resource.data.repId == request.auth.uid;
+      // Reps can only read their own scorecard (format: repId_weekId)
+      allow read: if isRep() &&
+                     scorecardId.matches('^' + request.auth.uid + '_.*');
+
+      // Only admins can write scorecard data
+      allow write: if isAdmin();
     }
 
-    // Tasks collection - Reps can read/write their own, admin can read all
-    match /tasks/{taskId} {
-      allow read: if isAdmin() ||
-        (isAuthenticated() && resource.data.assignedTo == request.auth.uid);
-      allow write: if isAuthenticated() && request.resource.data.assignedTo == request.auth.uid;
+    // Targets - Admins only (deprecated, but keeping for backwards compatibility)
+    match /targets/{targetId} {
+      allow read: if isRep();
+      allow write: if isAdmin();
     }
 
-    // Deny all other access by default
+    // Deal audit trail
+    match /dealAudit/{auditId} {
+      allow read: if isRep() || isAdmin();
+      allow write: if isRep() || isAdmin();
+    }
+
+    // Deny all other access
     match /{document=**} {
       allow read, write: if false;
     }
