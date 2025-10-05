@@ -1191,7 +1191,40 @@
                 if (!adminDoc.exists) {
                     console.error('CRITICAL: Admin user document does not exist in salesReps collection');
                     console.error('Expected document at: salesReps/' + user.uid);
-                    alert('Admin account not properly configured. Please create a salesReps document with role: "admin" for UID: ' + user.uid);
+
+                    // EMERGENCY: Offer to create admin document automatically
+                    const shouldCreate = confirm(
+                        'Admin account not found!\n\n' +
+                        'Would you like to create your admin account now?\n\n' +
+                        'This will create a salesReps document for: ' + user.email
+                    );
+
+                    if (shouldCreate) {
+                        try {
+                            await db.collection('salesReps').doc(user.uid).set({
+                                email: user.email,
+                                name: 'Admin',
+                                role: 'admin',
+                                active: true,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                weeklyTargets: {
+                                    discoveryCallsScheduled: 0,
+                                    discoveryCallsCompleted: 0,
+                                    dealsOnboarding: 0,
+                                    dealsLive: 0
+                                }
+                            });
+
+                            alert('Admin account created successfully! Please refresh the page.');
+                            location.reload();
+                            return;
+                        } catch (createError) {
+                            console.error('Error creating admin document:', createError);
+                            alert('Failed to create admin account: ' + createError.message + '\n\nPlease create it manually in Firebase Console.');
+                            return;
+                        }
+                    }
+
                     return;
                 }
 

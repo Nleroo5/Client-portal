@@ -37,7 +37,14 @@ service cloud.firestore {
       allow read: if resource.data.active == true ||
                      (request.auth != null && request.auth.uid == repId);
 
-      allow write, delete: if isAdmin();
+      // EMERGENCY: Allow authenticated users to create their own admin document ONCE
+      // This is for initial admin setup or recovery from accidental deletion
+      allow create: if request.auth != null &&
+                       request.auth.uid == repId &&
+                       request.resource.data.email == request.auth.token.email &&
+                       request.resource.data.role == 'admin';
+
+      allow update, delete: if isAdmin();
     }
 
     // Deals - Reps can read their own, update limited stages. Admins can do everything.
