@@ -26,9 +26,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Sales Reps - Admin only
+    // Sales Reps - Allow unauthenticated users to list active reps (for login dropdown)
+    // Authenticated reps can read their own data, admins can write
     match /salesReps/{repId} {
-      allow read: if isRep();
+      // Allow anyone to read basic info of active reps (for login page dropdown)
+      allow read: if resource.data.active == true || isRep();
       allow write: if isAdmin();
     }
 
@@ -56,11 +58,10 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    // Scorecard - Admins can write, reps can read their own
+    // Scorecard - Admins can write, reps can read all scorecards (for leaderboard)
     match /scorecard/{scorecardId} {
-      // Reps can only read their own scorecard (format: repId_weekId)
-      allow read: if isRep() &&
-                     scorecardId.matches('^' + request.auth.uid + '_.*');
+      // Reps can read all scorecards to view leaderboard
+      allow read: if isRep();
 
       // Only admins can write scorecard data
       allow write: if isAdmin();

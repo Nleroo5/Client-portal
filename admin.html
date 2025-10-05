@@ -1241,6 +1241,14 @@
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
+                    // Ensure weeklyTargets exists with default values
+                    const weeklyTargets = data.weeklyTargets || {
+                        discoveryCallsScheduled: 0,
+                        discoveryCallsCompleted: 0,
+                        dealsOnboarding: 0,
+                        dealsLive: 0
+                    };
+
                     const card = document.createElement('div');
                     card.style.cssText = 'background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s ease; border-left: 4px solid ' + (data.active ? '#05908C' : '#d1d5db');
 
@@ -1261,19 +1269,19 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                                 <div>
                                     <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Discovery Scheduled</div>
-                                    <div style="font-size: 1.25rem; font-weight: 700; color: #05908C;">${data.weeklyTargets.discoveryCallsScheduled}</div>
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: #05908C;">${weeklyTargets.discoveryCallsScheduled || 0}</div>
                                 </div>
                                 <div>
                                     <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Discovery Completed</div>
-                                    <div style="font-size: 1.25rem; font-weight: 700; color: #05908C;">${data.weeklyTargets.discoveryCallsCompleted}</div>
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: #05908C;">${weeklyTargets.discoveryCallsCompleted || 0}</div>
                                 </div>
                                 <div>
                                     <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Onboarding</div>
-                                    <div style="font-size: 1.25rem; font-weight: 700; color: #47a5a3;">${data.weeklyTargets.dealsOnboarding}</div>
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: #47a5a3;">${weeklyTargets.dealsOnboarding || 0}</div>
                                 </div>
                                 <div>
                                     <div style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 2px;">Gone Live</div>
-                                    <div style="font-size: 1.25rem; font-weight: 700; color: #47a5a3;">${data.weeklyTargets.dealsLive}</div>
+                                    <div style="font-size: 1.25rem; font-weight: 700; color: #47a5a3;">${weeklyTargets.dealsLive || 0}</div>
                                 </div>
                             </div>
                         </div>
