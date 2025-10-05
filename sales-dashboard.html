@@ -35,6 +35,9 @@
         <button class="nav-tab" data-tab="actions" onclick="switchTab('actions')">
             Tasks
         </button>
+        <button class="nav-tab" data-tab="archived" onclick="switchTab('archived')">
+            Archived
+        </button>
     </div>
 
     <!-- Main Content Container -->
@@ -191,6 +194,32 @@
             </div>
         </div>
 
+        <!-- Tab 5: Archived -->
+        <div class="tab-content" id="tab-archived">
+            <div style="margin-bottom: 24px;">
+                <h2 style="font-family: 'Bitter', serif; font-size: 2rem; font-weight: 700; margin-bottom: 4px; color: #FFFFFF;">Archived Deals</h2>
+                <p style="color: #EEF4D9; font-size: 1rem; margin: 0;">Deals that were marked as lost</p>
+            </div>
+
+            <div style="background: #FFFFFF; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(15, 23, 42, 0.06);">
+                <table class="scorecard-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Contact</th>
+                            <th>Stage When Lost</th>
+                            <th>Archived Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="archivedDealsBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 24px; color: #64748B;">Loading archived deals...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <!-- Deal Modal -->
@@ -209,6 +238,10 @@
                     <div>
                         <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #0F172A;">Contact Name</label>
                         <input type="text" id="dealContactName" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.95rem; color: #0F172A;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #0F172A;">Website</label>
+                        <input type="text" id="dealWebsite" placeholder="example.com" style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.95rem; color: #0F172A;">
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div>
@@ -369,6 +402,8 @@
                 loadTeamLeaderboard();
             } else if (tabName === 'actions') {
                 loadActionItems();
+            } else if (tabName === 'archived') {
+                loadArchivedDeals();
             }
         }
 
@@ -629,7 +664,8 @@
                                     <div style="font-weight: 700; color: #012E40;">${deal.companyName || 'Unnamed Deal'}</div>
                                     ${isStalling ? '<span style="background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">STALLING</span>' : ''}
                                 </div>
-                                <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 8px;">${deal.contactName || 'No contact'}</div>
+                                <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 4px;">${deal.contactName || 'No contact'}</div>
+                                ${deal.website ? `<div style="font-size: 0.8rem; color: #05908C; margin-bottom: 8px;"><a href="${deal.website.startsWith('http') ? deal.website : 'https://' + deal.website}" target="_blank" style="color: #05908C; text-decoration: none;">${deal.website}</a></div>` : '<div style="font-size: 0.8rem; color: #9ca3af; margin-bottom: 8px;">No website</div>'}
 
                                 <!-- Quick Stage Change -->
                                 <div style="margin-bottom: 8px;">
@@ -1222,6 +1258,60 @@
             }
         }
 
+        // Tab 5: Archived Deals
+        async function loadArchivedDeals() {
+            console.log('Loading Archived Deals tab...');
+            const repId = sessionStorage.getItem('repId');
+            if (!repId) return;
+
+            try {
+                // Load archived deals for this rep
+                const archivedSnapshot = await db.collection('deals')
+                    .where('assignedTo', '==', repId)
+                    .where('archived', '==', true)
+                    .orderBy('archivedAt', 'desc')
+                    .get();
+
+                const stageNames = {
+                    'qualified': 'Qualified',
+                    'cold-outreach': 'Cold Outreach',
+                    'follow-up': 'Follow-Up',
+                    'discovery-scheduled': 'Discovery Scheduled',
+                    'discovery-completed': 'Discovery Completed',
+                    'proposal-sent': 'Proposal Sent',
+                    'negotiation': 'Negotiation',
+                    'onboarding': 'Onboarding',
+                    'campaign-live': 'Campaign Live'
+                };
+
+                if (archivedSnapshot.empty) {
+                    document.getElementById('archivedDealsBody').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 24px; color: #64748B;">No archived deals</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                archivedSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const archivedDate = data.archivedAt ? data.archivedAt.toDate().toLocaleDateString() : 'N/A';
+                    const stageWhenLost = stageNames[data.stageWhenLost] || data.stageWhenLost || 'Unknown';
+
+                    html += `
+                        <tr>
+                            <td>${data.companyName || 'Unnamed'}</td>
+                            <td>${data.contactName || 'N/A'}</td>
+                            <td>${stageWhenLost}</td>
+                            <td>${archivedDate}</td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById('archivedDealsBody').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading archived deals:', error);
+                document.getElementById('archivedDealsBody').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 24px; color: #d32f2f;">Error loading archived deals. Please refresh.</td></tr>';
+            }
+        }
+
         // Quick log activity
         async function quickLog(type, event) {
             const repId = sessionStorage.getItem('repId');
@@ -1415,6 +1505,7 @@
                 document.getElementById('dealId').value = dealId;
                 document.getElementById('dealCompanyName').value = deal.companyName || '';
                 document.getElementById('dealContactName').value = deal.contactName || '';
+                document.getElementById('dealWebsite').value = deal.website || '';
                 document.getElementById('dealEmail').value = deal.email || '';
                 document.getElementById('dealPhone').value = deal.phone || '';
                 document.getElementById('dealStage').value = deal.stage || 'qualified';
@@ -1432,7 +1523,12 @@
             if (!confirm('Mark this deal as LOST? This will archive the deal.')) return;
 
             try {
+                // Get current stage before archiving
+                const dealDoc = await db.collection('deals').doc(dealId).get();
+                const currentStage = dealDoc.data().stage;
+
                 await db.collection('deals').doc(dealId).update({
+                    stageWhenLost: currentStage,  // Save the stage when it was lost
                     stage: 'closed-lost',
                     archived: true,
                     archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1579,6 +1675,7 @@
             const dealData = {
                 companyName: document.getElementById('dealCompanyName').value,
                 contactName: document.getElementById('dealContactName').value || null,
+                website: document.getElementById('dealWebsite').value || null,
                 email: document.getElementById('dealEmail').value || null,
                 phone: document.getElementById('dealPhone').value || null,
                 stage: document.getElementById('dealStage').value,

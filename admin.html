@@ -685,6 +685,9 @@
         <button class="admin-tab" data-tab="sales-crm" onclick="switchAdminTab('sales-crm')">
             Sales CRM
         </button>
+        <button class="admin-tab" data-tab="archived-deals" onclick="switchAdminTab('archived-deals')">
+            Archived Deals
+        </button>
     </div>
 
     <div class="admin-container">
@@ -992,6 +995,34 @@
         </div>
         <!-- End Tab: Sales CRM -->
 
+        <!-- Tab: Archived Deals -->
+        <div class="admin-tab-content" id="tab-archived-deals">
+            <div class="admin-section">
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; color: #012E40;">All Archived Deals</h2>
+                <p style="color: #64748B; margin-bottom: 24px;">View all deals that have been marked as lost across all reps</p>
+
+                <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #E2E8F0;">
+                                <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Company</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Contact</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Assigned Rep</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Stage When Lost</th>
+                                <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Archived Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminArchivedDealsBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 24px; color: #64748B;">Loading archived deals...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- End Tab: Archived Deals -->
+
     </div>
 
     <!-- Edit Client Modal -->
@@ -1199,6 +1230,8 @@
             // Load data for specific tabs
             if (tabName === 'sales-reps') {
                 loadReps();
+            } else if (tabName === 'archived-deals') {
+                loadAdminArchivedDeals();
             }
         }
 
@@ -2185,6 +2218,66 @@
                 });
             }
         });
+
+        // Load archived deals for admin (all deals)
+        async function loadAdminArchivedDeals() {
+            console.log('Loading archived deals for admin...');
+
+            try {
+                // Load all archived deals
+                const archivedSnapshot = await db.collection('deals')
+                    .where('archived', '==', true)
+                    .orderBy('archivedAt', 'desc')
+                    .get();
+
+                // Also load all reps to map rep IDs to names
+                const repsSnapshot = await db.collection('salesReps').get();
+                const repsMap = {};
+                repsSnapshot.forEach(doc => {
+                    repsMap[doc.id] = doc.data().name;
+                });
+
+                const stageNames = {
+                    'qualified': 'Qualified',
+                    'cold-outreach': 'Cold Outreach',
+                    'follow-up': 'Follow-Up',
+                    'discovery-scheduled': 'Discovery Scheduled',
+                    'discovery-completed': 'Discovery Completed',
+                    'proposal-sent': 'Proposal Sent',
+                    'negotiation': 'Negotiation',
+                    'onboarding': 'Onboarding',
+                    'campaign-live': 'Campaign Live'
+                };
+
+                if (archivedSnapshot.empty) {
+                    document.getElementById('adminArchivedDealsBody').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #64748B;">No archived deals</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                archivedSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const archivedDate = data.archivedAt ? data.archivedAt.toDate().toLocaleDateString() : 'N/A';
+                    const stageWhenLost = stageNames[data.stageWhenLost] || data.stageWhenLost || 'Unknown';
+                    const repName = repsMap[data.assignedTo] || 'Unknown Rep';
+
+                    html += `
+                        <tr style="border-bottom: 1px solid #E2E8F0;">
+                            <td style="padding: 12px; color: #0F172A;">${data.companyName || 'Unnamed'}</td>
+                            <td style="padding: 12px; color: #64748B;">${data.contactName || 'N/A'}</td>
+                            <td style="padding: 12px; color: #64748B;">${repName}</td>
+                            <td style="padding: 12px; color: #0F172A;">${stageWhenLost}</td>
+                            <td style="padding: 12px; color: #64748B;">${archivedDate}</td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById('adminArchivedDealsBody').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading archived deals:', error);
+                document.getElementById('adminArchivedDealsBody').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: #d32f2f;">Error loading archived deals: ' + error.message + '</td></tr>';
+            }
+        }
     </script>
 
     <!-- Deal Creation/Edit Modal -->

@@ -49,9 +49,9 @@ service cloud.firestore {
       allow update: if isRep() &&
                        resource.data.assignedTo == request.auth.uid &&
                        (
-                         // Can only change stage to allowed stages
+                         // Can only change stage to allowed stages or mark as lost
                          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['stage']) ||
-                         request.resource.data.stage in ['qualified', 'cold-outreach', 'follow-up', 'discovery-scheduled']
+                         request.resource.data.stage in ['qualified', 'cold-outreach', 'follow-up', 'discovery-scheduled', 'closed-lost']
                        );
 
       // Admins can do everything
