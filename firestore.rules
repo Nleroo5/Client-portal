@@ -27,12 +27,16 @@ service cloud.firestore {
     }
 
     // Sales Reps - Allow unauthenticated users to list active reps (for login dropdown)
-    // Authenticated reps can read their own data, admins can write and delete
+    // Authenticated reps can read their own data, admins can read/write/delete all
     match /salesReps/{repId} {
+      // Allow admins to read all reps
+      allow read: if isAdmin();
+
       // Allow anyone to read basic info of active reps (for login page dropdown)
       // Allow authenticated users to read their own document (needed for isAdmin check)
       allow read: if resource.data.active == true ||
                      (request.auth != null && request.auth.uid == repId);
+
       allow write, delete: if isAdmin();
     }
 
