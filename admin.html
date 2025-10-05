@@ -2038,6 +2038,13 @@
         // Load and render CRM pipeline
         async function loadCRMPipeline() {
             try {
+                // Verify admin is authenticated
+                const currentUser = firebase.auth().currentUser;
+                if (!currentUser) {
+                    throw new Error('User not authenticated');
+                }
+                console.log('Loading CRM pipeline for user:', currentUser.uid, currentUser.email);
+
                 // Fetch all deals
                 const snapshot = await db.collection('deals').get();
                 const deals = [];
@@ -2065,6 +2072,26 @@
 
             } catch (error) {
                 console.error('Error loading CRM pipeline:', error);
+                console.error('Error code:', error.code);
+                console.error('Error details:', error);
+
+                // Check if user document exists
+                try {
+                    const currentUser = firebase.auth().currentUser;
+                    if (currentUser) {
+                        const userDoc = await db.collection('salesReps').doc(currentUser.uid).get();
+                        console.log('User document exists:', userDoc.exists);
+                        if (userDoc.exists) {
+                            console.log('User data:', userDoc.data());
+                        } else {
+                            showAlert('Admin user document not found in salesReps collection. Please contact support.', 'error');
+                            return;
+                        }
+                    }
+                } catch (checkError) {
+                    console.error('Error checking user document:', checkError);
+                }
+
                 showAlert('Error loading pipeline: ' + error.message, 'error');
             }
         }
