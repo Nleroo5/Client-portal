@@ -1631,12 +1631,13 @@
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
+                    const docId = doc.id; // Use Firestore document ID
 
                     // Generate correct portal link based on portal type
                     const portalType = data.portalType || 'contract';
                     const portalLink = portalType === 'm2m' ?
-                        `${PORTAL_BASE_URL}/index-m2m.html?c=${data.clientId}` :
-                        `${PORTAL_BASE_URL}/index-contract.html?c=${data.clientId}`;
+                        `${PORTAL_BASE_URL}/index-m2m.html?c=${docId}` :
+                        `${PORTAL_BASE_URL}/index-contract.html?c=${docId}`;
 
                     // Calculate progress percentage
                     const completedSteps = [
@@ -1683,16 +1684,16 @@
                         <div style="background: #f9fafb; border-radius: 8px; padding: 10px; margin-bottom: 14px;">
                             <div style="font-size: 0.7rem; color: #9ca3af; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Portal Link</div>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <input type="text" value="${portalLink}" id="link-${data.clientId}" readonly style="flex: 1; background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px; font-size: 0.8rem; color: #4b5563; font-family: monospace;">
-                                <button class="copy-btn" onclick="copyLink('${data.clientId}')" style="padding: 8px 16px; white-space: nowrap;">Copy</button>
+                                <input type="text" value="${portalLink}" id="link-${docId}" readonly style="flex: 1; background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px; font-size: 0.8rem; color: #4b5563; font-family: monospace;">
+                                <button class="copy-btn" onclick="copyLink('${docId}')" style="padding: 8px 16px; white-space: nowrap;">Copy</button>
                             </div>
                         </div>
 
                         <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-${data.active ? 'secondary' : 'success'} btn-small" onclick="toggleStatus('${data.clientId}', ${!data.active})" style="flex: 1; padding: 10px; font-size: 0.85rem;">
+                            <button class="btn btn-${data.active ? 'secondary' : 'success'} btn-small" onclick="toggleStatus('${docId}', ${!data.active})" style="flex: 1; padding: 10px; font-size: 0.85rem;">
                                 ${data.active ? 'Deactivate' : 'Activate'}
                             </button>
-                            <button class="btn btn-small" onclick="editClient('${data.clientId}')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Edit</button>
+                            <button class="btn btn-small" onclick="editClient('${docId}')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Edit</button>
                         </div>
                     `;
 
