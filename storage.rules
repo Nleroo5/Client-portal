@@ -1,0 +1,33 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null &&
+             firestore.get(/databases/(default)/documents/salesReps/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Helper function to check if user is a sales rep
+    function isRep() {
+      return request.auth != null &&
+             firestore.exists(/databases/(default)/documents/salesReps/$(request.auth.uid));
+    }
+
+    // Deal attachments - Reps can upload to their own folder, admins can access all
+    match /deal-attachments/{repId}/{fileName} {
+      // Admins can read/write all attachments
+      allow read, write: if isAdmin();
+
+      // Reps can upload to their own folder
+      allow write: if isRep() && request.auth.uid == repId;
+
+      // Reps can read their own attachments
+      allow read: if isRep() && request.auth.uid == repId;
+    }
+
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

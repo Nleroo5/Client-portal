@@ -266,6 +266,11 @@
                             <option value="follow-up-resell">Follow-Up & Resell</option>
                         </select>
                     </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #0F172A;">Attachments</label>
+                        <input type="file" id="dealAttachments" multiple style="width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.95rem; color: #0F172A;">
+                        <div id="attachmentsList" style="margin-top: 8px; font-size: 0.85rem; color: #64748B;"></div>
+                    </div>
                 </div>
                 <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 24px; border-top: 1px solid #E2E8F0;">
                     <button type="button" onclick="closeDealModal()" class="btn btn-outline" style="flex: 1;">Cancel</button>
@@ -683,6 +688,15 @@
                                     <span style="color: #000000; font-size: 0.75rem;">${daysInStage} of ${timelineText}</span>
                                     <span style="color: #000000; font-size: 0.75rem;">• Last: ${lastActivityText}</span>
                                 </div>
+                                ${deal.attachments && deal.attachments.length > 0 ? `
+                                    <div style="margin-bottom: 8px; padding: 8px; background: rgba(255, 255, 255, 0.6); border-radius: 6px;">
+                                        <div style="font-size: 0.75rem; color: #64748B; margin-bottom: 4px; font-weight: 600;">📎 Attachments (${deal.attachments.length})</div>
+                                        ${deal.attachments.map((url, idx) => {
+                                            const fileName = decodeURIComponent(url.split('/').pop().split('?')[0]).replace(/^\d+_/, '');
+                                            return `<a href="${url}" target="_blank" onclick="event.stopPropagation();" style="display: block; color: #05908C; font-size: 0.75rem; margin-top: 2px; text-decoration: none;">• ${fileName}</a>`;
+                                        }).join('')}
+                                    </div>
+                                ` : ''}
                                 <div style="display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #EEF4D9;">
                                     <button onclick="moveToNext('${deal.id}', '${deal.stage}'); event.stopPropagation();" style="flex: 1; padding: 4px 8px; background: #05908C; border: 2px solid rgba(0, 0, 0, 0.75); border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: white;">Next</button>
                                 </div>
@@ -1510,6 +1524,23 @@
                 document.getElementById('dealPhone').value = deal.phone || '';
                 document.getElementById('dealStage').value = deal.stage || 'qualified';
 
+                // Display existing attachments
+                const attachmentsList = document.getElementById('attachmentsList');
+                if (deal.attachments && deal.attachments.length > 0) {
+                    attachmentsList.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 4px;">Existing files:</div>
+                        ${deal.attachments.map((url, idx) => {
+                            const fileName = decodeURIComponent(url.split('/').pop().split('?')[0]).replace(/^\d+_/, '');
+                            return `<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <a href="${url}" target="_blank" style="color: #05908C; text-decoration: none; flex: 1;">📎 ${fileName}</a>
+                                <button type="button" onclick="removeAttachment('${dealId}', ${idx})" style="padding: 2px 6px; background: #fef2f2; border: 1px solid #dc2626; border-radius: 4px; font-size: 0.7rem; color: #dc2626; cursor: pointer;">Remove</button>
+                            </div>`;
+                        }).join('')}
+                    `;
+                } else {
+                    attachmentsList.innerHTML = '';
+                }
+
                 // Show modal
                 document.getElementById('dealModal').style.display = 'flex';
             } catch (error) {
@@ -1659,11 +1690,35 @@
             document.getElementById('dealSubmitBtn').textContent = 'Create Deal';
             document.getElementById('dealId').value = '';
             document.getElementById('dealForm').reset();
+            document.getElementById('attachmentsList').innerHTML = '';
             document.getElementById('dealModal').style.display = 'flex';
         }
 
         function closeDealModal() {
             document.getElementById('dealModal').style.display = 'none';
+        }
+
+        // Remove attachment from deal
+        async function removeAttachment(dealId, attachmentIndex) {
+            if (!confirm('Remove this attachment?')) return;
+
+            try {
+                const doc = await db.collection('deals').doc(dealId).get();
+                const deal = doc.data();
+                const attachments = deal.attachments || [];
+
+                // Remove the attachment at the specified index
+                attachments.splice(attachmentIndex, 1);
+
+                // Update the deal
+                await db.collection('deals').doc(dealId).update({ attachments });
+
+                // Refresh the edit modal
+                openEditDeal(dealId);
+            } catch (error) {
+                console.error('Error removing attachment:', error);
+                alert('Error removing attachment. Please try again.');
+            }
         }
 
         // Handle deal form submission (create or update)
@@ -1684,6 +1739,35 @@
             };
 
             try {
+                // Handle file uploads
+                const fileInput = document.getElementById('dealAttachments');
+                const files = fileInput.files;
+                const attachmentURLs = [];
+
+                if (files.length > 0) {
+                    const uploadPromises = [];
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const timestamp = Date.now();
+                        const fileName = `${timestamp}_${file.name}`;
+                        const storageRef = storage.ref(`deal-attachments/${repId}/${fileName}`);
+                        uploadPromises.push(
+                            storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL())
+                        );
+                    }
+                    const uploadedURLs = await Promise.all(uploadPromises);
+                    attachmentURLs.push(...uploadedURLs);
+                }
+
+                // Add attachments to dealData (merge with existing if editing)
+                if (dealId) {
+                    const existingDeal = await db.collection('deals').doc(dealId).get();
+                    const existingAttachments = existingDeal.data().attachments || [];
+                    dealData.attachments = [...existingAttachments, ...attachmentURLs];
+                } else {
+                    dealData.attachments = attachmentURLs;
+                }
+
                 if (dealId) {
                     // Update existing deal
                     await db.collection('deals').doc(dealId).update(dealData);
