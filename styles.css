@@ -27,7 +27,7 @@ body {
     padding: 30px 20px;
     background: linear-gradient(135deg, #FF6B35 0%, #F7931E 25%, #FFD23F 50%, #06FFA5 75%, #4D9DE0 100%);
     background-size: 300% 300%;
-    animation: colorWave 8s ease-in-out infinite;
+    animation: colorWave 15s ease-in-out infinite;
     color: #012E40;
     border-radius: 14px;
     box-shadow: 0 4px 20px rgba(5, 144, 140, 0.3);
@@ -50,16 +50,12 @@ body {
 .hero p {
     font-size: 1.1rem;
     opacity: 0.9;
-    margin-bottom: 25px;
+    margin-bottom: 0;
     color: #012E40;
 }
 
 .progress-container {
-    margin-top: 25px;
-    width: 100%;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
+    display: none;
 }
 
 .progress-bar {
