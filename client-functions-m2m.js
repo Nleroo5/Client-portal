@@ -174,15 +174,45 @@
         for (let i = 1; i <= 5; i++) {
             const bubble = document.getElementById(`sidebarBubble${i}`);
             if (bubble) {
+                const wasCompleted = bubble.classList.contains('completed');
                 bubble.className = 'sidebar-step-bubble upcoming';
                 if (portalState[i.toString()]) {
                     bubble.className = 'sidebar-step-bubble completed';
+                    // Trigger confetti if newly completed
+                    if (!wasCompleted) {
+                        createConfetti(bubble);
+                    }
                 } else if (i === 1 || portalState[(i - 1).toString()]) {
                     if (!portalState[i.toString()]) {
                         bubble.className = 'sidebar-step-bubble current';
                     }
                 }
             }
+        }
+    }
+
+    // Create confetti celebration effect
+    function createConfetti(element) {
+        const rect = element.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        for (let i = 0; i < 12; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti-particle';
+            confetti.style.position = 'fixed';
+            confetti.style.left = centerX + 'px';
+            confetti.style.top = centerY + 'px';
+            confetti.style.background = ['#F2A922', '#85C7B3', '#05908C', '#EEF4D9'][Math.floor(Math.random() * 4)];
+
+            const angle = (Math.PI * 2 * i) / 12;
+            const velocity = 50 + Math.random() * 50;
+            confetti.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
+            confetti.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
+
+            document.body.appendChild(confetti);
+
+            setTimeout(() => confetti.remove(), 1000);
         }
     }
 

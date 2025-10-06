@@ -225,13 +225,41 @@ body {
     padding: 10px 0;
 }
 
+/* Vertical connecting line */
+.sidebar-steps-track::before {
+    content: '';
+    position: absolute;
+    left: 25px;
+    top: 50px;
+    bottom: 50px;
+    width: 2px;
+    background: linear-gradient(180deg,
+        rgba(242, 169, 34, 0.3) 0%,
+        rgba(133, 199, 179, 0.3) 100%);
+    z-index: 0;
+}
+
 .sidebar-step-item {
     display: flex;
     align-items: center;
     margin-bottom: 30px;
     position: relative;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.sidebar-step-item:hover {
+    transform: translateX(5px);
+}
+
+.sidebar-step-item:hover .sidebar-step-bubble {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(242, 169, 34, 0.5);
+}
+
+.sidebar-step-item:hover .sidebar-step-label {
+    color: #F2A922;
 }
 
 .sidebar-step-bubble {
@@ -245,19 +273,36 @@ body {
     font-size: 18px;
     transition: all 0.3s ease;
     flex-shrink: 0;
+    position: relative;
+    z-index: 2;
 }
 
 .sidebar-step-bubble.completed {
     background: linear-gradient(135deg, #F2A922 0%, #f2b854 100%);
     color: #012E40;
     box-shadow: 0 4px 12px rgba(242, 169, 34, 0.4);
+    font-size: 22px;
+}
+
+.sidebar-step-bubble.completed::after {
+    content: '✓';
+    animation: checkmarkPop 0.5s ease-out;
 }
 
 .sidebar-step-bubble.current {
     background: linear-gradient(135deg, #05908C 0%, #85C7B3 100%);
     color: #EEF4D9;
     box-shadow: 0 4px 12px rgba(5, 144, 140, 0.4);
-    animation: pulse 2s infinite;
+    animation: pulseStrong 2s infinite;
+}
+
+.sidebar-step-bubble.current::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 2px solid #F2A922;
+    animation: rotatingBorder 3s linear infinite;
 }
 
 .sidebar-step-bubble.upcoming {
@@ -271,18 +316,72 @@ body {
     opacity: 1 !important;
     visibility: visible !important;
     white-space: nowrap;
+    flex: 1;
 }
 
 .sidebar-step-label {
     color: #EEF4D9;
     font-size: 14px;
     font-weight: 600;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
+    transition: color 0.3s ease;
+}
+
+.sidebar-step-eta {
+    color: rgba(133, 199, 179, 0.7);
+    font-size: 11px;
+    font-weight: 500;
+    font-style: italic;
 }
 
 @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
+}
+
+@keyframes pulseStrong {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 12px rgba(5, 144, 140, 0.4);
+    }
+    50% {
+        transform: scale(1.08);
+        box-shadow: 0 6px 20px rgba(5, 144, 140, 0.8);
+    }
+}
+
+@keyframes checkmarkPop {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes rotatingBorder {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Celebration confetti animation */
+@keyframes confetti {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx, 0), var(--ty, -100px)) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+.confetti-particle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: #F2A922;
+    animation: confetti 1s ease-out forwards;
+    pointer-events: none;
+    z-index: 99999;
 }
 
 /* Steps */
