@@ -378,71 +378,9 @@
             await loadMyPipeline();
         }
 
-        // Load Focus Zone (Today's priorities)
-        async function loadFocusZone() {
-            const repId = sessionStorage.getItem('repId');
-            if (!repId) return;
-
-            try {
-                const snapshot = await db.collection('deals')
-                    .where('assignedTo', '==', repId)
-                    .get();
-
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                let overdue = 0;
-                let discoveryToday = 0;
-                let stuckDeals = 0;
-                let quickWins = [];
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.stage === 'completed' || data.stage === 'closed-lost') return;
-
-                    const lastUpdated = data.lastUpdated?.toDate() || data.createdAt?.toDate() || new Date();
-                    const daysInStage = Math.floor((today - lastUpdated) / (1000 * 60 * 60 * 24));
-
-                    // Count overdue (>7 days in stage)
-                    if (daysInStage > 7) stuckDeals++;
-
-                    // Count discovery calls today
-                    if (data.stage === 'discovery-scheduled') discoveryToday++;
-
-                    // Quick wins (in onboarding or campaign-live)
-                    if (data.stage === 'onboarding-portal' || data.stage === 'campaign-live') {
-                        quickWins.push(data.companyName);
-                    }
-                });
-
-                let html = '<div style="display: grid; gap: 8px;">';
-
-                if (stuckDeals > 0) {
-                    html += `<div style="background: #F8FAFC; padding: 12px; border-radius: 6px; border: 1px solid #E2E8F0; color: #0F172A;"><strong>${stuckDeals}</strong> stalled deal${stuckDeals !== 1 ? 's' : ''} (>7 days in stage)</div>`;
-                }
-
-                if (discoveryToday > 0) {
-                    html += `<div style="background: #F8FAFC; padding: 12px; border-radius: 6px; border: 1px solid #E2E8F0; color: #0F172A;"><strong>${discoveryToday}</strong> discovery call${discoveryToday !== 1 ? 's' : ''} scheduled</div>`;
-                }
-
-                if (quickWins.length > 0) {
-                    html += `<div style="background: #F8FAFC; padding: 12px; border-radius: 6px; border: 1px solid #E2E8F0; color: #0F172A;">Quick Win: <strong>${quickWins[0]}</strong> is ready to close!</div>`;
-                }
-
-                if (stuckDeals === 0 && discoveryToday === 0 && quickWins.length === 0) {
-                    html = '<div style="text-align: center; padding: 12px; opacity: 0.8; color: #64748B;">You\'re all caught up! Add more deals to your pipeline.</div>';
-                }
-
-                html += '</div>';
-                document.getElementById('focusItems').innerHTML = html;
-            } catch (error) {
-                console.error('Error loading focus zone:', error);
-            }
-        }
 
         // Load My Pipeline
         async function loadMyPipeline() {
-            loadFocusZone(); // Also load focus zone
             const repId = sessionStorage.getItem('repId');
             if (!repId) return;
 
