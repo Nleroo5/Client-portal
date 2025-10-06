@@ -6,6 +6,7 @@
         "3": false,
         "4": false,
         "5": false,
+        "6": false,
         "creativeLink": null,
         "googleDriveLink": null,
         "invoiceLink": null,
@@ -119,6 +120,7 @@
                 step3Complete: portalState['3'],
                 step4Complete: portalState['4'],
                 step5Complete: portalState['5'],
+                step6Complete: portalState['6'],
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
             });
         } catch (error) {
@@ -130,7 +132,7 @@
     function updateProgressBar() {
         const completedSteps = Object.keys(portalState)
             .filter(key => !isNaN(key) && portalState[key]).length;
-        const totalSteps = 5;
+        const totalSteps = 6;
         const percentage = Math.round((completedSteps / totalSteps) * 100);
 
         const fill = document.getElementById('progressFill');
@@ -170,7 +172,7 @@
         }
 
         // Update step bubbles
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 6; i++) {
             const bubble = document.getElementById(`sidebarBubble${i}`);
             if (bubble) {
                 const wasCompleted = bubble.classList.contains('completed');
@@ -217,7 +219,7 @@
 
     // Update Step States
     function updateStepStates() {
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 6; i++) {
             const step = document.getElementById(`step${i}`);
             if (step) {
                 const isCompleted = portalState[i.toString()];
