@@ -1278,6 +1278,9 @@
 
             // Now that we're authenticated and verified, load the initial data
             loadClients();
+
+            // Start listening for unread messages globally (updates badge on all tabs)
+            startGlobalUnreadListener();
         });
 
         // Your portal URL
@@ -2468,6 +2471,23 @@
         // ===== MESSAGING SYSTEM =====
         let currentChatClientId = null;
         let messagesListener = null;
+
+        // Global unread messages listener - runs on all tabs to keep badge updated
+        function startGlobalUnreadListener() {
+            firebase.firestore().collection('messages')
+                .onSnapshot(snapshot => {
+                    let totalUnread = 0;
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        totalUnread += (data.unreadByAdmin || 0);
+                    });
+
+                    updateUnreadBadge(totalUnread);
+                }, error => {
+                    console.error('Error listening to unread messages:', error);
+                });
+        }
 
         // Load list of conversations
         async function loadMessagesList() {
