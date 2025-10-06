@@ -404,29 +404,51 @@
         }
     }
 
-    // Email Admin Details
-    function emailAdminDetails() {
+    // Send Admin Details via Message
+    async function emailAdminDetails() {
         const adminName = document.getElementById('adminName').value;
         const adminEmail = document.getElementById('adminEmail').value;
         const adminPhone = document.getElementById('adminPhone').value;
         const platform = document.getElementById('websitePlatform').value;
         const platformOther = document.getElementById('websitePlatformOther').value;
-        
+
         if (!adminEmail) {
             alert('Please enter admin email address');
             return;
         }
-        
+
+        if (!window.currentClientId) {
+            alert('Error: Client ID not found');
+            return;
+        }
+
         const platformText = platform === 'other' ? platformOther : platform;
-        const subject = 'Website Admin Contact Details - Client Portal';
-        const body = `Website Admin Contact Details:\n\n` +
+        const messageText = `📋 Website Admin Contact Details:\n\n` +
             `Name: ${adminName || 'Not provided'}\n` +
             `Email: ${adminEmail}\n` +
             `Phone: ${adminPhone || 'Not provided'}\n` +
             `Platform: ${platformText || 'Not specified'}\n\n` +
             `Please contact them to coordinate tracking installation.`;
-        
-        window.open(`mailto:${DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+
+        try {
+            await db.collection('messages').doc(window.currentClientId).collection('thread').add({
+                message: messageText,
+                sender: 'client',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                read: false
+            });
+
+            await db.collection('messages').doc(window.currentClientId).set({
+                lastMessage: messageText,
+                lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                unreadCount: firebase.firestore.FieldValue.increment(1)
+            }, { merge: true });
+
+            alert('Admin details sent successfully!');
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Error sending details. Please try again.');
+        }
     }
 
     // Email Access Details
