@@ -188,12 +188,12 @@
         // Update dynamic message
         const msg = document.getElementById('sidebarProgressMessage');
         if (msg) {
-            if (percentage === 0) msg.textContent = "Let's get started!";
-            else if (percentage === 20) msg.textContent = "Great beginning!";
+            if (percentage === 0) msg.textContent = "Let's get started";
+            else if (percentage === 20) msg.textContent = "Great beginning";
             else if (percentage === 40) msg.textContent = "Making progress";
-            else if (percentage === 60) msg.textContent = "Over halfway!";
-            else if (percentage === 80) msg.textContent = "Almost there!";
-            else if (percentage === 100) msg.textContent = "All complete! 🎉";
+            else if (percentage === 60) msg.textContent = "Over halfway";
+            else if (percentage === 80) msg.textContent = "Almost there";
+            else if (percentage === 100) msg.textContent = "Launch ready";
         }
         
         // Update step bubbles
