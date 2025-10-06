@@ -262,7 +262,7 @@ body {
 
 /* Deal Cards */
 .deal-card {
-    background: var(--deal-card-bg);
+    background: linear-gradient(135deg, #FFF8E6 0%, #FFFFFF 100%);
     border: 1px solid var(--secondary);
     border-radius: 8px;
     padding: 16px;
@@ -275,7 +275,7 @@ body {
     box-shadow: 0 8px 20px rgba(242, 169, 34, 0.15);
     transform: translateY(-2px);
     border-left-color: var(--primary);
-    background: #FFFFFF;
+    background: linear-gradient(135deg, #FFF8E6 0%, #FFFFFF 100%);
 }
 
 /* Tables */
