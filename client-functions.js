@@ -6,6 +6,7 @@
         "3": false,
         "4": false,
         "5": false,
+        "6": false,
         "creativeLink": null,
         "googleDriveLink": null,
         "docuSignLinks": {
@@ -72,6 +73,7 @@
             portalState['3'] = data.step3Complete || false;
             portalState['4'] = data.step4Complete || false;
             portalState['5'] = data.step5Complete || false;
+            portalState['6'] = data.step6Complete || false;
             
             // Load custom DocuSign links
             if (data.dpaLink) {
@@ -137,7 +139,7 @@
     // Save state to Firebase - THIS SAVES TO FIREBASE INSTEAD OF LOCALSTORAGE
     async function saveState() {
         if (!window.currentClientId) return;
-        
+
         try {
             await db.collection('clients').doc(window.currentClientId).update({
                 step1Complete: portalState['1'],
@@ -145,6 +147,7 @@
                 step3Complete: portalState['3'],
                 step4Complete: portalState['4'],
                 step5Complete: portalState['5'],
+                step6Complete: portalState['6'],
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
             });
         } catch (error) {
@@ -156,7 +159,7 @@
     function updateProgressBar() {
         const completedSteps = Object.keys(portalState)
             .filter(key => !isNaN(key) && portalState[key]).length;
-        const totalSteps = 5;
+        const totalSteps = 6;
         const percentage = Math.round((completedSteps / totalSteps) * 100);
         
         const fill = document.getElementById('progressFill');
@@ -188,15 +191,15 @@
         const msg = document.getElementById('sidebarProgressMessage');
         if (msg) {
             if (percentage === 0) msg.textContent = "Let's get started";
-            else if (percentage === 20) msg.textContent = "Great beginning";
-            else if (percentage === 40) msg.textContent = "Making progress";
-            else if (percentage === 60) msg.textContent = "Over halfway";
-            else if (percentage === 80) msg.textContent = "Almost there";
+            else if (percentage >= 17 && percentage < 34) msg.textContent = "Great beginning";
+            else if (percentage >= 34 && percentage < 50) msg.textContent = "Making progress";
+            else if (percentage >= 50 && percentage < 67) msg.textContent = "Over halfway";
+            else if (percentage >= 67 && percentage < 100) msg.textContent = "Almost there";
             else if (percentage === 100) msg.textContent = "Launch ready";
         }
-        
+
         // Update step bubbles
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 6; i++) {
             const bubble = document.getElementById(`sidebarBubble${i}`);
             if (bubble) {
                 const wasCompleted = bubble.classList.contains('completed');
@@ -243,15 +246,15 @@
 
     // Update Step States
     function updateStepStates() {
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 6; i++) {
             const step = document.getElementById(`step${i}`);
             if (step) {
                 const isCompleted = portalState[i.toString()];
                 const isUnlocked = i === 1 || portalState[(i - 1).toString()];
-                
+
                 step.classList.toggle('completed', isCompleted);
                 step.classList.toggle('locked', !isUnlocked);
-                
+
                 const btn = step.querySelector('.btn-complete');
                 if (btn) {
                     btn.textContent = isCompleted ? `✓ Step ${i} Completed` : `Mark Step ${i} Complete`;

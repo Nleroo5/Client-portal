@@ -56,19 +56,26 @@
             <div class="sidebar-step-item">
                 <div class="sidebar-step-bubble upcoming" id="sidebarBubble3">3</div>
                 <div class="sidebar-step-info">
-                    <div class="sidebar-step-label">Meta Setup</div>
-                    <div class="sidebar-step-eta">~10-20 min</div>
+                    <div class="sidebar-step-label">Brand Kit</div>
+                    <div class="sidebar-step-eta">~5-10 min</div>
                 </div>
             </div>
             <div class="sidebar-step-item">
                 <div class="sidebar-step-bubble upcoming" id="sidebarBubble4">4</div>
+                <div class="sidebar-step-info">
+                    <div class="sidebar-step-label">Meta Setup</div>
+                    <div class="sidebar-step-eta">~10-15 min</div>
+                </div>
+            </div>
+            <div class="sidebar-step-item">
+                <div class="sidebar-step-bubble upcoming" id="sidebarBubble5">5</div>
                 <div class="sidebar-step-info">
                     <div class="sidebar-step-label">Tracking</div>
                     <div class="sidebar-step-eta">~10 min</div>
                 </div>
             </div>
             <div class="sidebar-step-item">
-                <div class="sidebar-step-bubble upcoming" id="sidebarBubble5">5</div>
+                <div class="sidebar-step-bubble upcoming" id="sidebarBubble6">6</div>
                 <div class="sidebar-step-info">
                     <div class="sidebar-step-label">Approval</div>
                 </div>
@@ -249,104 +256,114 @@
             </div>
         </div>
 
-        <!-- Step 3: Meta Access & Brand Kit -->
+        <!-- Step 3: Brand Kit Upload -->
         <div class="step locked" id="step3">
             <div class="step-header">
                 <div>
-                    <h2>Meta Access & Brand Kit</h2>
+                    <h2>Brand Kit Upload</h2>
+                    <div class="step-note">Share your brand assets so we can create ads that perfectly match your brand</div>
                 </div>
                 <div class="step-number">3</div>
             </div>
             <div class="step-content">
-                <div style="margin-bottom: 25px;">
-                    <h4 style="color: #012E40; margin-bottom: 15px;">Meta Business Suite Setup</h4>
-                    <p style="color: #012E40; margin-bottom: 15px;">Let's handle this together - I'll walk you through the setup step-by-step.</p>
-                    
-                    <div style="background: #DFF5F3; padding: 25px; border-radius: 12px; border: 2px solid #85C7B3; text-align: center; max-width: 450px; margin: 0 auto;">
-                        <img src="https://www.driveleadmedia.com/s/IMG_1337.png" 
-                             alt="Nicolas - Drive Lead Media" 
-                             style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #05908C;">
-                        
-                        <h5 style="color: #012E40; margin-bottom: 10px;">Call Nicolas</h5>
-                        
-                        <div style="background: #05908C; color: #EEF4D9; padding: 12px 20px; border-radius: 8px; margin: 15px 0; font-size: 1.1rem; font-weight: 700;">
-                            <a href="tel:+16786506411" style="color: #EEF4D9; text-decoration: none;">
-                                (678) 650-6411
-                            </a>
-                        </div>
-                        
-                        <div style="color: #012E40; font-size: 0.9rem; line-height: 1.5;">
-                            <p style="margin-bottom: 5px;"><strong>Available:</strong> 9am - 5pm, Mon-Sat</p>
-                            <p style="margin-bottom: 10px;"><strong>Call Duration:</strong> ~15 minutes</p>
-                            
-                            <div style="background: rgba(242, 169, 34, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #F2A922; margin-top: 10px;">
-                                <p style="margin: 0; font-size: 0.85rem;">
-                                    If I don't answer, shoot me a text or leave a voicemail - I'll get right back to you.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <h4 style="color: #012E40; margin: 0;">What to Upload:</h4>
+                    <button class="btn btn-small btn-outline" id="brandKitInfoBtn" style="font-size: 0.8rem; padding: 4px 12px;" onclick="window.toggleBrandKitInfo()">
+                        What is a brand kit?
+                    </button>
                 </div>
-                
-                <!-- Brand Kit Upload Section -->
-                <div style="margin: 30px 0 20px 0; border-top: 2px solid rgba(133, 199, 179, 0.3); padding-top: 25px;">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
-                        <h4 style="color: #012E40; margin: 0;">📁 Brand Kit Upload:</h4>
-                        <button class="btn btn-small btn-outline" id="brandKitInfoBtn" style="font-size: 0.8rem; padding: 4px 12px;" onclick="window.toggleBrandKitInfo()">
-                            What is a brand kit?
-                        </button>
-                    </div>
-                    
-                    <!-- Brand Kit Explanation (hidden initially) -->
-                    <div id="brandKitInfo" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
-                        <h5 style="color: #012E40; margin-bottom: 10px;">Your Brand Kit Should Include:</h5>
-                        <div class="brand-kit-grid">
-                            <div>
-                                <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">🎨 Logo Files:</h6>
-                                <ul style="margin-left: 15px; color: #012E40; line-height: 1.5;">
-                                    <li>High-resolution logo PNG (transparent background)</li>
-                                    <li>Logo variations (if available)</li>
-                                </ul>
-                                <p style="color: #012E40; margin-top: 8px; font-size: 0.9rem; font-style: italic;">
-                                    We can work with whatever you have, but the more options you provide, the more creative flexibility we'll have to make your ads stand out
-                                </p>
-                            </div>
-                            <div>
-                                <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">🌈 Color Palette:</h6>
-                                <ul style="margin-left: 15px; color: #012E40; line-height: 1.5;">
-                                    <li>Brand colors (hex codes like #012E40)</li>
-                                    <li>Color palette document or screenshot</li>
-                                    <li>Brand guidelines PDF (if available)</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div style="background: #DFF5F3; padding: 15px; border-radius: 6px; border-left: 3px solid #05908C;">
-                            <p style="color: #012E40; margin: 0; font-size: 0.9rem;">
-                                <strong>💡 Don't have all of these?</strong> No worries! Upload whatever you have. Even just a logo PNG and your main brand colors will help us create ads that match your brand perfectly.
+
+                <!-- Brand Kit Explanation (hidden initially) -->
+                <div id="brandKitInfo" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
+                    <h5 style="color: #012E40; margin-bottom: 10px;">Your Brand Kit Should Include:</h5>
+                    <div class="brand-kit-grid">
+                        <div>
+                            <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Logo Files:</h6>
+                            <ul style="margin-left: 15px; color: #012E40; line-height: 1.5;">
+                                <li>High-resolution logo PNG (transparent background)</li>
+                                <li>Logo variations (if available)</li>
+                            </ul>
+                            <p style="color: #012E40; margin-top: 8px; font-size: 0.9rem; font-style: italic;">
+                                We can work with whatever you have, but the more options you provide, the more creative flexibility we'll have to make your ads stand out
                             </p>
                         </div>
+                        <div>
+                            <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Color Palette:</h6>
+                            <ul style="margin-left: 15px; color: #012E40; line-height: 1.5;">
+                                <li>Brand colors (hex codes like #012E40)</li>
+                                <li>Color palette document or screenshot</li>
+                                <li>Brand guidelines PDF (if available)</li>
+                            </ul>
+                        </div>
                     </div>
-                    
-                    <p style="color: #012E40; margin-bottom: 15px;">Upload your logos, brand guidelines, fonts, and any existing creative assets so we can create ads that perfectly match your brand.</p>
-                    <a href="https://drive.google.com/drive/folders/1jds7K6SdV6G_SwTyZZjxqjuftqIHiaPY?usp=sharing" 
-                       class="btn btn-outline" id="uploadBtn" target="_blank" rel="noopener">
-                        Upload Brand Assets
-                    </a>
+                    <div style="background: #DFF5F3; padding: 15px; border-radius: 6px; border-left: 3px solid #05908C;">
+                        <p style="color: #012E40; margin: 0; font-size: 0.9rem;">
+                            <strong>Don't have all of these?</strong> No worries! Upload whatever you have. Even just a logo PNG and your main brand colors will help us create ads that match your brand perfectly.
+                        </p>
+                    </div>
                 </div>
+
+                <p style="color: #012E40; margin-bottom: 15px;">Upload your logos, brand guidelines, fonts, and any existing creative assets so we can create ads that perfectly match your brand.</p>
+                <a href="https://drive.google.com/drive/folders/1jds7K6SdV6G_SwTyZZjxqjuftqIHiaPY?usp=sharing"
+                   class="btn btn-outline" id="uploadBtn" target="_blank" rel="noopener">
+                    Upload Brand Assets to Google Drive
+                </a>
             </div>
             <div class="step-actions">
                 <button class="btn btn-complete" onclick="window.markStepComplete(3)">Mark Step 3 Complete</button>
             </div>
         </div>
 
-        <!-- Step 4: Website Access for Tracking -->
+        <!-- Step 4: Meta Business Suite Setup -->
         <div class="step locked" id="step4">
+            <div class="step-header">
+                <div>
+                    <h2>Meta Business Suite Setup</h2>
+                    <div class="step-note">Let's handle this together - I'll walk you through the setup step-by-step</div>
+                </div>
+                <div class="step-number">4</div>
+            </div>
+            <div class="step-content">
+                <p style="color: #012E40; margin-bottom: 15px;">We'll connect your Facebook and Instagram accounts to our advertising platform so we can run your campaigns.</p>
+
+                <div style="background: #DFF5F3; padding: 25px; border-radius: 12px; border: 2px solid #85C7B3; text-align: center; max-width: 450px; margin: 0 auto;">
+                    <img src="https://www.driveleadmedia.com/s/IMG_1337.png"
+                         alt="Nicolas - Drive Lead Media"
+                         style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #05908C;">
+
+                    <h5 style="color: #012E40; margin-bottom: 10px;">Call Nicolas</h5>
+
+                    <div style="background: #05908C; color: #EEF4D9; padding: 12px 20px; border-radius: 8px; margin: 15px 0; font-size: 1.1rem; font-weight: 700;">
+                        <a href="tel:+16786506411" style="color: #EEF4D9; text-decoration: none;">
+                            (678) 650-6411
+                        </a>
+                    </div>
+
+                    <div style="color: #012E40; font-size: 0.9rem; line-height: 1.5;">
+                        <p style="margin-bottom: 5px;"><strong>Available:</strong> 9am - 5pm, Mon-Sat</p>
+                        <p style="margin-bottom: 10px;"><strong>Call Duration:</strong> ~10-15 minutes</p>
+
+                        <div style="background: rgba(242, 169, 34, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #F2A922; margin-top: 10px;">
+                            <p style="margin: 0; font-size: 0.85rem;">
+                                If I don't answer, shoot me a text or leave a voicemail - I'll get right back to you.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="step-actions">
+                <button class="btn btn-complete" onclick="window.markStepComplete(4)">Mark Step 4 Complete</button>
+            </div>
+        </div>
+
+        <!-- Step 5: Website Access for Tracking -->
+        <div class="step locked" id="step5">
             <div class="step-header">
                 <div>
                     <h2>Website Access for Tracking</h2>
                     <div class="step-note">We install GA4 and Meta Pixel (no PHI). We handle all technical setup - you just provide access.</div>
                 </div>
-                <div class="step-number">4</div>
+                <div class="step-number">5</div>
             </div>
             <div class="step-content">
                 <div style="margin-bottom: 25px;">
@@ -476,17 +493,17 @@
                 </div>
             </div>
             <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(4)">Mark Step 4 Complete</button>
+                <button class="btn btn-complete" onclick="window.markStepComplete(5)">Mark Step 5 Complete</button>
             </div>
         </div>
 
-        <!-- Step 5: Creative Approval -->
-        <div class="step locked" id="step5">
+        <!-- Step 6: Creative Approval -->
+        <div class="step locked" id="step6">
             <div class="step-header">
                 <div>
                     <h2>Creative Approval</h2>
                 </div>
-                <div class="step-number">5</div>
+                <div class="step-number">6</div>
             </div>
             <div class="step-content">
                 <div class="gallery-placeholder" id="galleryPlaceholder">
@@ -516,7 +533,7 @@
                 </div>
             </div>
             <div class="step-actions">
-                <button class="btn btn-complete" onclick="window.markStepComplete(5)">Mark Step 5 Complete</button>
+                <button class="btn btn-complete" onclick="window.markStepComplete(6)">Mark Step 6 Complete</button>
             </div>
         </div>
 
