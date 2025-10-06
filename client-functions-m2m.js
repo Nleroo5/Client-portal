@@ -268,13 +268,12 @@
         }
 
         // Check if all complete
-        const allComplete = [1,2,3,4,5].every(n => portalState[n.toString()]);
+        const allComplete = [1,2,3,4,5,6].every(n => portalState[n.toString()]);
         if (allComplete) {
             const successMsg = document.getElementById('successMessage');
             if (successMsg) {
                 setTimeout(() => {
                     successMsg.style.display = 'block';
-                    successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 1000);
             }
         }
