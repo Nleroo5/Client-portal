@@ -513,6 +513,172 @@
         console.log('✓ Portal initialized successfully with Firebase');
     });
 
+    // ===== CLIENT MESSAGING SYSTEM =====
+    let chatPanelOpen = false;
+    let clientMessagesListener = null;
+
+    // Toggle chat panel
+    window.toggleChatPanel = function() {
+        const chatPanel = document.getElementById('chatPanel');
+        chatPanelOpen = !chatPanelOpen;
+
+        if (chatPanelOpen) {
+            chatPanel.style.right = '0';
+            loadClientMessages();
+        } else {
+            chatPanel.style.right = '-400px';
+        }
+    };
+
+    // Load client messages
+    function loadClientMessages() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('c');
+
+        if (!clientId) return;
+
+        const messagesContainer = document.getElementById('clientChatMessages');
+
+        // Stop previous listener
+        if (clientMessagesListener) {
+            clientMessagesListener();
+        }
+
+        // Listen to messages
+        clientMessagesListener = db.collection('messages')
+            .doc(clientId)
+            .collection('thread')
+            .orderBy('timestamp', 'asc')
+            .onSnapshot(snapshot => {
+                messagesContainer.innerHTML = '';
+
+                if (snapshot.empty) {
+                    messagesContainer.innerHTML = `
+                        <div style="text-align: center; padding: 40px 20px; color: #64748B;">
+                            <div style="font-size: 2rem; margin-bottom: 12px; opacity: 0.3;">💬</div>
+                            <p>No messages yet. Start a conversation!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const isClient = msg.sender === 'client';
+
+                    const messageDiv = document.createElement('div');
+                    messageDiv.style.cssText = `
+                        display: flex;
+                        justify-content: ${isClient ? 'flex-end' : 'flex-start'};
+                    `;
+
+                    messageDiv.innerHTML = `
+                        <div style="
+                            max-width: 70%;
+                            padding: 12px 16px;
+                            border-radius: 12px;
+                            background: ${isClient ? 'rgba(242, 169, 34, 0.3)' : 'white'};
+                            color: #000000;
+                            border: 1px solid ${isClient ? '#F2A922' : '#e5e7eb'};
+                        ">
+                            <div style="font-size: 0.75rem; font-weight: 600; margin-bottom: 4px; color: #64748B;">
+                                ${msg.senderName || (isClient ? 'You' : 'Admin')}
+                            </div>
+                            <div style="font-size: 0.9rem; margin-bottom: 4px; word-wrap: break-word;">
+                                ${msg.text}
+                            </div>
+                            <div style="font-size: 0.7rem; color: #64748B; text-align: right;">
+                                ${msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleString() : ''}
+                            </div>
+                        </div>
+                    `;
+
+                    messagesContainer.appendChild(messageDiv);
+                });
+
+                // Scroll to bottom
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                // Mark messages as read by client
+                markClientMessagesAsRead(clientId);
+            });
+
+        // Listen to unread count
+        db.collection('messages').doc(clientId).onSnapshot(doc => {
+            if (doc.exists) {
+                const data = doc.data();
+                const unread = data.unreadByClient || 0;
+                const badge = document.getElementById('clientUnreadBadge');
+
+                if (unread > 0) {
+                    badge.textContent = unread;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    // Mark messages as read by client
+    async function markClientMessagesAsRead(clientId) {
+        try {
+            await db.collection('messages').doc(clientId).update({
+                unreadByClient: 0
+            });
+        } catch (error) {
+            console.error('Error marking messages as read:', error);
+        }
+    }
+
+    // Send message from client
+    document.getElementById('clientMessageForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('c');
+
+        if (!clientId) return;
+
+        const input = document.getElementById('clientMessageInput');
+        const messageText = input.value.trim();
+
+        if (!messageText) return;
+
+        try {
+            // Get client name from portal
+            const clientDoc = await db.collection('clients').doc(clientId).get();
+            const clientData = clientDoc.data();
+            const clientName = clientData.clientName || 'Client';
+
+            // Add message to thread
+            await db.collection('messages')
+                .doc(clientId)
+                .collection('thread')
+                .add({
+                    text: messageText,
+                    sender: 'client',
+                    senderName: clientName,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    read: false
+                });
+
+            // Update conversation metadata
+            await db.collection('messages').doc(clientId).set({
+                lastMessage: messageText,
+                lastMessageTime: firebase.firestore.FieldValue.serverTimestamp(),
+                unreadByAdmin: firebase.firestore.FieldValue.increment(1),
+                unreadByClient: 0,
+                clientName: clientName
+            }, { merge: true });
+
+            input.value = '';
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Error sending message. Please try again.');
+        }
+    });
+
     // Expose functions globally
     window.markStepComplete = markStepComplete;
     window.toggleBrandKitInfo = toggleBrandKitInfo;

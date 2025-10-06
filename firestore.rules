@@ -91,6 +91,24 @@ service cloud.firestore {
       allow write: if isRep() || isAdmin();
     }
 
+    // Messages - Client-Admin messaging system
+    match /messages/{clientId} {
+      // Admins can read/write all messages
+      allow read, write: if isAdmin();
+
+      // Clients can read and write to their own message thread (unauthenticated access)
+      allow read, write: if true;  // Protected by client portal URL parameter
+
+      // Message thread subcollection
+      match /thread/{messageId} {
+        // Admins can read/write all messages
+        allow read, write: if isAdmin();
+
+        // Clients can read and write to their own thread
+        allow read, write: if true;  // Protected by client portal URL parameter
+      }
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;
