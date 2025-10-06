@@ -383,11 +383,66 @@
         window.open(`mailto:${DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
     }
 
+    // Fireworks display
+    function triggerFireworks() {
+        const colors = ['#F2A922', '#05908C', '#85C7B3', '#EEF4D9', '#012E40'];
+        const fireworksContainer = document.createElement('div');
+        fireworksContainer.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999;';
+        document.body.appendChild(fireworksContainer);
+
+        function createFirework(x, y) {
+            const particleCount = 30;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.cssText = `
+                    position: absolute;
+                    left: ${x}px;
+                    top: ${y}px;
+                    width: 8px;
+                    height: 8px;
+                    background: ${color};
+                    border-radius: 50%;
+                    pointer-events: none;
+                `;
+
+                const angle = (Math.PI * 2 * i) / particleCount;
+                const velocity = 100 + Math.random() * 100;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
+
+                particle.style.animation = `fireworkParticle 1s ease-out forwards`;
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+
+                fireworksContainer.appendChild(particle);
+
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        // Launch multiple fireworks
+        const launchCount = 15;
+        for (let i = 0; i < launchCount; i++) {
+            setTimeout(() => {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight * 0.6;
+                createFirework(x, y);
+            }, i * 200);
+        }
+
+        // Remove container after all animations
+        setTimeout(() => fireworksContainer.remove(), 4000);
+    }
+
     // Approve Creatives
     function approveCreatives() {
         if (confirm('Approve creatives for launch?')) {
-            markStepComplete(5);
-            alert('Approved! Your campaign will launch within 24-48 hours.');
+            markStepComplete(6);
+            triggerFireworks();
+            setTimeout(() => {
+                alert('🎉 Approved! Your campaign will launch within 24-48 hours.');
+            }, 500);
         }
     }
 
