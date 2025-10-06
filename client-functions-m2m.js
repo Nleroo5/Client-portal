@@ -148,11 +148,10 @@
     function updateFloatingSidebar() {
         const { completedSteps, percentage } = updateProgressBar();
 
-        // Update circle
-        const circle = document.getElementById('sidebarProgressCircle');
-        if (circle) {
-            const offset = 126 - (percentage / 100 * 126);
-            circle.style.strokeDashoffset = offset;
+        // Update progress rectangle
+        const progressContainer = document.querySelector('.progress-percentage-circle');
+        if (progressContainer) {
+            progressContainer.style.setProperty('--progress-width', percentage + '%');
         }
 
         // Update percentage text
