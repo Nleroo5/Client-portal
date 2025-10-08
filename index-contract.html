@@ -196,6 +196,30 @@
                 <div class="step-number">1</div>
             </div>
             <div class="step-content">
+                <!-- Educational Context -->
+                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C;">
+                    <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">📋 Why This Matters</h4>
+                    <p style="color: #012E40; margin-bottom: 15px; line-height: 1.6;">
+                        These agreements protect both of us and ensure we're on the same page about how we'll work together and handle your data.
+                    </p>
+                    <div style="display: grid; gap: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✓</span>
+                            <div>
+                                <strong style="color: #012E40;">What We'll Do:</strong>
+                                <span style="color: #012E40;"> Send agreements via DocuSign for easy electronic signing (takes ~5 minutes)</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✗</span>
+                            <div>
+                                <strong style="color: #012E40;">What We Won't Do:</strong>
+                                <span style="color: #012E40;"> We never share your data with third parties or use it for anything beyond your campaigns</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div style="margin-bottom: 20px;">
                     <a href="#" class="btn" id="dpaBtn" target="_blank" rel="noopener" style="border: 1px solid #000;">
                         Sign DPA (Data Processing Agreement)
@@ -230,6 +254,30 @@
                 <div class="step-number">2</div>
             </div>
             <div class="step-content">
+                <!-- Educational Context -->
+                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C;">
+                    <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">💳 Why This Matters</h4>
+                    <p style="color: #012E40; margin-bottom: 15px; line-height: 1.6;">
+                        Setting up payment now means we can start your campaign immediately once onboarding is complete. No delays waiting for invoices!
+                    </p>
+                    <div style="display: grid; gap: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✓</span>
+                            <div>
+                                <strong style="color: #012E40;">What We'll Do:</strong>
+                                <span style="color: #012E40;"> Use Stripe's secure payment system (same as Amazon, Google). Your payment info is encrypted and never stored on our servers.</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✗</span>
+                            <div>
+                                <strong style="color: #012E40;">What We Won't Do:</strong>
+                                <span style="color: #012E40;"> No surprise charges. You'll only be charged the agreed amount, and you can cancel anytime per your agreement terms.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="payment-term-display">
                     <h4 style="color: #012E40; margin: 0;">
                         <span id="paymentTermText">6-Month</span> Payment Options
@@ -261,53 +309,123 @@
             <div class="step-header">
                 <div>
                     <h2>Brand Kit Upload</h2>
-                    <div class="step-note">Share your brand assets so we can create ads that perfectly match your brand</div>
+                    <div class="step-note">Just your logo and 2 brand colors - that's all we need!</div>
                 </div>
                 <div class="step-number">3</div>
             </div>
             <div class="step-content">
-                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
-                    <h4 style="color: #012E40; margin: 0;">What to Upload:</h4>
-                    <button class="btn btn-small btn-outline" id="brandKitInfoBtn" style="font-size: 0.8rem; padding: 4px 12px;" onclick="window.toggleBrandKitInfo()">
-                        What is a brand kit?
+                <!-- Simplified Brand Kit -->
+                <div style="background: #DFF5F3; padding: 25px; border-radius: 12px; border: 2px solid #85C7B3; margin-bottom: 25px;">
+                    <h4 style="color: #012E40; margin-bottom: 20px;">Essential Brand Assets</h4>
+
+                    <!-- Logo Upload -->
+                    <div style="margin-bottom: 25px;">
+                        <label style="color: #012E40; font-weight: 600; display: block; margin-bottom: 10px;">
+                            1. Upload Your Logo *
+                        </label>
+                        <div style="display: flex; gap: 15px; align-items: start; flex-wrap: wrap;">
+                            <label for="brandLogoInput" style="background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: #EEF4D9; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; border: 2px solid #000000; transition: all 0.2s ease; display: inline-block;">
+                                Choose File
+                            </label>
+                            <input type="file" id="brandLogoInput" accept="image/*" style="display: none;" onchange="window.handleLogoUpload(this)">
+
+                            <div id="logoPreviewContainer" style="display: none;">
+                                <div style="display: flex; gap: 10px; align-items: center; background: white; padding: 10px 15px; border-radius: 8px; border: 1px solid #05908C;">
+                                    <img id="logoPreviewImg" style="max-height: 60px; max-width: 120px; object-fit: contain;">
+                                    <div>
+                                        <div id="logoFileName" style="color: #012E40; font-size: 0.9rem; font-weight: 600;"></div>
+                                        <div style="color: #6b7280; font-size: 0.8rem;">✓ Uploaded</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <small style="color: #6b7280; margin-top: 8px; display: block;">PNG with transparent background works best</small>
+                    </div>
+
+                    <!-- Brand Colors -->
+                    <div>
+                        <label style="color: #012E40; font-weight: 600; display: block; margin-bottom: 10px;">
+                            2. Your Brand Colors *
+                        </label>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div>
+                                <label for="primaryColor" style="color: #012E40; font-size: 0.9rem; display: block; margin-bottom: 6px;">Primary Color</label>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="color" id="primaryColor" value="#05908C" style="width: 60px; height: 60px; border: 2px solid #000000; border-radius: 8px; cursor: pointer;">
+                                    <input type="text" id="primaryColorHex" value="#05908C" placeholder="#05908C" style="flex: 1; padding: 10px; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: monospace;" onchange="window.syncColorFromHex('primary')">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="secondaryColor" style="color: #012E40; font-size: 0.9rem; display: block; margin-bottom: 6px;">Secondary Color</label>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <input type="color" id="secondaryColor" value="#F2A922" style="width: 60px; height: 60px; border: 2px solid #000000; border-radius: 8px; cursor: pointer;">
+                                    <input type="text" id="secondaryColorHex" value="#F2A922" placeholder="#F2A922" style="flex: 1; padding: 10px; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: monospace;" onchange="window.syncColorFromHex('secondary')">
+                                </div>
+                            </div>
+                        </div>
+                        <small style="color: #6b7280; margin-top: 8px; display: block;">Don't know your exact colors? Pick the closest match - we can adjust later!</small>
+                    </div>
+                </div>
+
+                <!-- Advanced Section (Collapsed) -->
+                <div style="margin-bottom: 20px;">
+                    <button onclick="window.toggleAdvancedBrandKit()" style="background: transparent; border: 1px solid #05908C; color: #05908C; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease; width: 100%; justify-content: center;">
+                        <span id="advancedToggleIcon">▼</span>
+                        <span>Advanced Options (Fonts, Guidelines, etc.)</span>
                     </button>
                 </div>
 
-                <!-- Brand Kit Explanation (hidden initially) -->
-                <div id="brandKitInfo" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
-                    <h5 style="color: #012E40; margin-bottom: 10px;">Your Brand Kit Should Include:</h5>
-                    <div class="brand-kit-grid">
-                        <div>
-                            <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Logo Files:</h6>
-                            <ul style="margin-left: 15px; color: #012E40; line-height: 1.5;">
-                                <li>High-resolution logo PNG (transparent background)</li>
-                                <li>Logo variations (if available)</li>
-                            </ul>
-                            <p style="color: #012E40; margin-top: 8px; font-size: 0.9rem; font-style: italic;">
-                                We can work with whatever you have, but the more options you provide, the more creative flexibility we'll have to make your ads stand out
-                            </p>
-                        </div>
-                        <div>
-                            <h6 style="color: #012E40; margin-bottom: 8px; font-weight: 600;">Color Palette:</h6>
-                            <ul style="margin-left: 15px; color: #012E40; line-height: 1.5;">
-                                <li>Brand colors (hex codes like #012E40)</li>
-                                <li>Color palette document or screenshot</li>
-                                <li>Brand guidelines PDF (if available)</li>
-                            </ul>
-                        </div>
+                <div id="advancedBrandKitSection" style="display: none; background: #FBE9D1; padding: 25px; border-radius: 12px; border: 1px solid #F2A922; margin-bottom: 20px;">
+                    <h5 style="color: #012E40; margin-bottom: 15px;">Optional: Additional Brand Assets</h5>
+                    <p style="color: #012E40; margin-bottom: 20px; font-size: 0.95rem;">
+                        If you have detailed brand guidelines, fonts, or multiple logo variations, upload them to our Google Drive folder:
+                    </p>
+
+                    <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                        <h6 style="color: #012E40; margin-bottom: 10px;">What You Can Include:</h6>
+                        <ul style="color: #012E40; margin-left: 20px; line-height: 1.8;">
+                            <li>Additional logo variations (vertical, horizontal, icon only)</li>
+                            <li>Brand guidelines PDF</li>
+                            <li>Font files (TTF, OTF)</li>
+                            <li>Brand style guide</li>
+                            <li>Existing creative examples</li>
+                        </ul>
                     </div>
-                    <div style="background: #DFF5F3; padding: 15px; border-radius: 6px; border-left: 3px solid #05908C;">
+
+                    <a href="https://drive.google.com/drive/folders/1jds7K6SdV6G_SwTyZZjxqjuftqIHiaPY?usp=sharing"
+                       class="btn btn-outline" target="_blank" rel="noopener" style="width: 100%; text-align: center;">
+                        Upload Additional Assets to Google Drive
+                    </a>
+
+                    <div style="background: #DFF5F3; padding: 15px; border-radius: 6px; border-left: 3px solid #05908C; margin-top: 15px;">
                         <p style="color: #012E40; margin: 0; font-size: 0.9rem;">
-                            <strong>Don't have all of these?</strong> No worries! Upload whatever you have. Even just a logo PNG and your main brand colors will help us create ads that match your brand perfectly.
+                            <strong>Not sure?</strong> The basics above are all we need to get started. You can always add more later!
                         </p>
                     </div>
                 </div>
 
-                <p style="color: #012E40; margin-bottom: 15px;">Upload your logos, brand guidelines, fonts, and any existing creative assets so we can create ads that perfectly match your brand.</p>
-                <a href="https://drive.google.com/drive/folders/1jds7K6SdV6G_SwTyZZjxqjuftqIHiaPY?usp=sharing"
-                   class="btn btn-outline" id="uploadBtn" target="_blank" rel="noopener">
-                    Upload Brand Assets to Google Drive
-                </a>
+                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #05908C;">
+                    <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">🎨 Why This Matters</h4>
+                    <p style="color: #012E40; margin-bottom: 15px; line-height: 1.6;">
+                        Your logo and colors help us create ads that feel authentic to your brand and catch your ideal customers' attention.
+                    </p>
+                    <div style="display: grid; gap: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✓</span>
+                            <div>
+                                <strong style="color: #012E40;">What We'll Do:</strong>
+                                <span style="color: #012E40;"> Design ad creatives that match your brand perfectly and get them approved by you before running anything</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✗</span>
+                            <div>
+                                <strong style="color: #012E40;">What We Won't Do:</strong>
+                                <span style="color: #012E40;"> We won't use generic templates or stock photos that don't match your brand identity</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="step-actions">
                 <button class="btn btn-complete" onclick="window.markStepComplete(3)">Mark Step 3 Complete</button>
@@ -324,6 +442,30 @@
                 <div class="step-number">4</div>
             </div>
             <div class="step-content">
+                <!-- Educational Context -->
+                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C;">
+                    <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">📱 Why This Matters</h4>
+                    <p style="color: #012E40; margin-bottom: 15px; line-height: 1.6;">
+                        This connects your Facebook and Instagram accounts so we can run ads on your behalf. It's the technical setup that makes everything work!
+                    </p>
+                    <div style="display: grid; gap: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✓</span>
+                            <div>
+                                <strong style="color: #012E40;">What We'll Do:</strong>
+                                <span style="color: #012E40;"> Walk you through the setup on a quick call (~10-15 minutes). We'll handle all the technical parts.</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✗</span>
+                            <div>
+                                <strong style="color: #012E40;">What We Won't Do:</strong>
+                                <span style="color: #012E40;"> We never post to your personal social media or access anything beyond what's needed for advertising</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <p style="color: #012E40; margin-bottom: 15px;">We'll connect your Facebook and Instagram accounts to our advertising platform so we can run your campaigns.</p>
 
                 <div style="background: #DFF5F3; padding: 25px; border-radius: 12px; border: 2px solid #85C7B3; text-align: center; max-width: 450px; margin: 0 auto;">
@@ -366,6 +508,30 @@
                 <div class="step-number">5</div>
             </div>
             <div class="step-content">
+                <!-- Educational Context -->
+                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C;">
+                    <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">📊 Why This Matters</h4>
+                    <p style="color: #012E40; margin-bottom: 15px; line-height: 1.6;">
+                        Tracking pixels let us see which ads are working and which aren't. This is how we optimize your campaigns to get better results over time!
+                    </p>
+                    <div style="display: grid; gap: 10px;">
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✓</span>
+                            <div>
+                                <strong style="color: #012E40;">What We'll Do:</strong>
+                                <span style="color: #012E40;"> Install Google Analytics 4 and Meta Pixel to track form submissions, calls, and key actions on your website</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✗</span>
+                            <div>
+                                <strong style="color: #012E40;">What We Won't Do:</strong>
+                                <span style="color: #012E40;"> We never track Protected Health Information (PHI) or personally identifiable data. Only anonymous analytics.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div style="margin-bottom: 25px;">
                     <h4 style="color: #012E40; margin-bottom: 15px;">🖥️ Website Access Needed</h4>
                     <p style="color: #012E40; margin-bottom: 15px;">Choose the easiest option for you:</p>
@@ -555,7 +721,10 @@
 
     <!-- Configuration -->
     <script src="config.js"></script>
-    
+
+    <!-- Notification System -->
+    <script src="notifications-system.js"></script>
+
     <!-- Main Functions -->
     <script src="client-functions.js"></script>
 </body>

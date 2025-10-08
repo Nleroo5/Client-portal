@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Discovery Form - Drive Lead Media</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Young+Serif:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #012E40;
+            background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+            padding: 40px;
+            text-align: center;
+            color: #EEF4D9;
+        }
+
+        .form-header h1 {
+            font-family: 'Young Serif', serif;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            font-size: 1.1rem;
+            color: #85C7B3;
+        }
+
+        .progress-section {
+            background: #f9fafb;
+            padding: 20px 40px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #F2A922 0%, #05908C 100%);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: #6b7280;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .save-indicator {
+            font-size: 0.85rem;
+            color: #05908C;
+            display: none;
+        }
+
+        .save-indicator.saving {
+            display: inline;
+            color: #F2A922;
+        }
+
+        .save-indicator.saved {
+            display: inline;
+            color: #05908C;
+        }
+
+        .sections-nav {
+            background: white;
+            padding: 30px 40px 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .section-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .section-item:hover {
+            background: #f9fafb;
+            border-color: #e5e7eb;
+        }
+
+        .section-item.active {
+            background: #EEF4D9;
+            border-color: #05908C;
+        }
+
+        .section-item.completed {
+            background: #f0fdf4;
+        }
+
+        .section-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6b7280;
+            flex-shrink: 0;
+        }
+
+        .section-item.active .section-icon {
+            background: #05908C;
+            color: white;
+        }
+
+        .section-item.completed .section-icon {
+            background: #22c55e;
+            color: white;
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #012E40;
+            flex: 1;
+        }
+
+        .section-arrow {
+            color: #9ca3af;
+            font-size: 1.2rem;
+        }
+
+        .form-content {
+            padding: 40px;
+        }
+
+        .section-content {
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-heading {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #012E40;
+            margin-bottom: 10px;
+        }
+
+        .section-description {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #012E40;
+            font-size: 0.95rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="url"],
+        .form-group input[type="date"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #05908C;
+            box-shadow: 0 0 0 3px rgba(5, 144, 140, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-group,
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item,
+        .radio-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover,
+        .radio-item:hover {
+            border-color: #05908C;
+            background: #f9fafb;
+        }
+
+        .checkbox-item input,
+        .radio-item input {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label,
+        .radio-item label {
+            cursor: pointer;
+            margin: 0;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .form-container {
+                border-radius: 12px;
+            }
+
+            .form-header {
+                padding: 30px 20px;
+            }
+
+            .form-header h1 {
+                font-size: 1.6rem;
+            }
+
+            .form-header p {
+                font-size: 0.95rem;
+            }
+
+            .progress-section {
+                padding: 15px 20px;
+            }
+
+            .sections-nav {
+                padding: 20px 20px 15px;
+            }
+
+            .section-item {
+                padding: 10px 12px;
+            }
+
+            .section-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 0.75rem;
+                margin-right: 10px;
+            }
+
+            .section-title {
+                font-size: 0.85rem;
+            }
+
+            .form-content {
+                padding: 25px 20px;
+            }
+
+            .section-heading {
+                font-size: 1.4rem;
+            }
+
+            .section-description {
+                font-size: 0.9rem;
+            }
+
+            .form-group label {
+                font-size: 0.9rem;
+            }
+
+            .form-group input[type="text"],
+            .form-group input[type="email"],
+            .form-group input[type="tel"],
+            .form-group input[type="url"],
+            .form-group input[type="date"],
+            .form-group textarea,
+            .form-group select {
+                font-size: 16px; /* Prevents iOS zoom on focus */
+                padding: 14px 16px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .checkbox-item,
+            .radio-item {
+                padding: 10px;
+            }
+
+            .checkbox-item input,
+            .radio-item input {
+                width: 18px;
+                height: 18px;
+                margin-right: 10px;
+            }
+
+            .checkbox-item label,
+            .radio-item label {
+                font-size: 0.9rem;
+            }
+
+            .btn-group {
+                flex-direction: column-reverse;
+                gap: 10px;
+                margin-top: 30px;
+            }
+
+            .btn {
+                padding: 16px 24px;
+                font-size: 1rem;
+                width: 100%;
+            }
+
+            .btn-secondary {
+                padding: 14px 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .form-header p {
+                font-size: 0.85rem;
+            }
+
+            .section-heading {
+                font-size: 1.2rem;
+            }
+
+            .progress-text {
+                font-size: 0.8rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #047a72 0%, #05908C 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 14px 28px;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .skip-link {
+            color: #6b7280;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-top: 15px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .skip-link:hover {
+            color: #05908C;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: #EEF4D9;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(238, 244, 217, 0.3);
+            border-top-color: #EEF4D9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .completion-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .completion-screen.active {
+            display: block;
+        }
+
+        .completion-icon {
+            width: 80px;
+            height: 80px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .completion-screen h2 {
+            font-size: 2rem;
+            color: #012E40;
+            margin-bottom: 15px;
+        }
+
+        .completion-screen p {
+            color: #6b7280;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .helper-text {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .conditional-section {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid #05908C;
+        }
+
+        .conditional-section.active {
+            display: block;
+        }
+
+        .website-reference-item {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .add-another-btn {
+            background: white;
+            border: 2px dashed #d1d5db;
+            color: #05908C;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .add-another-btn:hover {
+            border-color: #05908C;
+            background: #f0fdf4;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h2>Loading Your Discovery Form...</h2>
+        </div>
+    </div>
+
+    <!-- Main Form Container -->
+    <div class="form-container" style="display: none;" id="mainForm">
+        <!-- Header -->
+        <div class="form-header">
+            <h1>Website Discovery Form</h1>
+            <p>Help us understand your vision</p>
+        </div>
+
+        <!-- Admin Info Box (only visible to you) -->
+        <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0284c7; border-radius: 12px; padding: 20px; margin: 0 40px 30px 40px;">
+            <div style="display: flex; align-items: start; gap: 15px;">
+                <div style="font-size: 2rem;">📋</div>
+                <div style="flex: 1;">
+                    <h3 style="color: #0369a1; margin: 0 0 10px 0; font-size: 1.1rem;">Share This Form with Clients</h3>
+                    <div style="background: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #bae6fd;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="text" value="" readonly
+                                   style="flex: 1; border: none; background: transparent; font-family: monospace; font-size: 0.9rem; color: #0c4a6e; font-weight: 600;"
+                                   id="formLinkInput">
+                            <button onclick="copyFormLink()" style="padding: 8px 16px; background: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; white-space: nowrap;">
+                                Copy Link
+                            </button>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #64748b; margin-top: -8px; margin-bottom: 12px;">
+                        Current URL: <span id="currentUrlDisplay" style="font-family: monospace;"></span>
+                    </div>
+                    <div style="color: #0369a1; font-size: 0.85rem; line-height: 1.5;">
+                        <strong>How it works:</strong><br>
+                        • Clients fill out 12 sections (~15-20 minutes)<br>
+                        • Auto-saves every 30 seconds - they can pause anytime<br>
+                        • You see their progress in real-time in admin dashboard<br>
+                        • Click "Generate AI Prompt" when complete to build their site
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
+                <div style="flex: 1; min-width: 250px;">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBar"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progressText">Section 0 of 16 complete</span>
+                        <span class="save-indicator" id="saveIndicator" style="color: #10b981; font-weight: 600;">
+                            <span id="saveStatus">Saved ✓</span>
+                        </span>
+                    </div>
+                </div>
+                <button onclick="window.saveAndExit()" style="background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: #EEF4D9; border: 2px solid #000000; border-radius: 10px; padding: 12px 24px; font-size: 1rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(5, 144, 140, 0.3);">
+                    💾 Save & Continue Later
+                </button>
+            </div>
+            <div style="background: #E8F5F3; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #05908C; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.2rem;">🔄</span>
+                <span style="color: #012E40; font-size: 0.9rem;">
+                    <strong>Auto-saves every 30 seconds</strong> — Your progress is safe! Take your time and come back anytime.
+                </span>
+            </div>
+        </div>
+
+        <!-- Form Content -->
+        <div class="form-content">
+            <!-- Section 1: The Business -->
+            <div class="section-content active" data-section="1">
+                <h2 class="section-heading">1. The Business</h2>
+                <p class="section-description">Tell us about your business</p>
+
+                <div class="form-group">
+                    <label for="businessName">Business Name *</label>
+                    <input type="text" id="businessName" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ownerName">Owner/Contact Person *</label>
+                        <input type="text" id="ownerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="businessDescription">What Does Your Business Do? *</label>
+                    <textarea id="businessDescription" required placeholder="Describe your business in detail..."></textarea>
+                    <span class="helper-text">Be as detailed as possible about your products, services, and what you offer</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="yearsInBusiness">How Long in Business? *</label>
+                        <select id="yearsInBusiness" required>
+                            <option value="">-- Select --</option>
+                            <option value="new">New business (less than 1 year)</option>
+                            <option value="1-3">1-3 years</option>
+                            <option value="3-5">3-5 years</option>
+                            <option value="5-10">5-10 years</option>
+                            <option value="10-20">10-20 years</option>
+                            <option value="20+">20+ years</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="businessType">Type of Business *</label>
+                        <select id="businessType" required>
+                            <option value="">-- Select --</option>
+                            <option value="restaurant">Restaurant/Food Service</option>
+                            <option value="medical">Doctor/Medical</option>
+                            <option value="legal">Lawyer/Legal Services</option>
+                            <option value="retail">Retail Store</option>
+                            <option value="consulting">Consultant/Professional Services</option>
+                            <option value="home-services">Home Services (Plumbing, HVAC, etc.)</option>
+                            <option value="beauty">Salon/Beauty Services</option>
+                            <option value="fitness">Fitness/Gym</option>
+                            <option value="real-estate">Real Estate</option>
+                            <option value="automotive">Automotive</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="locations">Your Location(s) *</label>
+                    <input type="text" id="locations" required placeholder="Physical address or service area">
+                </div>
+
+                <div class="form-group">
+                    <label for="budgetRange">Budget Range *</label>
+                    <select id="budgetRange" required>
+                        <option value="">-- Select Your Budget --</option>
+                        <option value="under-2k">Under $2,000</option>
+                        <option value="2k-5k">$2,000 - $5,000</option>
+                        <option value="5k-10k">$5,000 - $10,000</option>
+                        <option value="10k-20k">$10,000 - $20,000</option>
+                        <option value="20k+">$20,000+</option>
+                        <option value="not-sure">Not Sure Yet</option>
+                    </select>
+                    <span class="helper-text">This helps us recommend the right solution for your needs and budget. We work with businesses at all budget levels!</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Competitor Websites (Optional)</label>
+                    <span class="helper-text">Share 1-2 competitor websites so we understand your market positioning</span>
+                    <div style="margin-top: 10px;">
+                        <input type="url" id="competitor1Url" placeholder="https://competitor1.com" style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; margin-bottom: 10px;">
+                        <input type="url" id="competitor2Url" placeholder="https://competitor2.com" style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Save & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Section 2: Current Website -->
+            <div class="section-content" data-section="2">
+                <h2 class="section-heading">2. Current Website</h2>
+                <p class="section-description">Tell us about your existing website (if applicable)</p>
+
+                <div class="form-group">
+                    <label>Do you have a current website? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="hasWebsiteYes" name="hasCurrentWebsite" value="yes" onchange="toggleCurrentWebsiteSection()">
+                            <label for="hasWebsiteYes">Yes, we have a current website</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="hasWebsiteNo" name="hasCurrentWebsite" value="no" onchange="toggleCurrentWebsiteSection()">
+                            <label for="hasWebsiteNo">No, this is our first website</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="conditional-section" id="currentWebsiteDetails">
+                    <div class="form-group">
+                        <label for="currentWebsiteUrl">Current Website URL</label>
+                        <input type="url" id="currentWebsiteUrl" placeholder="https://www.yoursite.com">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="websiteAge">How Old Is It?</label>
+                            <select id="websiteAge">
+                                <option value="">-- Select --</option>
+                                <option value="less-1">Less than 1 year</option>
+                                <option value="1-2">1-2 years</option>
+                                <option value="3-5">3-5 years</option>
+                                <option value="5+">5+ years</option>
+                                <option value="unknown">Don't know</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="builtBy">Who Built It?</label>
+                            <input type="text" id="builtBy" placeholder="Previous developer or company">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What's Wrong With Your Current Website?</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="problem1" value="outdated">
+                                <label for="problem1">Looks outdated</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="problem2" value="mobile">
+                                <label for="problem2">Doesn't work on phones</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="problem3" value="seo">
+                                <label for="problem3">Can't find it on Google</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="problem4" value="navigation">
+                                <label for="problem4">Hard to navigate</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="problem5" value="update">
+                                <label for="problem5">Can't update it ourselves</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="problem6" value="slow">
+                                <label for="problem6">Slow to load</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="whatWorksWell">What's Working Well?</label>
+                        <textarea id="whatWorksWell" placeholder="Things you want to keep from your current site..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="monthlyVisitors">Monthly Visitors (if known)</label>
+                            <input type="text" id="monthlyVisitors" placeholder="e.g., 500-1000">
+                        </div>
+                        <div class="form-group">
+                            <label for="trafficSources">Where Do Visitors Come From?</label>
+                            <input type="text" id="trafficSources" placeholder="e.g., Google, Social Media, Direct">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Save & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Section 3: Websites You Like -->
+            <div class="section-content" data-section="3">
+                <h2 class="section-heading">3. Websites You Like</h2>
+                <p class="section-description">Share examples of websites you admire</p>
+
+                <div class="form-group">
+                    <label for="favoriteWebsiteUrl">Your Favorite Website (Reference Website) *</label>
+                    <input type="url" id="favoriteWebsiteUrl" required placeholder="https://www.example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="likesAboutLook">What do you love about the way it looks?</label>
+                    <textarea id="likesAboutLook" placeholder="Describe the visual design..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>What do you love about how it works?</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func1" value="easy-navigation">
+                            <label for="func1">Easy to navigate</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func2" value="fast-loading">
+                            <label for="func2">Loads quickly</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func3" value="mobile-friendly">
+                            <label for="func3">Works great on mobile</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func4" value="clear-menu">
+                            <label for="func4">Clear menu structure</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func5" value="easy-contact">
+                            <label for="func5">Easy to contact/book</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func6" value="search-works">
+                            <label for="func6">Search function works well</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func7" value="smooth-animations">
+                            <label for="func7">Smooth animations/transitions</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func8" value="intuitive">
+                            <label for="func8">Intuitive/makes sense</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func9" value="interactive">
+                            <label for="func9">Interactive elements</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func10" value="clear-ctas">
+                            <label for="func10">Clear call-to-action buttons</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func11" value="organized">
+                            <label for="func11">Well organized content</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func12" value="filtering">
+                            <label for="func12">Good filtering/sorting options</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func13" value="video-integration">
+                            <label for="func13">Video integration</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func14" value="social-integration">
+                            <label for="func14">Social media integration</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="func15" value="live-chat">
+                            <label for="func15">Live chat feature</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="likesAboutColors">The colors:</label>
+                        <input type="text" id="likesAboutColors" placeholder="Describe the color scheme">
+                    </div>
+                    <div class="form-group">
+                        <label for="likesAboutLayout">The layout:</label>
+                        <input type="text" id="likesAboutLayout" placeholder="Describe the layout style">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Specific Features You Like</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat1" value="image-slider">
+                            <label for="feat1">Image slider/carousel</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat2" value="parallax">
+                            <label for="feat2">Parallax scrolling effect</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat3" value="video-background">
+                            <label for="feat3">Video background</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat4" value="hover-effects">
+                            <label for="feat4">Cool hover effects</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat5" value="sticky-header">
+                            <label for="feat5">Sticky header/navigation</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat6" value="testimonials">
+                            <label for="feat6">Testimonials/reviews display</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat7" value="portfolio-grid">
+                            <label for="feat7">Portfolio/gallery grid</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat8" value="pricing-tables">
+                            <label for="feat8">Pricing tables</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat9" value="team-section">
+                            <label for="feat9">Team member section</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat10" value="faq-accordion">
+                            <label for="feat10">FAQ accordion</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat11" value="mega-menu">
+                            <label for="feat11">Mega menu</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat12" value="quick-view">
+                            <label for="feat12">Product quick view</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat13" value="lightbox">
+                            <label for="feat13">Lightbox/popup images</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat14" value="progress-bars">
+                            <label for="feat14">Progress bars/statistics</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat15" value="counters">
+                            <label for="feat15">Animated counters</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feat16" value="tabs">
+                            <label for="feat16">Tabbed content sections</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Save & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Section 4: Look & Feel -->
+            <div class="section-content" data-section="4">
+                <h2 class="section-heading">4. Look & Feel</h2>
+                <p class="section-description">Define your website's visual style</p>
+
+                <div class="form-group">
+                    <label for="logoFile">Your Logo File * (PNG preferred)</label>
+                    <input type="file" id="logoFile" accept="image/png,image/jpeg,image/svg+xml" style="padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; width: 100%;">
+                    <span class="helper-text">Upload your logo file (PNG, JPG, or SVG)</span>
+                    <div id="logoPreview" style="margin-top: 15px; display: none;">
+                        <img id="logoPreviewImg" style="max-width: 200px; max-height: 100px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px;">
+                        <p id="logoFileName" style="margin-top: 8px; font-size: 0.9rem; color: #6b7280;"></p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Brand Colors *</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="colorMain">Main Color</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="color" id="colorMainPicker" style="width: 60px; height: 45px; border: 1.5px solid #d1d5db; border-radius: 8px; cursor: pointer;">
+                                <input type="text" id="colorMain" placeholder="Navy Blue or #003366" style="flex: 1;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="colorSecondary">Secondary Color</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="color" id="colorSecondaryPicker" style="width: 60px; height: 45px; border: 1.5px solid #d1d5db; border-radius: 8px; cursor: pointer;">
+                                <input type="text" id="colorSecondary" placeholder="White or #FFFFFF" style="flex: 1;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="colorAccent">Accent Color</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="color" id="colorAccentPicker" style="width: 60px; height: 45px; border: 1.5px solid #d1d5db; border-radius: 8px; cursor: pointer;">
+                                <input type="text" id="colorAccent" placeholder="For buttons, highlights" style="flex: 1;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="colorBackground">Background Preference</label>
+                            <select id="colorBackground">
+                                <option value="">-- Select --</option>
+                                <option value="light">Light/White</option>
+                                <option value="dark">Dark</option>
+                                <option value="colored">Colored</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Save & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Section 5: Your Customers -->
+            <div class="section-content" data-section="5">
+                <h2 class="section-heading">5. Your Customers</h2>
+                <p class="section-description">Help us understand who you're serving</p>
+
+                <div class="form-group">
+                    <label for="customerAge">Customer Age Range *</label>
+                    <div style="padding: 20px; background: #f9fafb; border-radius: 8px; border: 1.5px solid #d1d5db;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span id="ageMin" style="font-weight: 600; color: #05908C;">18</span>
+                            <span id="ageMax" style="font-weight: 600; color: #05908C;">65+</span>
+                        </div>
+                        <input type="range" id="customerAgeMin" min="18" max="80" value="18" style="width: 100%; margin-bottom: 10px;">
+                        <input type="range" id="customerAgeMax" min="18" max="80" value="65" style="width: 100%;">
+                        <input type="hidden" id="customerAge" value="18-65">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="customerLocation">Customer Location *</label>
+                    <select id="customerLocation" required>
+                        <option value="">-- Select --</option>
+                        <option value="local">Local</option>
+                        <option value="regional">Regional</option>
+                        <option value="national">National</option>
+                        <option value="international">International</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>How Do Customers Find You Now?</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="find1" value="google">
+                            <label for="find1">Google searches</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="find2" value="social">
+                            <label for="find2">Social media</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="find3" value="word-of-mouth">
+                            <label for="find3">Word of mouth</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="find4" value="drive-by">
+                            <label for="find4">Drive/walk by</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="find5" value="referrals">
+                            <label for="find5">Referrals</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Save & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Section 6: Pages Needed -->
+            <div class="section-content" data-section="6">
+                <h2 class="section-heading">6. Pages Needed</h2>
+                <p class="section-description">What pages do you need on your website?</p>
+
+                <div class="form-group">
+                    <label>Main Pages *</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page1" value="home">
+                            <label for="page1">Home Page</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page2" value="about">
+                            <label for="page2">About Us/Our Story</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page3" value="services">
+                            <label for="page3">Services (what you offer)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page4" value="products">
+                            <label for="page4">Products (what you sell)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page5" value="contact">
+                            <label for="page5">Contact/Get in Touch</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page6" value="gallery">
+                            <label for="page6">Gallery/Portfolio/Our Work</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page7" value="testimonials">
+                            <label for="page7">Testimonials/Reviews</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page8" value="faq">
+                            <label for="page8">FAQ (Common Questions)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page9" value="pricing">
+                            <label for="page9">Pricing/Rates</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page10" value="team">
+                            <label for="page10">Team/Staff</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="page11" value="resources">
+                            <label for="page11">Resources/Downloads</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="otherPages">Other Pages Needed</label>
+                    <textarea id="otherPages" placeholder="List any other pages you need..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>For Your Services/Products:</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="servicePages1" name="servicePages" value="own-page">
+                            <label for="servicePages1">Each needs its own page</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="servicePages2" name="servicePages" value="one-page">
+                            <label for="servicePages2">Can all be on one page</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="servicePages3" name="servicePages" value="grouped">
+                            <label for="servicePages3">Group similar ones together</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Legal Pages</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="legal1" value="privacy">
+                            <label for="legal1">Privacy Policy</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="legal2" value="terms">
+                            <label for="legal2">Terms of Service</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="legal3" value="disclaimer">
+                            <label for="legal3">Disclaimer</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="legal4" value="cookies">
+                            <label for="legal4">Cookie Policy</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Save & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Section 7: Features & Functionality -->
+            <div class="section-content" data-section="7">
+                <h2 class="section-heading">7. Features & Functionality</h2>
+                <p class="section-description">What features do you need?</p>
+
+                <div class="form-group">
+                    <label>Contact Features</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="contact1" value="contact-form">
+                            <label for="contact1">Contact form (name, email, message)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="contact2" value="phone">
+                            <label for="contact2">Phone number (clickable on mobile)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="contact3" value="email-display">
+                            <label for="contact3">Email address</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="contact4" value="address">
+                            <label for="contact4">Physical address</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="contact5" value="map">
+                            <label for="contact5">Map showing location</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="contact6" value="directions">
+                            <label for="contact6">Driving directions</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="contact7" value="hours">
+                            <label for="contact7">Business hours</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="contact8" value="holiday">
+                            <label for="contact8">Holiday schedule</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="formsNeeded">Forms You Need</label>
+                    <textarea id="formsNeeded" placeholder="e.g., Quote request, Appointment booking, Newsletter signup..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Social Media Links</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="socialFacebook" value="facebook" onchange="toggleSocialInput('Facebook')">
+                            <label for="socialFacebook">Facebook</label>
+                        </div>
+                        <div class="conditional-section" id="socialFacebookInput" style="margin-left: 30px; margin-top: 10px;">
+                            <input type="text" id="facebookUrl" placeholder="Facebook profile URL" style="width: 100%; padding: 10px; border: 1.5px solid #d1d5db; border-radius: 8px;">
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="socialInstagram" value="instagram" onchange="toggleSocialInput('Instagram')">
+                            <label for="socialInstagram">Instagram</label>
+                        </div>
+                        <div class="conditional-section" id="socialInstagramInput" style="margin-left: 30px; margin-top: 10px;">
+                            <input type="text" id="instagramUrl" placeholder="Instagram profile URL" style="width: 100%; padding: 10px; border: 1.5px solid #d1d5db; border-radius: 8px;">
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="socialX" value="x" onchange="toggleSocialInput('X')">
+                            <label for="socialX">X (Twitter)</label>
+                        </div>
+                        <div class="conditional-section" id="socialXInput" style="margin-left: 30px; margin-top: 10px;">
+                            <input type="text" id="xUrl" placeholder="X profile URL" style="width: 100%; padding: 10px; border: 1.5px solid #d1d5db; border-radius: 8px;">
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="socialYoutube" value="youtube" onchange="toggleSocialInput('Youtube')">
+                            <label for="socialYoutube">YouTube</label>
+                        </div>
+                        <div class="conditional-section" id="socialYoutubeInput" style="margin-left: 30px; margin-top: 10px;">
+                            <input type="text" id="youtubeUrl" placeholder="YouTube channel URL" style="width: 100%; padding: 10px; border: 1.5px solid #d1d5db; border-radius: 8px;">
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="socialLinkedin" value="linkedin" onchange="toggleSocialInput('Linkedin')">
+                            <label for="socialLinkedin">LinkedIn</label>
+                        </div>
+                        <div class="conditional-section" id="socialLinkedinInput" style="margin-left: 30px; margin-top: 10px;">
+                            <input type="text" id="linkedinUrl" placeholder="LinkedIn profile URL" style="width: 100%; padding: 10px; border: 1.5px solid #d1d5db; border-radius: 8px;">
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="socialTiktok" value="tiktok" onchange="toggleSocialInput('Tiktok')">
+                            <label for="socialTiktok">TikTok</label>
+                        </div>
+                        <div class="conditional-section" id="socialTiktokInput" style="margin-left: 30px; margin-top: 10px;">
+                            <input type="text" id="tiktokUrl" placeholder="TikTok profile URL" style="width: 100%; padding: 10px; border: 1.5px solid #d1d5db; border-radius: 8px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Special Features</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature1" value="photo-gallery">
+                            <label for="feature1">Photo galleries</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature2" value="before-after">
+                            <label for="feature2">Before/after sliders</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature3" value="video-bg">
+                            <label for="feature3">Video backgrounds</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature4" value="animations">
+                            <label for="feature4">Animated elements</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature5" value="popup">
+                            <label for="feature5">Popup announcements</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature6" value="chat">
+                            <label for="feature6">Chat bubble</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature7" value="search">
+                            <label for="feature7">Search bar</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature8" value="language">
+                            <label for="feature8">Multiple languages</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="feature9" value="booking">
+                            <label for="feature9">Appointment booking/scheduling</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Do you need E-commerce/Online Sales? *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="ecommerceYes" name="needsEcommerce" value="yes" onchange="toggleEcommerceSection()">
+                            <label for="ecommerceYes">Yes, we want to sell online</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="ecommerceNo" name="needsEcommerce" value="no" onchange="toggleEcommerceSection()">
+                            <label for="ecommerceNo">No, just display information</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="conditional-section" id="ecommerceDetails">
+                    <div class="form-group">
+                        <label>E-commerce Features Needed</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ecom1" value="product-pages">
+                                <label for="ecom1">Product pages</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ecom2" value="shopping-cart">
+                                <label for="ecom2">Shopping cart</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ecom3" value="payments">
+                                <label for="ecom3">Accept payments online</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ecom4" value="categories">
+                                <label for="ecom4">Product categories</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ecom5" value="product-search">
+                                <label for="ecom5">Product search</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ecom6" value="customer-accounts">
+                                <label for="ecom6">Customer accounts</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ecom7" value="order-tracking">
+                                <label for="ecom7">Order tracking</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ecom8" value="inventory">
+                                <label for="ecom8">Inventory tracking</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productCount">Approximately how many products?</label>
+                        <input type="text" id="productCount" placeholder="e.g., 10-50, 100+">
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Save & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Section 8: Ecommerce & Content -->
+            <div class="section-content" data-section="8">
+                <h2 class="section-heading">8. Ecommerce & Content</h2>
+                <p class="section-description">Who will provide the content?</p>
+
+                <div class="form-group">
+                    <label>Written Content *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="content1" name="writtenContent" value="we-write">
+                            <label for="content1">We'll write everything</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="content2" name="writtenContent" value="need-help">
+                            <label for="content2">We need help writing</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="content3" name="writtenContent" value="some-ready">
+                            <label for="content3">We have some content ready</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="content4" name="writtenContent" value="copy-current">
+                            <label for="content4">Copy from current website</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="contentProvided">What Content Will You Provide?</label>
+                    <textarea id="contentProvided" placeholder="e.g., About Us story, Service descriptions, Team bios..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Photos/Videos *</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="photo1" value="professional-photos">
+                            <label for="photo1">We have professional photos</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="photo2" value="phone-photos">
+                            <label for="photo2">We have phone photos</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="photo3" value="need-stock">
+                            <label for="photo3">Need stock photos</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="photo4" value="planning-photoshoot">
+                            <label for="photo4">Planning a photoshoot</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="photo5" value="have-videos">
+                            <label for="photo5">Have videos</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="photo6" value="embed-videos">
+                            <label for="photo6">Need videos embedded (YouTube, etc.)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="documents">Documents to Include</label>
+                    <textarea id="documents" placeholder="e.g., Menus, Price lists, Brochures, Forms..."></textarea>
+                    <span class="helper-text">Any PDFs or downloadable documents</span>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Save & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Section 9: Updates & Maintenance -->
+            <div class="section-content" data-section="9">
+                <h2 class="section-heading">9. Updates & Maintenance</h2>
+                <p class="section-description">How will you manage the website?</p>
+
+                <div class="form-group">
+                    <label>What Do You Want to Update Yourself?</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="update1" value="text">
+                            <label for="update1">Add/edit text</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="update2" value="photos-update">
+                            <label for="update2">Change photos</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="update3" value="prices">
+                            <label for="update3">Update prices</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="update4" value="products-services">
+                            <label for="update4">Add new products/services</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="update5" value="blog-posts">
+                            <label for="update5">Post news/blog articles</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="update6" value="hours-update">
+                            <label for="update6">Update hours</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="update7" value="team">
+                            <label for="update7">Add team members</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="update8" value="job-openings">
+                            <label for="update8">Post job openings</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="updateFrequency">How Often Will You Update? *</label>
+                    <select id="updateFrequency" required>
+                        <option value="">-- Select --</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="rarely">Rarely</option>
+                        <option value="when-needed">Only when things change</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="whoUpdates">Who Will Update It? *</label>
+                    <input type="text" id="whoUpdates" required placeholder="e.g., Owner, Employee, Multiple people">
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Save & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Section 10: Marketing & SEO -->
+            <div class="section-content" data-section="10">
+                <h2 class="section-heading">10. Marketing & SEO</h2>
+                <p class="section-description">How do you want to be found online?</p>
+
+                <div class="form-group">
+                    <label for="searchKeywords">What Do People Search For when looking for your business? *</label>
+                    <textarea id="searchKeywords" required placeholder='e.g., "dentist near me", "emergency plumber", "birthday cakes"'></textarea>
+                    <span class="helper-text">List the words/phrases people use to find businesses like yours</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="serviceArea">Your Service Area *</label>
+                    <select id="serviceArea" required>
+                        <option value="">-- Select --</option>
+                        <option value="one-neighborhood">One neighborhood</option>
+                        <option value="one-city">One city</option>
+                        <option value="multiple-cities">Multiple cities</option>
+                        <option value="one-state">One state</option>
+                        <option value="multiple-states">Multiple states</option>
+                        <option value="national">National</option>
+                        <option value="international">International</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Marketing You Currently Do</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="market1" value="google-ads">
+                            <label for="market1">Google Ads</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="market2" value="facebook-ads">
+                            <label for="market2">Facebook/Instagram Ads</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="market3" value="email-newsletters">
+                            <label for="market3">Email newsletters</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="market4" value="print-ads">
+                            <label for="market4">Print ads</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="market5" value="radio-tv">
+                            <label for="market5">Radio/TV</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Online Reviews</label>
+                    <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 15px;">Select which platforms you have reviews on and rate them</p>
+
+                    <div style="display: grid; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+                            <input type="checkbox" id="reviewGoogle" value="google" style="width: 20px; height: 20px;">
+                            <label for="reviewGoogle" style="font-weight: 600; min-width: 120px; margin: 0;">Google</label>
+                            <select id="reviewGoogleStars" style="padding: 8px; border-radius: 6px; border: 1.5px solid #d1d5db;">
+                                <option value="">Stars...</option>
+                                <option value="5">⭐⭐⭐⭐⭐ (5.0)</option>
+                                <option value="4.5">⭐⭐⭐⭐½ (4.5)</option>
+                                <option value="4">⭐⭐⭐⭐ (4.0)</option>
+                                <option value="3.5">⭐⭐⭐½ (3.5)</option>
+                                <option value="3">⭐⭐⭐ (3.0)</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+                            <input type="checkbox" id="reviewYelp" value="yelp" style="width: 20px; height: 20px;">
+                            <label for="reviewYelp" style="font-weight: 600; min-width: 120px; margin: 0;">Yelp</label>
+                            <select id="reviewYelpStars" style="padding: 8px; border-radius: 6px; border: 1.5px solid #d1d5db;">
+                                <option value="">Stars...</option>
+                                <option value="5">⭐⭐⭐⭐⭐ (5.0)</option>
+                                <option value="4.5">⭐⭐⭐⭐½ (4.5)</option>
+                                <option value="4">⭐⭐⭐⭐ (4.0)</option>
+                                <option value="3.5">⭐⭐⭐½ (3.5)</option>
+                                <option value="3">⭐⭐⭐ (3.0)</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+                            <input type="checkbox" id="reviewFacebook" value="facebook" style="width: 20px; height: 20px;">
+                            <label for="reviewFacebook" style="font-weight: 600; min-width: 120px; margin: 0;">Facebook</label>
+                            <select id="reviewFacebookStars" style="padding: 8px; border-radius: 6px; border: 1.5px solid #d1d5db;">
+                                <option value="">Stars...</option>
+                                <option value="5">⭐⭐⭐⭐⭐ (5.0)</option>
+                                <option value="4.5">⭐⭐⭐⭐½ (4.5)</option>
+                                <option value="4">⭐⭐⭐⭐ (4.0)</option>
+                                <option value="3.5">⭐⭐⭐½ (3.5)</option>
+                                <option value="3">⭐⭐⭐ (3.0)</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+                            <input type="checkbox" id="reviewTrustpilot" value="trustpilot" style="width: 20px; height: 20px;">
+                            <label for="reviewTrustpilot" style="font-weight: 600; min-width: 120px; margin: 0;">Trustpilot</label>
+                            <select id="reviewTrustpilotStars" style="padding: 8px; border-radius: 6px; border: 1.5px solid #d1d5db;">
+                                <option value="">Stars...</option>
+                                <option value="5">⭐⭐⭐⭐⭐ (5.0)</option>
+                                <option value="4.5">⭐⭐⭐⭐½ (4.5)</option>
+                                <option value="4">⭐⭐⭐⭐ (4.0)</option>
+                                <option value="3.5">⭐⭐⭐½ (3.5)</option>
+                                <option value="3">⭐⭐⭐ (3.0)</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 8px;">
+                            <input type="checkbox" id="reviewTripadvisor" value="tripadvisor" style="width: 20px; height: 20px;">
+                            <label for="reviewTripadvisor" style="font-weight: 600; min-width: 120px; margin: 0;">TripAdvisor</label>
+                            <select id="reviewTripadvisorStars" style="padding: 8px; border-radius: 6px; border: 1.5px solid #d1d5db;">
+                                <option value="">Stars...</option>
+                                <option value="5">⭐⭐⭐⭐⭐ (5.0)</option>
+                                <option value="4.5">⭐⭐⭐⭐½ (4.5)</option>
+                                <option value="4">⭐⭐⭐⭐ (4.0)</option>
+                                <option value="3.5">⭐⭐⭐½ (3.5)</option>
+                                <option value="3">⭐⭐⭐ (3.0)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <label style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="showReviewsOnWebsite" style="width: 20px; height: 20px;">
+                            <span style="font-weight: 600;">Display reviews on website</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Save & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Section 11: Technical Needs -->
+            <div class="section-content" data-section="11">
+                <h2 class="section-heading">11. Technical Needs</h2>
+                <p class="section-description">Let's cover the technical details</p>
+
+                <div class="form-group">
+                    <label>Domain Name (Website Address) *</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="domain1" name="domainStatus" value="own">
+                            <label for="domain1">We already own our domain</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="domain2" name="domainStatus" value="need-buy">
+                            <label for="domain2">Need to buy one</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="domainName">Domain Name (if you have one)</label>
+                    <input type="url" id="domainName" placeholder="www.yourbusiness.com">
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Save & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Section 12: Special Requests -->
+            <div class="section-content" data-section="12">
+                <h2 class="section-heading">12. Special Requests</h2>
+                <p class="section-description">Final details and special considerations</p>
+
+                <div class="form-group">
+                    <label for="specificWants">Specific Things You Want</label>
+                    <textarea id="specificWants" placeholder="Any specific requests or must-have features..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="dontWant">Things You DON'T Want</label>
+                    <textarea id="dontWant" placeholder="Anything you specifically want to avoid..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="concerns">What Are You Worried About?</label>
+                    <textarea id="concerns" placeholder="Any concerns or questions you have..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="additionalQuestions">Questions for Us</label>
+                    <textarea id="additionalQuestions" placeholder="Any questions you'd like to ask..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="additionalNotes">Additional Notes</label>
+                    <textarea id="additionalNotes" placeholder="Anything else we should know..."></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Complete Form ✓</button>
+                </div>
+            </div>
+
+            <!-- Completion Screen -->
+            <div class="completion-screen" id="completionScreen">
+                <div class="completion-icon">✓</div>
+                <h2>Thank You!</h2>
+                <p style="margin-bottom: 30px;">We've received your discovery form. Our team will review your information and be in touch shortly with a detailed quote.</p>
+
+                <!-- Ballpark Quote Estimate -->
+                <div id="ballparkQuote" style="background: linear-gradient(135deg, #E8F5F3 0%, #DFF5F3 100%); border: 2px solid #05908C; border-radius: 16px; padding: 30px; margin: 30px 0; box-shadow: 0 4px 16px rgba(5, 144, 140, 0.2);">
+                    <h3 style="color: #012E40; margin-bottom: 15px; font-size: 1.3rem;">📊 Estimated Project Range</h3>
+                    <p style="color: #000000; margin-bottom: 20px; line-height: 1.6;">Based on your answers, here's a ballpark estimate for your website project:</p>
+
+                    <div style="background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; text-align: center; border: 2px solid #05908C;">
+                        <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Estimated Cost</div>
+                        <div id="estimatedCost" style="font-size: 2.5rem; font-weight: 700; color: #012E40; margin-bottom: 10px;">$5,000 - $8,000</div>
+                        <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Timeline</div>
+                        <div id="estimatedTimeline" style="font-size: 1.5rem; font-weight: 600; color: #05908C;">3-4 weeks</div>
+                    </div>
+
+                    <div style="background: rgba(242, 169, 34, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #F2A922; margin-bottom: 15px;">
+                        <p style="color: #000000; margin: 0; font-size: 0.9rem; line-height: 1.6;">
+                            <strong>Please note:</strong> This is a rough estimate based on typical projects with similar requirements. Your actual quote may vary based on specific customizations and complexity.
+                        </p>
+                    </div>
+
+                    <div id="estimateBreakdown" style="background: white; border-radius: 8px; padding: 20px; margin-top: 15px;">
+                        <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">What's Included:</h4>
+                        <div id="breakdownList" style="color: #000000; line-height: 2;">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; border-left: 4px solid #05908C; margin-top: 20px;">
+                    <h4 style="color: #012E40; margin-bottom: 10px;">🎯 Next Steps</h4>
+                    <ol style="color: #000000; margin-left: 20px; line-height: 1.8;">
+                        <li>We'll review your full discovery form</li>
+                        <li>Prepare a detailed, itemized proposal</li>
+                        <li>Schedule a call to walk through everything</li>
+                        <li>Answer any questions you have</li>
+                    </ol>
+                    <p style="color: #05908C; font-weight: 600; margin-top: 15px; margin-bottom: 0;">Expect to hear from us within 48 hours!</p>
+                </div>
+
+                <p style="color: #05908C; font-weight: 600; margin-top: 25px;">Check your email for confirmation.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <!-- Configuration -->
+    <script src="config.js"></script>
+
+    <!-- Notification System -->
+    <script src="notifications-system.js"></script>
+
+    <!-- Quote Form Functions -->
+    <script src="website-quote-functions.js"></script>
+
+    <script>
+        // Toggle social media input fields
+        window.toggleSocialInput = function(platform) {
+            const checkbox = document.getElementById(`social${platform}`);
+            const inputSection = document.getElementById(`social${platform}Input`);
+
+            if (checkbox.checked) {
+                inputSection.classList.add('active');
+            } else {
+                inputSection.classList.remove('active');
+                // Clear the input when unchecked
+                const input = inputSection.querySelector('input[type="text"]');
+                if (input) input.value = '';
+            }
+        };
+
+        // Set the current page URL on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUrl = window.location.origin + window.location.pathname;
+            const formLinkInput = document.getElementById('formLinkInput');
+            const currentUrlDisplay = document.getElementById('currentUrlDisplay');
+
+            if (formLinkInput) {
+                formLinkInput.value = currentUrl;
+            }
+            if (currentUrlDisplay) {
+                currentUrlDisplay.textContent = currentUrl;
+            }
+        });
+
+        // Copy form link to clipboard
+        window.copyFormLink = function() {
+            const input = document.getElementById('formLinkInput');
+            input.select();
+            input.setSelectionRange(0, 99999); // For mobile devices
+
+            navigator.clipboard.writeText(input.value).then(() => {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied! ✓';
+                button.style.background = '#059669';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#0284c7';
+                }, 2000);
+            }).catch(err => {
+                alert('Link copied: ' + input.value);
+            });
+        };
+    </script>
+</body>
+</html>

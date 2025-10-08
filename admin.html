@@ -104,6 +104,29 @@
             display: block;
         }
 
+        .btn-filter {
+            padding: 8px 16px;
+            border: 1.5px solid #d1d5db;
+            background: white;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #374151;
+        }
+
+        .btn-filter:hover {
+            border-color: #05908C;
+            background: #f9fafb;
+        }
+
+        .btn-filter.active {
+            background: #05908C;
+            color: white;
+            border-color: #05908C;
+        }
+
         .admin-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -685,25 +708,55 @@
     <!-- Password Protection Overlay -->
     <div class="admin-header">
         <h1 style="flex: 1; text-align: center;">Admin Dashboard</h1>
+
+        <!-- Notifications Bell -->
+        <div style="position: relative; margin-right: 20px;">
+            <button onclick="toggleNotifications()" style="background: transparent; border: none; cursor: pointer; position: relative; padding: 8px;">
+                <span style="font-size: 1.5rem;">🔔</span>
+                <span id="notificationBadge" style="display: none; position: absolute; top: 4px; right: 4px; background: #ef4444; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7rem; font-weight: 600; min-width: 18px; text-align: center;"></span>
+            </button>
+
+            <!-- Notifications Dropdown -->
+            <div id="notificationsDropdown" style="display: none; position: absolute; right: 0; top: 45px; background: white; border: 2px solid #05908C; border-radius: 12px; width: 400px; max-height: 500px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 1000;">
+                <div style="padding: 15px; border-bottom: 2px solid #E8F5F3; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); border-radius: 10px 10px 0 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0; color: #EEF4D9; font-size: 1.1rem;">Notifications</h3>
+                        <button onclick="markAllNotificationsRead()" style="background: transparent; border: 1px solid #EEF4D9; color: #EEF4D9; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                            Mark All Read
+                        </button>
+                    </div>
+                </div>
+                <div id="notificationsList" style="padding: 10px;">
+                    <div style="text-align: center; padding: 40px 20px; color: #6b7280;">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🔔</div>
+                        <div>No new notifications</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <button class="btn-logout" onclick="logoutAdmin()">Logout</button>
     </div>
 
     <!-- Admin Navigation Tabs -->
     <div class="admin-nav-tabs">
-        <button class="admin-tab active" data-tab="client-portals" onclick="switchAdminTab('client-portals')">
-            Client Portals
+        <button class="admin-tab active" data-tab="dashboard" onclick="switchAdminTab('dashboard')">
+            Dashboard
         </button>
-        <button class="admin-tab" data-tab="sales-reps" onclick="switchAdminTab('sales-reps')">
-            Sales Reps
+        <button class="admin-tab" data-tab="sales-pipeline" onclick="switchAdminTab('sales-pipeline')">
+            Sales Pipeline
         </button>
-        <button class="admin-tab" data-tab="sales-crm" onclick="switchAdminTab('sales-crm')">
-            Sales CRM
+        <button class="admin-tab" data-tab="team" onclick="switchAdminTab('team')">
+            Team
         </button>
-        <button class="admin-tab" data-tab="archived-deals" onclick="switchAdminTab('archived-deals')">
-            Archived Deals
+        <button class="admin-tab" data-tab="clients" onclick="switchAdminTab('clients')">
+            Clients <span id="messagesUnreadBadge" style="display: none; background: #ef4444; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.75rem; margin-left: 6px;"></span>
         </button>
-        <button class="admin-tab" data-tab="messages" onclick="switchAdminTab('messages')">
-            Messages <span id="messagesUnreadBadge" style="display: none; background: #ef4444; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.75rem; margin-left: 6px;"></span>
+        <button class="admin-tab" data-tab="website-quotes" onclick="switchAdminTab('website-quotes')">
+            Website Quotes
+        </button>
+        <button class="admin-tab" data-tab="settings" onclick="switchAdminTab('settings')">
+            Settings
         </button>
     </div>
 
@@ -711,8 +764,82 @@
         <!-- Alert Messages -->
         <div id="alertMessage" style="display: none;"></div>
 
-        <!-- Tab: Client Portals -->
-        <div class="admin-tab-content active" id="tab-client-portals">
+        <!-- Tab: Dashboard (NEW) -->
+        <div class="admin-tab-content active" id="tab-dashboard">
+
+            <!-- Revenue Overview -->
+            <div class="admin-section" style="background: linear-gradient(135deg, #012E40 0%, #05908C 100%);">
+                <div style="margin-bottom: 24px;">
+                    <h2 style="margin-bottom: 4px; font-family: 'Bitter', serif; color: #FFFFFF;">Revenue Overview</h2>
+                    <p style="color: #E0F2F1; font-size: 0.9rem; margin: 0;">Real-time snapshot of your business performance</p>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <div style="background: linear-gradient(135deg, #D1F2EB 0%, #FFFFFF 100%); padding: 24px; border-radius: 12px; text-align: center; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);">
+                        <div style="font-size: 0.75rem; color: #000000; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Total Pipeline Value</div>
+                        <div style="font-size: 2.25rem; font-weight: 700; color: #000;" id="dashboardTotalPipeline">$0</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #D1F2EB 0%, #FFFFFF 100%); padding: 24px; border-radius: 12px; text-align: center; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);">
+                        <div style="font-size: 0.75rem; color: #000000; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Active Deals</div>
+                        <div style="font-size: 2.25rem; font-weight: 700; color: #000;" id="dashboardActiveDeals">0</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #D1F2EB 0%, #FFFFFF 100%); padding: 24px; border-radius: 12px; text-align: center; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);">
+                        <div style="font-size: 0.75rem; color: #000000; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">This Month MRR</div>
+                        <div style="font-size: 2.25rem; font-weight: 700; color: #000;" id="dashboardMonthlyMRR">$0</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #D1F2EB 0%, #FFFFFF 100%); padding: 24px; border-radius: 12px; text-align: center; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);">
+                        <div style="font-size: 0.75rem; color: #000000; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Active Clients</div>
+                        <div style="font-size: 2.25rem; font-weight: 700; color: #000;" id="dashboardActiveClients">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Urgent Tasks -->
+            <div class="admin-section">
+                <h2 style="font-family: 'Bitter', serif; color: #000000; margin-bottom: 16px;">Urgent Tasks</h2>
+                <div id="urgentTasksList" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 16px; border-radius: 8px;">
+                        <div style="font-weight: 600; color: #92400E; margin-bottom: 4px;">Website Quotes Pending Review</div>
+                        <div style="color: #78350F; font-size: 0.9rem;"><span id="dashboardQuotesPending">0</span> quotes waiting for your response</div>
+                    </div>
+                    <div style="background: #DBEAFE; border-left: 4px solid #3B82F6; padding: 16px; border-radius: 8px;">
+                        <div style="font-weight: 600; color: #1E3A8A; margin-bottom: 4px;">Deals in Proposal Stage</div>
+                        <div style="color: #1E40AF; font-size: 0.9rem;"><span id="dashboardProposalDeals">0</span> deals need follow-up</div>
+                    </div>
+                    <div style="background: #FCE7F3; border-left: 4px solid #EC4899; padding: 16px; border-radius: 8px;">
+                        <div style="font-weight: 600; color: #831843; margin-bottom: 4px;">Unread Client Messages</div>
+                        <div style="color: #9F1239; font-size: 0.9rem;"><span id="dashboardUnreadMessages">0</span> messages awaiting response</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="admin-section">
+                <h2 style="font-family: 'Bitter', serif; color: #000000; margin-bottom: 16px;">Quick Actions</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <button onclick="switchAdminTab('clients')" style="background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: white; border: none; border-radius: 10px; padding: 20px; font-weight: 600; cursor: pointer; text-align: left; box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3); transition: all 0.3s ease;">
+                        <div style="font-size: 1.5rem; margin-bottom: 8px;">👥</div>
+                        <div>Create Client Portal</div>
+                    </button>
+                    <button onclick="switchAdminTab('sales-pipeline'); setTimeout(() => openDealModal(), 100);" style="background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%); color: white; border: none; border-radius: 10px; padding: 20px; font-weight: 600; cursor: pointer; text-align: left; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); transition: all 0.3s ease;">
+                        <div style="font-size: 1.5rem; margin-bottom: 8px;">💰</div>
+                        <div>Add New Deal</div>
+                    </button>
+                    <button onclick="switchAdminTab('website-quotes')" style="background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%); color: white; border: none; border-radius: 10px; padding: 20px; font-weight: 600; cursor: pointer; text-align: left; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
+                        <div style="font-size: 1.5rem; margin-bottom: 8px;">📝</div>
+                        <div>View Website Quotes</div>
+                    </button>
+                    <button onclick="switchAdminTab('clients')" style="background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%); color: white; border: none; border-radius: 10px; padding: 20px; font-weight: 600; cursor: pointer; text-align: left; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3); transition: all 0.3s ease;">
+                        <div style="font-size: 1.5rem; margin-bottom: 8px;">💬</div>
+                        <div>View Messages</div>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        <!-- End Tab: Dashboard -->
+
+        <!-- Tab: Clients (Merged: Client Portals + Messages) -->
+        <div class="admin-tab-content" id="tab-clients">
 
         <!-- Create New Client -->
         <div class="admin-section">
@@ -854,10 +981,62 @@
         </div>
 
         </div>
-        <!-- End Tab: Client Portals -->
 
-        <!-- Tab: Sales Reps -->
-        <div class="admin-tab-content" id="tab-sales-reps">
+        <!-- Messages Section (within Clients tab) -->
+        <div class="admin-section">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; color: #012E40;">Client Messages</h2>
+            <p style="color: #000000; margin-bottom: 24px;">View and respond to client messages</p>
+
+            <div style="display: grid; grid-template-columns: 350px 1fr; gap: 20px; height: 600px;">
+                <!-- Client List -->
+                <div style="background: #FFF8E6; border-radius: 12px; padding: 20px; overflow-y: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: #012E40;">Conversations</h3>
+                    <div id="messageClientsList">
+                        <div style="text-align: center; padding: 40px 20px; color: #64748B;">
+                            Loading conversations...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Thread -->
+                <div style="background: #E8F5F3; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <div id="chatThreadContainer" style="display: none; flex: 1; flex-direction: column;">
+                        <!-- Header -->
+                        <div style="padding: 20px; border-bottom: 2px solid #B2DFDB;">
+                            <h3 style="font-size: 1.1rem; font-weight: 600; color: #012E40;" id="chatClientName">Select a conversation</h3>
+                        </div>
+
+                        <!-- Messages -->
+                        <div id="chatMessages" style="flex: 1; overflow-y: auto; padding: 20px;">
+                            <!-- Messages will be loaded here -->
+                        </div>
+
+                        <!-- Reply Form -->
+                        <div style="padding: 20px; border-top: 2px solid #B2DFDB; background: white;">
+                            <form id="replyMessageForm" style="display: flex; gap: 12px;">
+                                <textarea id="replyMessageText" placeholder="Type your reply..." required
+                                          style="flex: 1; padding: 12px; border: 2px solid #B2DFDB; border-radius: 8px; resize: vertical; min-height: 60px; font-family: inherit; font-size: 0.95rem;"></textarea>
+                                <button type="submit" class="btn btn-primary" style="align-self: flex-end; white-space: nowrap;">Send Reply</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="chatEmptyState" style="display: flex; align-items: center; justify-content: center; height: 100%; color: #64748B; text-align: center; padding: 40px;">
+                        <div>
+                            <div style="font-size: 3rem; margin-bottom: 16px;">💬</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px;">No conversation selected</div>
+                            <div>Select a client from the left to view messages</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+        <!-- End Tab: Clients -->
+
+        <!-- Tab: Team (Renamed from Sales Reps) -->
+        <div class="admin-tab-content" id="tab-team">
 
             <!-- Add New Sales Rep -->
             <div class="admin-section">
@@ -925,10 +1104,10 @@
             </div>
 
         </div>
-        <!-- End Tab: Sales Reps -->
+        <!-- End Tab: Team -->
 
-        <!-- Tab: Sales CRM -->
-        <div class="admin-tab-content" id="tab-sales-crm">
+        <!-- Tab: Sales Pipeline (Merged: Sales CRM + Archived Deals) -->
+        <div class="admin-tab-content" id="tab-sales-pipeline">
 
             <!-- Revenue Metrics Dashboard -->
             <div class="admin-section" style="background: linear-gradient(135deg, #012E40 0%, #05908C 100%);">
@@ -970,93 +1149,139 @@
                 </div>
             </div>
 
-        </div>
-        <!-- End Tab: Sales CRM -->
-
-        <!-- Tab: Archived Deals -->
-        <div class="admin-tab-content" id="tab-archived-deals">
+            <!-- Archived Deals Section (within Sales Pipeline tab) -->
             <div class="admin-section">
-                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; color: #012E40;">All Archived Deals</h2>
-                <p style="color: #000000; margin-bottom: 24px;">View all deals that have been marked as lost across all reps</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; color: #012E40;">Archived Deals</h2>
+                        <p style="color: #000000; margin: 0; font-size: 0.9rem;">View all deals that have been marked as lost</p>
+                    </div>
+                    <button onclick="toggleArchivedDeals()" id="toggleArchivedBtn" style="background: #6b7280; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                        Show Archived
+                    </button>
+                </div>
 
-                <div style="background: #FFF8E6; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid #E2E8F0;">
-                                <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Company</th>
-                                <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Contact</th>
-                                <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Assigned Rep</th>
-                                <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Stage When Lost</th>
-                                <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Archived Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminArchivedDealsBody">
-                            <tr>
-                                <td colspan="5" style="text-align: center; padding: 24px; color: #64748B;">Loading archived deals...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div id="archivedDealsSection" style="display: none;">
+                    <div style="background: #FFF8E6; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #E2E8F0;">
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Company</th>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Contact</th>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Assigned Rep</th>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Stage When Lost</th>
+                                    <th style="padding: 12px; text-align: left; font-weight: 600; color: #0F172A;">Archived Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminArchivedDealsBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 24px; color: #64748B;">Loading archived deals...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+
         </div>
-        <!-- End Tab: Archived Deals -->
+        <!-- End Tab: Sales Pipeline -->
 
-        <!-- Tab: Messages -->
-        <div class="admin-tab-content" id="tab-messages">
+        <!-- Tab: Website Quotes -->
+        <div class="admin-tab-content" id="tab-website-quotes">
             <div class="admin-section">
-                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; color: #012E40;">Client Messages</h2>
-                <p style="color: #000000; margin-bottom: 24px;">View and respond to client messages</p>
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; color: #012E40;">Website Quote Requests</h2>
+                <p style="color: #000000; margin-bottom: 24px;">Manage website discovery forms and quotes</p>
 
-                <div style="display: grid; grid-template-columns: 350px 1fr; gap: 20px; height: 600px;">
-                    <!-- Client List -->
-                    <div style="background: #FFF8E6; border-radius: 12px; padding: 20px; overflow-y: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: #012E40;">Conversations</h3>
-                        <div id="messageClientsList">
-                            <div style="text-align: center; padding: 40px 20px; color: #64748B;">
-                                Loading conversations...
+                <!-- Share Form Info Box -->
+                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0284c7; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+                    <div style="display: flex; align-items: start; gap: 15px;">
+                        <div style="font-size: 2rem;">📋</div>
+                        <div style="flex: 1;">
+                            <h3 style="color: #0369a1; margin: 0 0 10px 0; font-size: 1.1rem;">Share This Form with Clients</h3>
+                            <div style="background: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #bae6fd;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="text" value="https://portal.driveleadmedia.com/index-website-quote.html" readonly
+                                           style="flex: 1; border: none; background: transparent; font-family: monospace; font-size: 0.9rem; color: #0c4a6e; font-weight: 600;"
+                                           id="adminFormLinkInput">
+                                    <button onclick="copyAdminFormLink()" style="padding: 8px 16px; background: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; white-space: nowrap;">
+                                        Copy Link
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Chat Thread -->
-                    <div style="background: #E8F5F3; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                        <div id="chatThreadContainer" style="display: none; flex: 1; flex-direction: column;">
-                            <!-- Chat Header -->
-                            <div id="chatHeader" style="background: rgba(5, 144, 140, 0.2); padding: 16px 20px; border-bottom: 1px solid #000000; border-radius: 12px 12px 0 0;">
-                                <h3 id="chatClientName" style="margin: 0; color: #012E40; font-size: 1.1rem; font-weight: 600;"></h3>
-                            </div>
-
-                            <!-- Messages Area -->
-                            <div id="chatMessages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
-                            </div>
-
-                            <!-- Message Input -->
-                            <div style="padding: 16px 20px; border-top: 1px solid #000000; background: rgba(255, 255, 255, 0.5); border-radius: 0 0 12px 12px;">
-                                <form id="adminMessageForm" style="display: flex; gap: 10px;">
-                                    <input
-                                        type="text"
-                                        id="adminMessageInput"
-                                        placeholder="Type your message..."
-                                        required
-                                        style="flex: 1; padding: 12px; border: 1px solid #000000; border-radius: 8px; font-size: 0.9rem; background: white;"
-                                    >
-                                    <button type="submit" class="btn" style="margin: 0; padding: 12px 24px;">Send</button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Empty State -->
-                        <div id="chatEmptyState" style="flex: 1; display: flex; align-items: center; justify-content: center; color: #64748B;">
-                            <div style="text-align: center;">
-                                <div style="font-size: 3rem; margin-bottom: 12px; opacity: 0.3;">💬</div>
-                                <p style="font-size: 1.1rem; font-weight: 500;">Select a conversation to view messages</p>
+                            <div style="color: #0369a1; font-size: 0.85rem; line-height: 1.5;">
+                                <strong>How it works:</strong><br>
+                                • Clients fill out 12 sections (~15-20 minutes)<br>
+                                • Auto-saves every 30 seconds - they can pause anytime<br>
+                                • You see their progress in real-time in admin dashboard<br>
+                                • Click "Generate AI Prompt" when complete to build their site
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Stats Overview -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 12px; border: 2px solid #e5e7eb;">
+                        <div style="font-size: 2rem; font-weight: 700; color: #05908C; margin-bottom: 5px;" id="quotesIncomplete">0</div>
+                        <div style="color: #6b7280; font-size: 0.9rem;">Incomplete</div>
+                    </div>
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 12px; border: 2px solid #e5e7eb;">
+                        <div style="font-size: 2rem; font-weight: 700; color: #F2A922; margin-bottom: 5px;" id="quotesCompleted">0</div>
+                        <div style="color: #6b7280; font-size: 0.9rem;">Completed</div>
+                    </div>
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 12px; border: 2px solid #e5e7eb;">
+                        <div style="font-size: 2rem; font-weight: 700; color: #3b82f6; margin-bottom: 5px;" id="quotesQuoteSent">0</div>
+                        <div style="color: #6b7280; font-size: 0.9rem;">Quote Sent</div>
+                    </div>
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 12px; border: 2px solid #e5e7eb;">
+                        <div style="font-size: 2rem; font-weight: 700; color: #22c55e; margin-bottom: 5px;" id="quotesWon">0</div>
+                        <div style="color: #6b7280; font-size: 0.9rem;">Won</div>
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button onclick="filterQuotes('all')" class="btn-filter active" id="filter-all">All</button>
+                    <button onclick="filterQuotes('incomplete')" class="btn-filter" id="filter-incomplete">Incomplete</button>
+                    <button onclick="filterQuotes('completed')" class="btn-filter" id="filter-completed">Completed</button>
+                    <button onclick="filterQuotes('quote-sent')" class="btn-filter" id="filter-quote-sent">Quote Sent</button>
+                    <button onclick="filterQuotes('won')" class="btn-filter" id="filter-won">Won</button>
+                    <button onclick="filterQuotes('lost')" class="btn-filter" id="filter-lost">Lost</button>
+                </div>
+
+                <!-- Quotes List -->
+                <div id="websiteQuotesList">
+                    <div style="text-align: center; padding: 60px 20px; color: #6b7280;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">📋</div>
+                        <p>Loading website quotes...</p>
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- End Tab: Messages -->
+        <!-- End Tab: Website Quotes -->
+
+        <!-- Tab: Settings (NEW - Placeholder) -->
+        <div class="admin-tab-content" id="tab-settings">
+            <div class="admin-section">
+                <h2 style="font-family: 'Bitter', serif; color: #000000; margin-bottom: 16px;">Settings</h2>
+                <p style="color: #000000; margin-bottom: 24px;">System configuration and preferences</p>
+
+                <div style="background: #E8F5F3; border-left: 4px solid #05908C; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #012E40; margin-bottom: 12px;">Coming Soon</h3>
+                    <p style="color: #000000; margin-bottom: 16px;">The Settings tab will include:</p>
+                    <ul style="color: #000000; margin-left: 20px; line-height: 1.8;">
+                        <li>Account management</li>
+                        <li>Email notification preferences</li>
+                        <li>Default templates and links</li>
+                        <li>Integration settings (Stripe, DocuSign, etc.)</li>
+                        <li>Branding customization</li>
+                        <li>User permissions</li>
+                        <li>Data export/backup</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- End Tab: Settings -->
 
     </div>
 
@@ -1198,6 +1423,7 @@
     <script src="config.js"></script>
     <script src="validation.js"></script>
     <script src="toast.js"></script>
+    <script src="notifications-system.js"></script>
 
     <script>
         // ============================================
@@ -1277,6 +1503,7 @@
             isAuthChecked = true;
 
             // Now that we're authenticated and verified, load the initial data
+            loadDashboardData(); // Load dashboard first since it's the default tab
             loadClients();
 
             // Start listening for unread messages globally (updates badge on all tabs)
@@ -1322,14 +1549,95 @@
             document.getElementById(`tab-${tabName}`).classList.add('active');
 
             // Load data for specific tabs
-            if (tabName === 'sales-reps') {
+            if (tabName === 'dashboard') {
+                loadDashboardData();
+            } else if (tabName === 'team') {
                 loadReps();
-            } else if (tabName === 'archived-deals') {
-                loadAdminArchivedDeals();
-            } else if (tabName === 'messages') {
+            } else if (tabName === 'sales-pipeline') {
+                // Pipeline data is already loaded, but ensure archived deals can be loaded
+                if (document.getElementById('archivedDealsSection').style.display !== 'none') {
+                    loadAdminArchivedDeals();
+                }
+            } else if (tabName === 'clients') {
                 loadMessagesList();
             }
         }
+
+        // Load Dashboard Data
+        async function loadDashboardData() {
+            try {
+                // Load pipeline metrics
+                const dealsSnapshot = await db.collection('deals').get();
+                let totalPipeline = 0;
+                let activeDeals = 0;
+                let monthlyMRR = 0;
+                let proposalDeals = 0;
+
+                const currentMonth = new Date().getMonth();
+                const currentYear = new Date().getFullYear();
+
+                dealsSnapshot.forEach(doc => {
+                    const deal = doc.data();
+                    if (deal.stage !== 'Lost' && deal.stage !== 'Won') {
+                        activeDeals++;
+                        const dealValue = parseFloat(deal.value) || 0;
+                        totalPipeline += dealValue;
+
+                        // Count deals in Proposal stage
+                        if (deal.stage === 'Proposal') {
+                            proposalDeals++;
+                        }
+                    }
+
+                    // Calculate MRR for deals won this month
+                    if (deal.stage === 'Won' && deal.closedDate) {
+                        const closedDate = deal.closedDate.toDate();
+                        if (closedDate.getMonth() === currentMonth && closedDate.getFullYear() === currentYear) {
+                            monthlyMRR += parseFloat(deal.value) || 0;
+                        }
+                    }
+                });
+
+                // Update dashboard metrics
+                document.getElementById('dashboardTotalPipeline').textContent = '$' + totalPipeline.toLocaleString();
+                document.getElementById('dashboardActiveDeals').textContent = activeDeals;
+                document.getElementById('dashboardMonthlyMRR').textContent = '$' + monthlyMRR.toLocaleString();
+                document.getElementById('dashboardProposalDeals').textContent = proposalDeals;
+
+                // Load active clients count
+                const clientsSnapshot = await db.collection('clients').get();
+                const activeClients = clientsSnapshot.docs.filter(doc => doc.data().active !== false).length;
+                document.getElementById('dashboardActiveClients').textContent = activeClients;
+
+                // Load website quotes pending
+                const quotesSnapshot = await db.collection('websiteQuotes').where('status', 'in', ['completed', 'incomplete']).get();
+                document.getElementById('dashboardQuotesPending').textContent = quotesSnapshot.size;
+
+                // Load unread messages count
+                const messagesSnapshot = await db.collection('messages').where('read', '==', false).get();
+                document.getElementById('dashboardUnreadMessages').textContent = messagesSnapshot.size;
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Toggle Archived Deals visibility
+        window.toggleArchivedDeals = function() {
+            const section = document.getElementById('archivedDealsSection');
+            const btn = document.getElementById('toggleArchivedBtn');
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                btn.textContent = 'Hide Archived';
+                btn.style.background = '#05908C';
+                loadAdminArchivedDeals();
+            } else {
+                section.style.display = 'none';
+                btn.textContent = 'Show Archived';
+                btn.style.background = '#6b7280';
+            }
+        };
 
         // Initialize tab click handlers
         document.querySelectorAll('.admin-tab').forEach(tab => {
@@ -1738,10 +2046,8 @@
             try {
                 await db.collection('clients').doc(clientId).set(clientData);
 
-                // Generate correct portal URL based on type
-                const portalUrl = portalType === 'm2m' ?
-                    `${PORTAL_BASE_URL}/index-m2m.html?c=${clientId}` :
-                    `${PORTAL_BASE_URL}/index-contract.html?c=${clientId}`;
+                // Generate unified portal URL
+                const portalUrl = `${PORTAL_BASE_URL}/client.html?id=${clientId}`;
 
                 showAlert(`${portalType === 'm2m' ? 'Month-to-Month' : 'Contract'} portal created successfully! Portal link: ${portalUrl}`);
                 document.getElementById('createClientForm').reset();
@@ -1785,9 +2091,7 @@
 
                     // Generate correct portal link based on portal type
                     const portalType = data.portalType || 'contract';
-                    const portalLink = portalType === 'm2m' ?
-                        `${PORTAL_BASE_URL}/index-m2m.html?c=${docId}` :
-                        `${PORTAL_BASE_URL}/index-contract.html?c=${docId}`;
+                    const portalLink = `${PORTAL_BASE_URL}/client.html?id=${docId}`;
 
                     // Calculate progress percentage
                     const completedSteps = [
@@ -2093,12 +2397,21 @@
                     document.getElementById('dealContractLength').value = data.contractLength || '';
                     document.getElementById('dealClientPortalId').value = data.clientPortalId || '';
                     document.getElementById('dealNotes').value = data.notes || '';
+
+                    // Show website quote section if linked
+                    if (data.websiteQuoteId) {
+                        document.getElementById('websiteQuoteSection').style.display = 'block';
+                        document.getElementById('dealWebsiteQuoteId').value = data.websiteQuoteId;
+                    } else {
+                        document.getElementById('websiteQuoteSection').style.display = 'none';
+                    }
                 }
             } else {
                 // Create mode
                 title.textContent = 'Add New Deal';
                 form.reset();
                 document.getElementById('dealId').value = '';
+                document.getElementById('websiteQuoteSection').style.display = 'none';
             }
 
             modal.style.display = 'flex';
@@ -2109,6 +2422,28 @@
             document.getElementById('dealModal').style.display = 'none';
             document.getElementById('dealForm').reset();
         }
+
+        // View linked website quote
+        window.viewLinkedWebsiteQuote = function() {
+            const quoteId = document.getElementById('dealWebsiteQuoteId').value;
+            if (quoteId) {
+                // Switch to website quotes tab and highlight the quote
+                switchAdminTab('website-quotes');
+                closeDealModal();
+
+                // Scroll to the quote card after a brief delay
+                setTimeout(() => {
+                    const quoteCard = document.querySelector(`[data-quote-id="${quoteId}"]`);
+                    if (quoteCard) {
+                        quoteCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        quoteCard.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.5)';
+                        setTimeout(() => {
+                            quoteCard.style.boxShadow = '';
+                        }, 2000);
+                    }
+                }, 300);
+            }
+        };
 
         // Load reps for deal form dropdown
         async function loadRepsForDealForm() {
@@ -2330,6 +2665,7 @@
                         <span style="color: #000000; font-weight: 600;">👤 ${repName}</span>
                     </div>
                     ${deal.clientPortalId ? '<div style="margin-top: 6px; font-size: 0.75rem; color: #05908C;">🔗 Portal Linked</div>' : ''}
+                    ${deal.websiteQuoteId ? '<div style="margin-top: 6px; font-size: 0.75rem; color: #F59E0B; font-weight: 600;">📝 From Website Quote</div>' : ''}
                 </div>
             `;
         }
@@ -2352,12 +2688,14 @@
             document.getElementById('avgDealSize').textContent = `$${Math.round(avgDeal).toLocaleString()}`;
         }
 
-        // Load CRM when switching to Sales CRM tab
+        // Load CRM and Website Quotes when switching tabs
         const originalSwitchAdminTab = switchAdminTab;
         switchAdminTab = function(tabName) {
             originalSwitchAdminTab(tabName);
             if (tabName === 'sales-crm') {
                 loadCRMPipeline();
+            } else if (tabName === 'website-quotes') {
+                loadWebsiteQuotes();
             }
         };
 
@@ -2372,6 +2710,8 @@
                     e.preventDefault();
 
                     const dealId = document.getElementById('dealId').value;
+                    const websiteQuoteId = document.getElementById('dealWebsiteQuoteId').value || null;
+
                     const dealData = {
                         companyName: document.getElementById('dealCompanyName').value,
                         contactName: document.getElementById('dealContactName').value || null,
@@ -2382,20 +2722,71 @@
                         mrr: parseFloat(document.getElementById('dealMRR').value) || 0,
                         contractLength: parseInt(document.getElementById('dealContractLength').value) || 0,
                         clientPortalId: document.getElementById('dealClientPortalId').value || null,
+                        websiteQuoteId: websiteQuoteId, // Preserve website quote link
                         notes: document.getElementById('dealNotes').value || null,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
 
                     try {
+                        let isNewDeal = !dealId;
+                        let oldDealData = null;
+                        let wasAssignmentChange = false;
+                        let wasStageChange = false;
+
                         if (dealId) {
+                            // Get old data to detect changes
+                            const oldDoc = await db.collection('deals').doc(dealId).get();
+                            oldDealData = oldDoc.data();
+                            wasAssignmentChange = oldDealData.assignedTo !== dealData.assignedTo;
+                            wasStageChange = oldDealData.stage !== dealData.stage;
+
                             // Update existing deal
                             await db.collection('deals').doc(dealId).update(dealData);
                             showAlert('Deal updated successfully!');
                         } else {
                             // Create new deal
                             dealData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                            await db.collection('deals').add(dealData);
+                            const newDealRef = await db.collection('deals').add(dealData);
+                            dealId = newDealRef.id;
                             showAlert('Deal created successfully!');
+                        }
+
+                        // Create notifications based on what changed
+                        if (window.createNotification) {
+                            // Notification 1: Deal assigned to a rep (not "unassigned")
+                            if ((isNewDeal || wasAssignmentChange) && dealData.assignedTo && dealData.assignedTo !== 'unassigned') {
+                                await window.createNotification({
+                                    type: 'DEAL_ASSIGNED',
+                                    recipientId: dealData.assignedTo,
+                                    recipientType: 'sales-rep',
+                                    message: `New deal assigned: ${dealData.companyName}`,
+                                    actionUrl: `sales-dashboard.html`,
+                                    relatedId: dealId,
+                                    metadata: {
+                                        companyName: dealData.companyName,
+                                        stage: dealData.stage
+                                    }
+                                });
+                                console.log('✓ Sales rep notification created for deal assignment');
+                            }
+
+                            // Notification 2: Deal stage changed (only for existing deals with assigned rep)
+                            if (!isNewDeal && wasStageChange && dealData.assignedTo && dealData.assignedTo !== 'unassigned') {
+                                await window.createNotification({
+                                    type: 'DEAL_STAGE_CHANGE',
+                                    recipientId: dealData.assignedTo,
+                                    recipientType: 'sales-rep',
+                                    message: `${dealData.companyName} moved to ${dealData.stage}`,
+                                    actionUrl: `sales-dashboard.html`,
+                                    relatedId: dealId,
+                                    metadata: {
+                                        companyName: dealData.companyName,
+                                        oldStage: oldDealData.stage,
+                                        newStage: dealData.stage
+                                    }
+                                });
+                                console.log('✓ Sales rep notification created for stage change');
+                            }
                         }
 
                         closeDealModal();
@@ -2704,12 +3095,1068 @@
                         clientName: document.getElementById('chatClientName').textContent
                     }, { merge: true });
 
+                // Create notification for client about admin reply
+                if (window.createNotification) {
+                    await window.createNotification({
+                        type: 'MESSAGE_REPLY',
+                        recipientId: currentChatClientId,
+                        recipientType: 'client',
+                        message: `Admin replied to your message`,
+                        actionUrl: `client.html?id=${currentChatClientId}#messages`,
+                        relatedId: currentChatClientId,
+                        metadata: {
+                            messagePreview: messageText.substring(0, 50) + (messageText.length > 50 ? '...' : '')
+                        }
+                    });
+                    console.log('✓ Client notification created for admin message reply');
+                }
+
                 input.value = '';
             } catch (error) {
                 console.error('Error sending message:', error);
                 showAlert('Error sending message: ' + error.message, 'error');
             }
         });
+
+        // ===================================
+        // WEBSITE QUOTES FUNCTIONS
+        // ===================================
+
+        let allWebsiteQuotes = [];
+        let currentQuoteFilter = 'all';
+
+        // Load website quotes
+        async function loadWebsiteQuotes() {
+            try {
+                const snapshot = await db.collection('websiteQuotes').orderBy('createdAt', 'desc').get();
+
+                allWebsiteQuotes = [];
+                snapshot.forEach(doc => {
+                    allWebsiteQuotes.push({ id: doc.id, ...doc.data() });
+                });
+
+                updateQuoteStats();
+                displayWebsiteQuotes();
+            } catch (error) {
+                console.error('Error loading website quotes:', error);
+                document.getElementById('websiteQuotesList').innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: #dc2626;">
+                        <p>Error loading quotes. Please refresh the page.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Update stats
+        function updateQuoteStats() {
+            const stats = {
+                incomplete: 0,
+                completed: 0,
+                quoteSent: 0,
+                won: 0
+            };
+
+            allWebsiteQuotes.forEach(quote => {
+                if (quote.status === 'incomplete') stats.incomplete++;
+                else if (quote.status === 'completed') stats.completed++;
+                else if (quote.status === 'quote-sent') stats.quoteSent++;
+                else if (quote.status === 'won') stats.won++;
+            });
+
+            document.getElementById('quotesIncomplete').textContent = stats.incomplete;
+            document.getElementById('quotesCompleted').textContent = stats.completed;
+            document.getElementById('quotesQuoteSent').textContent = stats.quoteSent;
+            document.getElementById('quotesWon').textContent = stats.won;
+        }
+
+        // Filter quotes
+        window.filterQuotes = function(filter) {
+            currentQuoteFilter = filter;
+
+            // Update active filter button
+            document.querySelectorAll('.btn-filter').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`filter-${filter}`).classList.add('active');
+
+            displayWebsiteQuotes();
+        };
+
+        // Display website quotes
+        function displayWebsiteQuotes() {
+            const container = document.getElementById('websiteQuotesList');
+
+            // Filter quotes
+            let filteredQuotes = allWebsiteQuotes;
+            if (currentQuoteFilter !== 'all') {
+                filteredQuotes = allWebsiteQuotes.filter(quote => quote.status === currentQuoteFilter);
+            }
+
+            if (filteredQuotes.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: #6b7280;">
+                        <div style="width: 64px; height: 64px; margin: 0 auto 20px; border: 3px solid #e5e7eb; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <p style="font-size: 1.1rem; font-weight: 500;">No ${currentQuoteFilter === 'all' ? '' : currentQuoteFilter} quotes found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filteredQuotes.forEach(quote => {
+                const statusColors = {
+                    'incomplete': '#6b7280',
+                    'completed': '#F2A922',
+                    'quote-sent': '#3b82f6',
+                    'won': '#22c55e',
+                    'lost': '#ef4444'
+                };
+
+                const statusColor = statusColors[quote.status] || '#6b7280';
+                const createdDate = quote.createdAt ? new Date(quote.createdAt.toDate()).toLocaleDateString() : 'N/A';
+                const completionPercent = quote.completionPercent || 0;
+
+                html += `
+                    <div data-quote-id="${quote.id}" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%); border: 1px solid rgba(5, 144, 140, 0.15); border-radius: 16px; padding: 28px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); backdrop-filter: blur(10px); transition: all 0.3s ease;">
+                        <!-- Header Section -->
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(5, 144, 140, 0.1);">
+                            <div style="flex: 1;">
+                                <h3 style="font-size: 1.4rem; font-weight: 700; color: #012E40; margin-bottom: 12px; letter-spacing: -0.02em;">
+                                    ${quote.businessName || 'Unnamed Business'}
+                                </h3>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; color: #6b7280; font-size: 0.9rem;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        <span>${createdDate}</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                            <polyline points="22,6 12,13 2,6"></polyline>
+                                        </svg>
+                                        <span>${quote.email || 'No email'}</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                        </svg>
+                                        <span>${quote.phone || 'No phone'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-left: 20px;">
+                                <span style="display: inline-flex; align-items: center; padding: 8px 16px; border-radius: 24px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; background: linear-gradient(135deg, ${statusColor} 0%, ${statusColor}dd 100%); color: white; box-shadow: 0 2px 8px ${statusColor}40; text-transform: uppercase;">
+                                    ${(quote.status || 'incomplete').replace('-', ' ')}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div style="background: linear-gradient(135deg, rgba(5, 144, 140, 0.03) 0%, rgba(242, 169, 34, 0.03) 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(5, 144, 140, 0.08);">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
+                                <div>
+                                    <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Business Type</div>
+                                    <div style="font-weight: 600; color: #012E40; font-size: 0.95rem;">${quote.businessType || 'Not specified'}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Budget Range</div>
+                                    <div style="font-weight: 600; color: #012E40; font-size: 0.95rem;">${quote.budgetRange || 'Not specified'}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Deadline</div>
+                                    <div style="font-weight: 600; color: #012E40; font-size: 0.95rem;">${quote.deadlineDate || 'Flexible'}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Progress</div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="flex: 1; height: 6px; background: #e5e7eb; border-radius: 10px; overflow: hidden;">
+                                            <div style="height: 100%; width: ${completionPercent}%; background: linear-gradient(90deg, #05908C 0%, #F2A922 100%); border-radius: 10px; transition: width 0.3s ease;"></div>
+                                        </div>
+                                        <span style="font-weight: 700; color: #05908C; font-size: 0.9rem; min-width: 40px;">${completionPercent}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button onclick="viewQuoteDetails('${quote.id}')" style="padding: 12px 24px; background: linear-gradient(135deg, rgba(5, 144, 140, 0.85) 0%, rgba(4, 122, 114, 0.85) 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(5, 144, 140, 0.2);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(5, 144, 140, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(5, 144, 140, 0.2)'">
+                                View Details
+                            </button>
+                            <button onclick="generateAIPrompt('${quote.id}')" style="padding: 12px 24px; background: linear-gradient(135deg, rgba(242, 169, 34, 0.85) 0%, rgba(217, 148, 25, 0.85) 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(242, 169, 34, 0.2);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(242, 169, 34, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(242, 169, 34, 0.2)'">
+                                Generate AI Prompt
+                            </button>
+                            <button onclick="copyQuoteLink('${quote.id}')" style="padding: 12px 24px; background: white; color: #05908C; border: 2px solid #05908C; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(5, 144, 140, 0.05)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='white'; this.style.transform='translateY(0)'">
+                                Copy Link
+                            </button>
+                            <select onchange="updateQuoteStatus('${quote.id}', this.value)" style="padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 10px; font-weight: 600; cursor: pointer; background: white; color: #374151; font-size: 0.9rem; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#05908C'" onmouseout="this.style.borderColor='#e5e7eb'">
+                                <option value="">Change Status...</option>
+                                <option value="incomplete" ${quote.status === 'incomplete' ? 'selected' : ''}>Incomplete</option>
+                                <option value="completed" ${quote.status === 'completed' ? 'selected' : ''}>Completed</option>
+                                <option value="quote-sent" ${quote.status === 'quote-sent' ? 'selected' : ''}>Quote Sent</option>
+                                <option value="won" ${quote.status === 'won' ? 'selected' : ''}>Won</option>
+                                <option value="lost" ${quote.status === 'lost' ? 'selected' : ''}>Lost</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // View quote details
+        window.viewQuoteDetails = function(quoteId) {
+            const quote = allWebsiteQuotes.find(q => q.id === quoteId);
+            if (!quote) return;
+
+            const details = `
+                <div style="max-height: 70vh; overflow-y: auto;">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 20px; color: #012E40;">Quote Details</h3>
+
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="color: #05908C; margin-bottom: 15px;">Business Information</h4>
+                        <p><strong>Business Name:</strong> ${quote.businessName || 'N/A'}</p>
+                        <p><strong>Owner:</strong> ${quote.ownerName || 'N/A'}</p>
+                        <p><strong>Email:</strong> ${quote.email || 'N/A'}</p>
+                        <p><strong>Phone:</strong> ${quote.phone || 'N/A'}</p>
+                        <p><strong>Type:</strong> ${quote.businessType || 'N/A'}</p>
+                        <p><strong>Years in Business:</strong> ${quote.yearsInBusiness || 'N/A'}</p>
+                        <p><strong>Locations:</strong> ${quote.locations || 'N/A'}</p>
+                        <p style="margin-top: 10px;"><strong>Description:</strong><br>${quote.businessDescription || 'N/A'}</p>
+                        <p style="margin-top: 10px;"><strong>What Makes Them Special:</strong><br>${quote.whatMakesSpecial || 'N/A'}</p>
+                    </div>
+
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="color: #05908C; margin-bottom: 15px;">Project Details</h4>
+                        <p><strong>Budget:</strong> ${quote.budgetRange || 'N/A'}</p>
+                        <p><strong>Deadline:</strong> ${quote.deadlineDate || 'Flexible'}</p>
+                        <p><strong>Decision Maker:</strong> ${quote.decisionMaker || 'N/A'}</p>
+                        <p style="margin-top: 10px;"><strong>Why Now:</strong><br>${quote.whyNow || 'N/A'}</p>
+                    </div>
+
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="color: #05908C; margin-bottom: 15px;">Design Preferences</h4>
+                        <p><strong>Logo Location:</strong> ${quote.logoLocation || 'N/A'}</p>
+                        <p><strong>Main Color:</strong> ${quote.brandColors?.main || 'N/A'}</p>
+                        <p><strong>Secondary Color:</strong> ${quote.brandColors?.secondary || 'N/A'}</p>
+                        <p><strong>Accent Color:</strong> ${quote.brandColors?.accent || 'N/A'}</p>
+                        <p><strong>Overall Style:</strong> ${quote.overallStyle?.join(', ') || 'N/A'}</p>
+                        <p><strong>Font Style:</strong> ${quote.fontStyle?.join(', ') || 'N/A'}</p>
+                        <p><strong>Image Style:</strong> ${quote.imageStyle?.join(', ') || 'N/A'}</p>
+                    </div>
+
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="color: #05908C; margin-bottom: 15px;">Favorite Website</h4>
+                        <p><strong>URL:</strong> <a href="${quote.favoriteWebsite?.url}" target="_blank" style="color: #05908C;">${quote.favoriteWebsite?.url || 'N/A'}</a></p>
+                        <p><strong>Likes About Look:</strong> ${quote.favoriteWebsite?.likesAboutLook || 'N/A'}</p>
+                        <p><strong>Likes About Function:</strong> ${quote.favoriteWebsite?.likesAboutFunction || 'N/A'}</p>
+                    </div>
+
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 8px;">
+                        <h4 style="color: #05908C; margin-bottom: 15px;">Customer Profile</h4>
+                        <p><strong>Age Range:</strong> ${quote.customerProfile?.ageRange || 'N/A'}</p>
+                        <p><strong>Gender:</strong> ${quote.customerProfile?.gender || 'N/A'}</p>
+                        <p><strong>Income Level:</strong> ${quote.customerProfile?.incomeLevel || 'N/A'}</p>
+                        <p><strong>Location:</strong> ${quote.customerProfile?.location || 'N/A'}</p>
+                        <p><strong>Tech Comfort:</strong> ${quote.customerProfile?.techComfort || 'N/A'}</p>
+                        <p><strong>Care About:</strong> ${quote.customerCareAbout?.join(', ') || 'N/A'}</p>
+                        <p><strong>Find Via:</strong> ${quote.howCustomersFind?.join(', ') || 'N/A'}</p>
+                    </div>
+                </div>
+            `;
+
+            showAlert(details, 'info');
+        };
+
+        // Generate AI Prompt
+        window.generateAIPrompt = function(quoteId) {
+            const quote = allWebsiteQuotes.find(q => q.id === quoteId);
+            if (!quote) return;
+
+            // Helper function to determine tech stack based on features
+            const determineTechStack = () => {
+                const features = quote.specialFeatures || [];
+                const needsEcommerce = quote.needsEcommerce === 'yes';
+                const hasComplexFeatures = features.includes('search') || features.includes('language') || features.includes('user-accounts');
+                const productCount = parseInt(quote.productCount) || 0;
+
+                if (needsEcommerce && productCount > 50) {
+                    return 'Next.js + Shopify Storefront API (large product catalog with custom frontend)';
+                } else if (needsEcommerce) {
+                    return 'Next.js + Stripe integration (custom e-commerce solution)';
+                } else if (hasComplexFeatures) {
+                    return 'Next.js with React (requires interactive features and client-side state management)';
+                } else {
+                    return 'HTML5/CSS3/Vanilla JavaScript (static site with optimal performance)';
+                }
+            };
+
+            // Helper function to get industry-specific requirements
+            const getIndustryRequirements = () => {
+                const industry = (quote.businessType || '').toLowerCase();
+
+                const industrySpecs = {
+                    'restaurant': `
+INDUSTRY-SPECIFIC REQUIREMENTS (Restaurant):
+- Prominent menu display (easy to read, organized by category)
+- Location and hours highly visible (above the fold)
+- Mobile-first design (80%+ of customers browse menus on phones)
+- Fast loading images (hungry customers are impatient)
+- Click-to-call phone number (sticky on mobile)
+- Map integration for directions
+- High-quality food photography
+${quote.specialFeatures?.includes('ecommerce') ? '- Online ordering system with cart and checkout' : ''}
+${quote.specialFeatures?.includes('booking') ? '- Reservation system integration' : ''}`,
+
+                    'law firm': `
+INDUSTRY-SPECIFIC REQUIREMENTS (Law Firm):
+- Professional, trustworthy design (conservative color palette)
+- Attorney profiles with credentials and specializations
+- Case intake form (multi-step with validation)
+- Practice areas clearly organized
+- Testimonials/case results (build credibility)
+- Blog for SEO and thought leadership
+- ADA accessibility compliance (legal requirement)
+- Secure contact forms (attorney-client privilege)
+- Mobile responsive (but desktop-optimized for reading)`,
+
+                    'ecommerce': `
+INDUSTRY-SPECIFIC REQUIREMENTS (E-commerce):
+- Product catalog with filtering and search
+- Shopping cart with persistence (localStorage)
+- Checkout flow (guest and account options)
+- Payment gateway integration (Stripe recommended)
+- Product image galleries with zoom
+- Customer reviews and ratings
+- Inventory management system
+- Order tracking
+- Customer account dashboard
+- Mobile-optimized checkout (reduce cart abandonment)
+- Fast loading (every 100ms delay = 1% lost sales)`,
+
+                    'real estate': `
+INDUSTRY-SPECIFIC REQUIREMENTS (Real Estate):
+- Property listing system with search/filter
+- Map integration (property locations)
+- Photo galleries for each property
+- Property detail pages (specs, features, pricing)
+- Lead capture forms (schedule showing)
+- Mortgage calculator
+- Neighborhood information
+- Agent profiles
+- Testimonials from buyers/sellers
+- IDX integration (if applicable)`,
+
+                    'medical': `
+INDUSTRY-SPECIFIC REQUIREMENTS (Medical/Healthcare):
+- HIPAA compliance considerations
+- Patient portal or contact forms (secure)
+- Insurance information clearly displayed
+- Services/conditions treated
+- Provider credentials and photos
+- Appointment booking system
+- Patient resources/education
+- Accessibility (ADA/WCAG 2.1 AA minimum)
+- Trust signals (certifications, affiliations)`,
+
+                    'default': `
+INDUSTRY-SPECIFIC REQUIREMENTS:
+- Clear value proposition above the fold
+- Intuitive navigation
+- Mobile-responsive design
+- Fast loading times
+- Clear calls-to-action
+- Contact information easily accessible`
+                };
+
+                for (const [key, value] of Object.entries(industrySpecs)) {
+                    if (industry.includes(key)) return value;
+                }
+                return industrySpecs.default;
+            };
+
+            // Helper function to format array items
+            const formatArray = (arr, fallback = 'Not specified') => {
+                return arr && arr.length > 0 ? arr.join(', ') : fallback;
+            };
+
+            // Build the comprehensive prompt
+            const techStack = determineTechStack();
+            const industryReqs = getIndustryRequirements();
+
+            const prompt = `You are building a professional website using Claude Code in VS Code.
+
+PROJECT OVERVIEW:
+Client: ${quote.businessName || '[Business Name]'}
+Industry: ${quote.businessType || '[Business Type]'}
+Location: ${quote.locations || '[Location]'}
+Years in Business: ${quote.yearsInBusiness || 'Not specified'}
+
+DEVELOPMENT ENVIRONMENT & DEPLOYMENT:
+- Code Editor: VS Code with Claude Code extension
+- Version Control: GitHub repository
+- Deployment Platform: Vercel (automatic deployments on git push)
+- Backend Services: Google Cloud Console (Firebase, Cloud Functions if needed)
+- Tech Stack: ${techStack}
+
+WORKFLOW:
+1. Build locally in VS Code using Claude Code
+2. Commit and push to GitHub repository
+3. Vercel automatically deploys from GitHub
+4. Domain connects through Vercel
+5. Any backend needs use Firebase (Auth, Firestore, Storage, Functions)
+
+═══════════════════════════════════════════════════════════
+
+SECTION 1: BUSINESS UNDERSTANDING
+
+About the Business:
+${quote.businessDescription || 'No description provided'}
+
+Competitor Websites:
+${quote.competitor1Url ? '1. ' + quote.competitor1Url : ''}
+${quote.competitor2Url ? '2. ' + quote.competitor2Url : ''}
+${!quote.competitor1Url && !quote.competitor2Url ? 'Not specified' : ''}
+
+${quote.competitor1Url || quote.competitor2Url ? 'ACTION: Visit competitor sites to understand market positioning, common features, and design patterns in this industry.' : ''}
+
+═══════════════════════════════════════════════════════════
+
+SECTION 2: CURRENT WEBSITE ANALYSIS
+${quote.hasCurrentWebsite === 'yes' ? `
+Current Website: ${quote.currentWebsiteUrl || 'URL not provided'}
+Age: ${quote.websiteAge || 'Not specified'}
+Built By: ${quote.builtBy || 'Not specified'}
+What Works Well: ${quote.whatWorksWell || 'Not specified'}
+Current Problems: ${formatArray(quote.currentProblems)}
+Monthly Visitors: ${quote.monthlyVisitors || 'Not specified'}
+Traffic Sources: ${quote.trafficSources || 'Not specified'}
+
+ACTION: Analyze the current site's structure and improve upon it.
+` : 'No current website - building from scratch.'}
+
+═══════════════════════════════════════════════════════════
+
+SECTION 3: DESIGN INSPIRATION
+
+Reference Website: ${quote.favoriteWebsite?.url || 'No reference provided'}
+${quote.favoriteWebsite?.url ? `ACTION: Visit this URL and analyze the design patterns, layout, and user experience.` : ''}
+
+What They Love About The Look:
+${quote.favoriteWebsite?.likesAboutLook || 'Not specified'}
+
+What They Love About Functionality:
+${formatArray(quote.favoriteWebsite?.likesAboutFunction)}
+
+Color Preferences:
+${quote.favoriteWebsite?.likesAboutColors || 'See brand colors below'}
+
+Layout Preferences:
+${quote.favoriteWebsite?.likesAboutLayout || 'Not specified'}
+
+Specific Features They Like:
+${formatArray(quote.favoriteWebsite?.specificFeatures)}
+
+═══════════════════════════════════════════════════════════
+
+SECTION 4: DESIGN SYSTEM
+
+Create a comprehensive design system using CSS custom properties:
+
+:root {
+  /* Brand Colors */
+  --color-primary: ${quote.brandColors?.main || '#05908C'};
+  --color-secondary: ${quote.brandColors?.secondary || '#012E40'};
+  --color-accent: ${quote.brandColors?.accent || '#F2A922'};
+  --color-background: ${quote.brandColors?.background || '#FFFFFF'};
+
+  /* Semantic Colors (derive from brand) */
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+
+  /* Typography Scale */
+  --font-heading: 'Your Choice', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* Spacing Scale (8px base) */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-6: 3rem;
+  --space-8: 4rem;
+  --space-12: 6rem;
+  --space-16: 8rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Breakpoints (use in media queries) */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+}
+
+${quote.logoUrl ? `Logo File Available: ${quote.logoUrl}\nLogo Filename: ${quote.logoFileName}` : 'No logo uploaded - use text-based branding'}
+
+═══════════════════════════════════════════════════════════
+
+SECTION 5: TARGET AUDIENCE
+
+Demographics:
+- Age Range: ${quote.customerProfile?.ageRange || 'Not specified'}
+- Location: ${quote.customerProfile?.location || 'Not specified'}
+
+How Customers Find This Business:
+${formatArray(quote.howCustomersFind)}
+
+Online Reviews:
+${quote.onlineReviews && quote.onlineReviews.length > 0
+    ? quote.onlineReviews.map(r => `${r.platform}: ${r.stars} stars`).join(', ')
+    : 'Not specified'}
+
+DESIGN IMPLICATIONS:
+${quote.customerProfile?.ageRange?.includes('18-35') ? '- Modern, bold design with interactive elements and animations' : ''}
+${quote.customerProfile?.ageRange?.includes('55') || quote.customerProfile?.ageRange?.includes('65') ? '- Large, readable text (minimum 16px body, 18px+ preferred)\n- High contrast for readability\n- Simple, clear navigation\n- Obvious call-to-action buttons' : ''}
+${quote.customerProfile?.location === 'local' ? '- Emphasize location, local keywords, map integration' : ''}
+${quote.customerProfile?.location === 'international' ? '- Consider multi-language support, currency options' : ''}
+
+═══════════════════════════════════════════════════════════
+
+SECTION 6: PAGES & SITE STRUCTURE
+
+Required Pages:
+${formatArray(quote.pagesNeeded, 'No pages specified - suggest: Home, About, Services, Contact')}
+
+${quote.otherPages ? `Additional Pages:\n${quote.otherPages}` : ''}
+
+${quote.servicePages ? `Service Pages Approach: ${quote.servicePages}` : ''}
+
+Legal Pages Needed:
+${formatArray(quote.legalPages)}
+
+FILE STRUCTURE:
+${techStack.includes('Next.js') ? `
+Next.js Project Structure:
+/
+├── app/ (App Router - Next.js 13+)
+│   ├── layout.js (root layout with nav/footer)
+│   ├── page.js (homepage)
+${quote.pagesNeeded?.includes('about') ? '│   ├── about/page.js' : ''}
+${quote.pagesNeeded?.includes('services') ? '│   ├── services/page.js' : ''}
+${quote.pagesNeeded?.includes('contact') ? '│   ├── contact/page.js' : ''}
+${quote.pagesNeeded?.includes('portfolio') ? '│   ├── portfolio/page.js' : ''}
+${quote.pagesNeeded?.includes('testimonials') ? '│   ├── testimonials/page.js' : ''}
+│   └── api/ (API routes for forms, integrations)
+├── components/
+│   ├── Header.jsx
+│   ├── Footer.jsx
+│   ├── Button.jsx
+│   └── [other reusable components]
+├── styles/
+│   ├── globals.css (design system variables)
+│   └── [component-specific styles]
+├── public/
+│   ├── images/
+│   └── assets/
+├── lib/ (utility functions, Firebase config)
+└── package.json
+
+Deploy to Vercel: Connect GitHub repo, auto-deploys on push to main
+` : `
+Static HTML/CSS/JS Structure:
+/
+├── index.html (Homepage)
+${quote.pagesNeeded?.includes('about') ? '├── about.html' : ''}
+${quote.pagesNeeded?.includes('services') ? '├── services.html' : ''}
+${quote.pagesNeeded?.includes('contact') ? '├── contact.html' : ''}
+${quote.pagesNeeded?.includes('portfolio') ? '├── portfolio.html' : ''}
+${quote.pagesNeeded?.includes('testimonials') ? '├── testimonials.html' : ''}
+├── css/
+│   ├── reset.css (normalize browser styles)
+│   ├── variables.css (design tokens)
+│   ├── components.css (reusable components)
+│   └── main.css (page-specific styles)
+├── js/
+│   ├── utils.js (helper functions)
+│   ├── components.js (interactive components)
+│   └── main.js (initialization)
+├── images/
+├── assets/
+└── vercel.json (Vercel configuration)
+
+Deploy to Vercel: Drag & drop or connect GitHub repo
+`}
+
+═══════════════════════════════════════════════════════════
+
+SECTION 7: FEATURES & FUNCTIONALITY
+
+Contact Methods Needed:
+${formatArray(quote.contactFeatures)}
+
+Forms Required:
+${quote.formsNeeded || 'Contact form (minimum)'}
+
+Social Media Integration:
+${quote.socialMedia || 'Not specified'}
+
+Special Features:
+${formatArray(quote.specialFeatures)}
+
+${quote.specialFeatures?.includes('booking') ? `
+BOOKING SYSTEM IMPLEMENTATION:
+- Integrate with Cal.com or Calendly (embed or API)
+- Allow users to select service/appointment type
+- Calendar view with availability
+- Email confirmations
+- Timezone handling
+` : ''}
+
+${quote.specialFeatures?.includes('live-chat') ? `
+LIVE CHAT IMPLEMENTATION:
+- Consider Tawk.to (free) or Intercom
+- Position in bottom-right corner
+- Only show after 5 seconds on page
+- Mobile-optimized
+` : ''}
+
+${quote.specialFeatures?.includes('search') ? `
+SEARCH FUNCTIONALITY:
+- Implement client-side search with Fuse.js
+- Search across pages, services, blog posts
+- Real-time results as user types
+- Highlight matching terms
+` : ''}
+
+═══════════════════════════════════════════════════════════
+
+SECTION 8: E-COMMERCE & CONTENT
+
+${quote.needsEcommerce === 'yes' ? `
+E-COMMERCE REQUIREMENTS:
+E-commerce Features Needed:
+${formatArray(quote.ecommerceFeatures)}
+
+Estimated Product Count: ${quote.productCount || 'Not specified'}
+
+IMPLEMENTATION:
+${quote.productCount && parseInt(quote.productCount) > 50
+    ? 'Recommend WooCommerce due to high product count'
+    : 'Can use static HTML with Stripe integration or Snipcart for simple shop'}
+
+Required Features:
+- Product listing page with grid layout
+- Individual product pages
+- Shopping cart (localStorage persistence)
+- Checkout flow with Stripe
+- Order confirmation emails
+- Admin panel for managing products/orders
+` : 'No e-commerce functionality needed.'}
+
+Content Strategy:
+${quote.writtenContent === 'need-help' ? 'Client needs copywriting assistance - use placeholder text, suggest professional copywriter' : ''}
+${quote.writtenContent === 'have-content' ? 'Client has content ready - create content blocks ready for their copy' : ''}
+${quote.writtenContent === 'write-it' ? 'You will write the content - draft compelling copy for each section' : ''}
+
+${quote.contentProvided ? `Content Details:\n${quote.contentProvided}` : ''}
+
+Photos/Videos:
+${formatArray(quote.photosVideos)}
+
+${quote.documents ? `Additional Documents:\n${quote.documents}` : ''}
+
+═══════════════════════════════════════════════════════════
+
+SECTION 9: UPDATES & MAINTENANCE
+
+What Client Wants to Update:
+${formatArray(quote.wantToUpdate)}
+
+Update Frequency: ${quote.updateFrequency || 'Not specified'}
+Who Updates: ${quote.whoUpdates || 'Not specified'}
+
+IMPLEMENTATION NOTES:
+${quote.whoUpdates === 'me' || quote.whoUpdates === 'both'
+    ? 'Client wants to update content themselves - Consider using Next.js with a simple CMS-like admin panel built with Firebase, or provide clear documentation for editing content files'
+    : 'Developer will handle all content updates - static HTML/CSS/JS is perfect for this use case'}
+
+═══════════════════════════════════════════════════════════
+
+SECTION 10: MARKETING & SEO
+
+Target Keywords:
+${quote.searchKeywords || 'Not specified - research industry keywords'}
+
+Service Area:
+${quote.serviceArea || 'Not specified'}
+
+Current Marketing:
+${formatArray(quote.currentMarketing)}
+
+SEO REQUIREMENTS:
+- Semantic HTML5 (proper heading hierarchy h1 > h2 > h3)
+- Meta tags (title, description, Open Graph, Twitter Card)
+- Alt text on all images (descriptive, include keywords naturally)
+- Structured data (Schema.org - LocalBusiness, Organization, etc.)
+- XML sitemap
+- Robots.txt
+- Fast loading (< 3 seconds on 3G)
+- Mobile-friendly (Google mobile-first indexing)
+- Clean URLs (no query parameters if possible)
+${quote.customerProfile?.location === 'local' ? '- Local SEO optimization (NAP consistency, Google Business integration)' : ''}
+
+═══════════════════════════════════════════════════════════
+
+SECTION 11: TECHNICAL REQUIREMENTS
+
+Domain Status: ${quote.domainStatus || 'Not specified'}
+${quote.domainName ? `Domain Name: ${quote.domainName}` : ''}
+
+${industryReqs}
+
+CORE TECHNICAL STANDARDS:
+✓ Mobile-First Responsive Design
+  - Breakpoints: 640px (sm), 768px (md), 1024px (lg), 1280px (xl)
+  - Test on iPhone SE, iPhone 12, iPad, Desktop
+  - Touch targets minimum 44x44px
+  - No horizontal scroll on any device
+
+✓ Performance Optimization
+  - Images: WebP format with fallbacks, lazy loading, max 200KB per image
+  - CSS: Minified, critical CSS inlined, non-critical deferred
+  - JavaScript: Minified, async/defer loading, no render-blocking
+  - Fonts: Subset fonts, preload critical fonts
+  - Target: Lighthouse score 90+ (Performance, Accessibility, Best Practices, SEO)
+
+✓ Cross-Browser Compatibility
+  - Chrome (latest 2 versions)
+  - Safari (latest 2 versions)
+  - Firefox (latest 2 versions)
+  - Edge (latest 2 versions)
+  - Graceful degradation for older browsers
+
+✓ Accessibility (WCAG 2.1 AA)
+  - Semantic HTML5 elements
+  - ARIA labels where needed
+  - Keyboard navigation (tab order, focus states)
+  - Color contrast ratio 4.5:1 minimum for text
+  - Alt text on images
+  - Skip to main content link
+  - Screen reader tested
+
+✓ Security Best Practices
+  - HTTPS only (enforce with meta tag)
+  - Input validation on forms
+  - Sanitize user inputs
+  - CSRF protection on forms
+  - Content Security Policy headers (if applicable)
+
+✓ Code Quality
+  - W3C valid HTML
+  - Valid CSS (no errors)
+  - ESLint compliant JavaScript
+  - Consistent code formatting (2-space indentation)
+  - Commented code (explain complex logic)
+  - No console.logs in production
+
+═══════════════════════════════════════════════════════════
+
+SECTION 12: GOALS & SUCCESS METRICS
+
+Primary Goal:
+${quote.primaryGoal || 'Not specified'}
+
+Secondary Goals:
+${quote.secondaryGoals || 'Not specified'}
+
+What Success Looks Like:
+${formatArray(quote.successLooksLike)}
+
+Tracking Methods:
+${formatArray(quote.trackingMethods)}
+
+ANALYTICS IMPLEMENTATION:
+${quote.trackingMethods?.includes('google-analytics') ? '- Add Google Analytics 4 tracking code\n- Track: page views, button clicks, form submissions' : ''}
+${quote.trackingMethods?.includes('facebook-pixel') ? '- Add Meta Pixel for ad tracking' : ''}
+${quote.trackingMethods?.includes('heatmaps') ? '- Integrate Hotjar or Microsoft Clarity for user behavior tracking' : ''}
+
+═══════════════════════════════════════════════════════════
+
+SECTION 13: SPECIAL REQUESTS & NOTES
+
+Specific Wants:
+${quote.specificWants || 'None specified'}
+
+Things to Avoid:
+${quote.dontWant || 'None specified'}
+
+Client Concerns:
+${quote.concerns || 'None specified'}
+
+Additional Questions:
+${quote.additionalQuestions || 'None'}
+
+Additional Notes:
+${quote.additionalNotes || 'None'}
+
+═══════════════════════════════════════════════════════════
+
+BUILD PROCESS - FOLLOW THESE STEPS:
+
+PHASE 1: FOUNDATION (Complete this first)
+1. Create file structure (as outlined above)
+2. Create reset.css (normalize browser styles)
+3. Create variables.css with design system (all CSS custom properties)
+4. Create base component styles (buttons, forms, cards, etc.)
+5. Set up responsive grid system
+
+PHASE 2: HOMEPAGE BUILD
+1. Header/Navigation (sticky on scroll if appropriate)
+2. Hero section (compelling headline, subheadline, CTA, hero image/video)
+3. Key features/services section (3-6 items with icons)
+4. Social proof (testimonials, logos, stats)
+5. Call-to-action section
+6. Footer (contact info, social links, legal pages)
+
+PHASE 3: ADDITIONAL PAGES
+Build each page from Section 6 following the same design system
+
+PHASE 4: INTERACTIVE FEATURES
+Implement features from Section 7:
+- Contact forms with validation
+- Mobile menu toggle
+- Image galleries/lightboxes
+- Booking integration
+- E-commerce functionality
+- Any custom features
+
+PHASE 5: OPTIMIZATION
+1. Compress all images (TinyPNG or similar)
+2. Minify CSS and JavaScript
+3. Add lazy loading to images
+4. Test on mobile devices (real devices if possible)
+5. Run Lighthouse audit (fix issues to reach 90+ scores)
+6. Validate HTML/CSS (W3C validators)
+7. Test accessibility (aXe DevTools or WAVE)
+8. Cross-browser testing
+
+PHASE 6: PRE-LAUNCH CHECKLIST
+□ All pages created and linked properly
+□ All images have alt text
+□ Forms tested (validation, submissions)
+□ Mobile responsive on all devices
+□ Fast loading (< 3 seconds)
+□ SEO meta tags on all pages
+□ Analytics tracking installed
+□ Favicon added
+□ 404 page created
+□ Contact information accurate
+□ Social media links working
+□ Legal pages (privacy policy, terms) if needed
+
+═══════════════════════════════════════════════════════════
+
+IMPORTANT REMINDERS:
+- Build mobile-first, then enhance for larger screens
+- Use semantic HTML5 (header, nav, main, section, article, aside, footer)
+- Keep CSS organized and commented
+- Use meaningful class names (BEM methodology recommended)
+- Test after each major component
+- Commit code frequently with descriptive messages
+- Ask clarifying questions if requirements are unclear
+- Prioritize performance and accessibility
+- Make it easy for the client to update content (if required)
+
+Start with Phase 1 and work through systematically. Show your progress after each phase for review.`;
+
+            // Show in modal with copy button
+            const modalContent = `
+                <div>
+                    <h3 style="margin-bottom: 20px;">AI Prompt Generated</h3>
+                    <textarea id="aiPromptText" style="width: 100%; height: 400px; padding: 15px; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: monospace; font-size: 0.9rem;">${prompt}</textarea>
+                    <button onclick="copyAIPrompt()" style="margin-top: 15px; padding: 12px 24px; background: #05908C; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%;">
+                        Copy to Clipboard
+                    </button>
+                </div>
+            `;
+
+            showAlert(modalContent, 'info');
+        };
+
+        // Copy AI Prompt
+        window.copyAIPrompt = function() {
+            const textarea = document.getElementById('aiPromptText');
+            if (textarea) {
+                textarea.select();
+                document.execCommand('copy');
+                showAlert('Prompt copied to clipboard!', 'success');
+            }
+        };
+
+        // Copy quote link
+        window.copyQuoteLink = function(quoteId) {
+            const link = `${PORTAL_BASE_URL}/client.html?id=${quoteId}`;
+            navigator.clipboard.writeText(link).then(() => {
+                showAlert('Quote link copied to clipboard!', 'success');
+            });
+        };
+
+        // Copy admin form link (from info box)
+        window.copyAdminFormLink = function() {
+            const input = document.getElementById('adminFormLinkInput');
+            input.select();
+            input.setSelectionRange(0, 99999);
+
+            navigator.clipboard.writeText(input.value).then(() => {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied! ✓';
+                button.style.background = '#059669';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#0284c7';
+                }, 2000);
+            }).catch(err => {
+                showAlert('Link copied!', 'success');
+            });
+        };
+
+        // Update quote status
+        window.updateQuoteStatus = async function(quoteId, newStatus) {
+            if (!newStatus) return;
+
+            try {
+                await db.collection('websiteQuotes').doc(quoteId).update({
+                    status: newStatus,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showAlert('Quote status updated!', 'success');
+                await loadWebsiteQuotes();
+            } catch (error) {
+                console.error('Error updating status:', error);
+                showAlert('Error updating status: ' + error.message, 'error');
+            }
+        };
+
+        // ============================================
+        // NOTIFICATIONS SYSTEM
+        // ============================================
+
+        let notificationsListener = null;
+        let adminNotifications = [];
+
+        // Toggle notifications dropdown
+        window.toggleNotifications = function() {
+            const dropdown = document.getElementById('notificationsDropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const bell = event.target.closest('button');
+
+            if (dropdown.style.display !== 'none' && !dropdown.contains(event.target) && (!bell || bell.onclick !== toggleNotifications)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Initialize notifications for admin
+        function initializeNotifications() {
+            // Listen for notifications in real-time
+            notificationsListener = window.listenForNotifications('admin', 'admin', function(notifications) {
+                adminNotifications = notifications;
+                updateNotificationsBadge();
+                renderNotificationsList();
+            });
+        }
+
+        // Update badge with unread count
+        function updateNotificationsBadge() {
+            const badge = document.getElementById('notificationBadge');
+            const unreadCount = adminNotifications.filter(n => !n.read).length;
+
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Render notifications list
+        function renderNotificationsList() {
+            const container = document.getElementById('notificationsList');
+
+            if (adminNotifications.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: #6b7280;">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🔔</div>
+                        <div>No new notifications</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = adminNotifications.map(notification => window.renderNotification(notification)).join('');
+            container.innerHTML = html;
+        }
+
+        // Mark all notifications as read
+        window.markAllNotificationsRead = async function() {
+            const unreadIds = adminNotifications.filter(n => !n.read).map(n => n.id);
+            if (unreadIds.length > 0) {
+                await window.markNotificationsRead(unreadIds);
+            }
+        };
+
+        // Initialize notifications when admin logs in
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                initializeNotifications();
+            } else if (notificationsListener) {
+                notificationsListener();
+                notificationsListener = null;
+            }
+        });
+
     </script>
 
     <!-- Deal Creation/Edit Modal -->
@@ -2784,6 +4231,18 @@
                     <label for="dealClientPortalId">Linked Client Portal ID</label>
                     <input type="text" id="dealClientPortalId" placeholder="Leave empty until Onboarding Portal stage">
                     <small style="color: #666; font-size: 0.85rem;">Link this deal to an existing client portal (optional)</small>
+                </div>
+
+                <!-- Website Quote Link (Read-only, auto-filled) -->
+                <div class="form-group" id="websiteQuoteSection" style="display: none;">
+                    <label style="color: #F59E0B; font-weight: 600;">📝 Website Quote</label>
+                    <div style="background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #92400E; font-size: 0.9rem;">This deal was auto-created from a website quote submission</span>
+                        <button type="button" onclick="viewLinkedWebsiteQuote()" style="background: #F59E0B; color: white; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
+                            View Quote
+                        </button>
+                    </div>
+                    <input type="hidden" id="dealWebsiteQuoteId">
                 </div>
 
                 <div class="form-group">

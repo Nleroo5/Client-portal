@@ -109,6 +109,42 @@ service cloud.firestore {
       }
     }
 
+    // Website Quotes - Discovery forms for website projects
+    match /websiteQuotes/{quoteId} {
+      // Admins can read/write all quotes
+      allow read, write: if isAdmin();
+
+      // Allow unauthenticated read/write for clients filling out their own form
+      // Protected by unique quote ID in URL
+      allow read, write, create: if true;
+    }
+
+    // Notifications - In-portal notification system
+    match /notifications/{notificationId} {
+      // Admins can read all notifications
+      allow read: if isAdmin();
+
+      // Sales reps can read their own notifications
+      allow read: if isRep() &&
+                     resource.data.recipientId == request.auth.uid &&
+                     resource.data.recipientType == 'sales-rep';
+
+      // Admins can read admin notifications
+      allow read: if isAdmin() &&
+                     resource.data.recipientType == 'admin';
+
+      // Allow unauthenticated creation (notifications created by system events)
+      allow create: if true;
+
+      // Allow updates to mark as read (by owner only)
+      allow update: if (isAdmin() && resource.data.recipientType == 'admin') ||
+                       (isRep() && resource.data.recipientId == request.auth.uid && resource.data.recipientType == 'sales-rep') ||
+                       (resource.data.recipientType == 'client');
+
+      // Only admins can delete notifications
+      allow delete: if isAdmin();
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

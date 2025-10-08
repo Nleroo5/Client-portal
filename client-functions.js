@@ -29,7 +29,7 @@
     // Load state from Firebase - THIS IS THE CRITICAL FIREBASE FUNCTION
     async function loadState() {
         const urlParams = new URLSearchParams(window.location.search);
-        const clientId = urlParams.get('c');
+        const clientId = urlParams.get('id') || urlParams.get('c'); // Support both new 'id' and legacy 'c' parameter
         
         // Hide loading screen function
         const hideLoading = () => {
@@ -267,10 +267,35 @@
     }
 
     // Mark Step Complete - SAVES TO FIREBASE
-    function markStepComplete(stepNum) {
+    async function markStepComplete(stepNum) {
         portalState[stepNum.toString()] = true;
-        saveState(); // This now saves to Firebase
-        
+        await saveState(); // This now saves to Firebase
+
+        // Create notification for admin about step completion
+        if (window.createNotification && window.currentClientId) {
+            try {
+                const clientDoc = await db.collection('clients').doc(window.currentClientId).get();
+                const clientData = clientDoc.data();
+
+                await window.createNotification({
+                    type: 'CLIENT_STEP_COMPLETE',
+                    recipientId: 'admin',
+                    recipientType: 'admin',
+                    message: `${clientData.clientName || 'Client'} completed Step ${stepNum}`,
+                    actionUrl: `admin.html?tab=clients`,
+                    relatedId: window.currentClientId,
+                    metadata: {
+                        clientName: clientData.clientName,
+                        stepNumber: stepNum,
+                        portalType: clientData.portalType
+                    }
+                });
+                console.log(`✓ Admin notification created for Step ${stepNum} completion`);
+            } catch (error) {
+                console.error('Error creating step completion notification:', error);
+            }
+        }
+
         // Add completing animation to button
         const step = document.getElementById(`step${stepNum}`);
         const btn = step?.querySelector('.btn-complete');
@@ -278,7 +303,7 @@
             btn.classList.add('completing');
             setTimeout(() => btn.classList.remove('completing'), 600);
         }
-        
+
         // Add green flash effect to step
         if (step) {
             step.style.transition = 'none';
@@ -293,7 +318,7 @@
         } else {
             updateStepStates();
         }
-        
+
         // Check if all complete
         const allComplete = [1,2,3,4,5,6].every(n => portalState[n.toString()]);
         if (allComplete) {
@@ -641,7 +666,7 @@
     // Load client messages
     function loadClientMessages() {
         const urlParams = new URLSearchParams(window.location.search);
-        const clientId = urlParams.get('c');
+        const clientId = urlParams.get('id') || urlParams.get('c'); // Support both new 'id' and legacy 'c' parameter
 
         if (!clientId) return;
 
@@ -744,7 +769,7 @@
         e.preventDefault();
 
         const urlParams = new URLSearchParams(window.location.search);
-        const clientId = urlParams.get('c');
+        const clientId = urlParams.get('id') || urlParams.get('c'); // Support both new 'id' and legacy 'c' parameter
 
         if (!clientId) return;
 
@@ -780,12 +805,151 @@
                 clientName: clientName
             }, { merge: true });
 
+            // Create notification for admin about new client message
+            if (window.createNotification) {
+                await window.createNotification({
+                    type: 'MESSAGE_RECEIVED',
+                    recipientId: 'admin',
+                    recipientType: 'admin',
+                    message: `${clientName} sent you a message`,
+                    actionUrl: `admin.html?tab=clients#messages`,
+                    relatedId: clientId,
+                    metadata: {
+                        clientName: clientName,
+                        messagePreview: messageText.substring(0, 50) + (messageText.length > 50 ? '...' : '')
+                    }
+                });
+                console.log('✓ Admin notification created for new client message');
+            }
+
             input.value = '';
         } catch (error) {
             console.error('Error sending message:', error);
             alert('Error sending message. Please try again.');
         }
     });
+
+    // Brand Kit Functions
+    window.handleLogoUpload = async function(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        try {
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('logoPreviewImg').src = e.target.result;
+                document.getElementById('logoFileName').textContent = file.name;
+                document.getElementById('logoPreviewContainer').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            // Upload to Firebase Storage
+            const urlParams = new URLSearchParams(window.location.search);
+            const clientId = urlParams.get('id') || urlParams.get('c');
+
+            if (!clientId) return;
+
+            const storageRef = firebase.storage().ref();
+            const logoRef = storageRef.child(`clients/${clientId}/brand-logo-${Date.now()}-${file.name}`);
+
+            await logoRef.put(file);
+            const logoUrl = await logoRef.getDownloadURL();
+
+            // Save logo URL to Firestore
+            await db.collection('clients').doc(clientId).update({
+                brandLogoUrl: logoUrl,
+                brandLogoFileName: file.name,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            console.log('✓ Logo uploaded successfully');
+
+        } catch (error) {
+            console.error('Error uploading logo:', error);
+            alert('Error uploading logo. Please try again.');
+        }
+    };
+
+    // Sync color picker with hex input
+    window.syncColorFromHex = function(type) {
+        const hexInput = document.getElementById(`${type}Color` + 'Hex');
+        const colorPicker = document.getElementById(`${type}Color`);
+
+        let hexValue = hexInput.value.trim();
+
+        // Add # if missing
+        if (!hexValue.startsWith('#')) {
+            hexValue = '#' + hexValue;
+        }
+
+        // Validate hex color
+        if (/^#[0-9A-F]{6}$/i.test(hexValue)) {
+            colorPicker.value = hexValue;
+            hexInput.value = hexValue;
+            saveBrandColors();
+        } else {
+            alert('Please enter a valid hex color (e.g., #05908C)');
+        }
+    };
+
+    // Save brand colors to Firestore
+    async function saveBrandColors() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('id') || urlParams.get('c');
+
+        if (!clientId) return;
+
+        const primaryColor = document.getElementById('primaryColor').value;
+        const secondaryColor = document.getElementById('secondaryColor').value;
+
+        try {
+            await db.collection('clients').doc(clientId).update({
+                brandPrimaryColor: primaryColor,
+                brandSecondaryColor: secondaryColor,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log('✓ Brand colors saved');
+        } catch (error) {
+            console.error('Error saving brand colors:', error);
+        }
+    }
+
+    // Listen for color picker changes
+    document.addEventListener('DOMContentLoaded', function() {
+        const primaryColor = document.getElementById('primaryColor');
+        const secondaryColor = document.getElementById('secondaryColor');
+        const primaryHex = document.getElementById('primaryColorHex');
+        const secondaryHex = document.getElementById('secondaryColorHex');
+
+        if (primaryColor) {
+            primaryColor.addEventListener('change', function() {
+                primaryHex.value = this.value;
+                saveBrandColors();
+            });
+        }
+
+        if (secondaryColor) {
+            secondaryColor.addEventListener('change', function() {
+                secondaryHex.value = this.value;
+                saveBrandColors();
+            });
+        }
+    });
+
+    // Toggle advanced brand kit section
+    window.toggleAdvancedBrandKit = function() {
+        const section = document.getElementById('advancedBrandKitSection');
+        const icon = document.getElementById('advancedToggleIcon');
+
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+            icon.textContent = '▲';
+        } else {
+            section.style.display = 'none';
+            icon.textContent = '▼';
+        }
+    };
 
     // Expose functions globally
     window.markStepComplete = markStepComplete;
