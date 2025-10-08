@@ -980,8 +980,6 @@
             </div>
         </div>
 
-        </div>
-
         <!-- Messages Section (within Clients tab) -->
         <div class="admin-section">
             <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 20px; color: #012E40;">Client Messages</h2>
@@ -1508,6 +1506,9 @@
 
             // Start listening for unread messages globally (updates badge on all tabs)
             startGlobalUnreadListener();
+
+            // Initialize notifications
+            initializeNotifications();
         });
 
         // Your portal URL
@@ -3058,11 +3059,13 @@
         }
 
         // Send message from admin
-        document.getElementById('adminMessageForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        const messageFormElement = document.getElementById('replyMessageForm');
+        if (messageFormElement) {
+            messageFormElement.addEventListener('submit', async (e) => {
+                e.preventDefault();
 
-            const input = document.getElementById('adminMessageInput');
-            const messageText = input.value.trim();
+                const input = document.getElementById('replyMessageText');
+                const messageText = input.value.trim();
 
             if (!messageText || !currentChatClientId) return;
 
@@ -3116,7 +3119,8 @@
                 console.error('Error sending message:', error);
                 showAlert('Error sending message: ' + error.message, 'error');
             }
-        });
+            });
+        }
 
         // ===================================
         // WEBSITE QUOTES FUNCTIONS
@@ -4146,16 +4150,6 @@ Start with Phase 1 and work through systematically. Show your progress after eac
                 await window.markNotificationsRead(unreadIds);
             }
         };
-
-        // Initialize notifications when admin logs in
-        firebase.auth().onAuthStateChanged(function(user) {
-            if (user) {
-                initializeNotifications();
-            } else if (notificationsListener) {
-                notificationsListener();
-                notificationsListener = null;
-            }
-        });
 
     </script>
 
