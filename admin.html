@@ -4220,9 +4220,26 @@ Start with Phase 1 and work through systematically. Show your progress after eac
             const password = document.getElementById('cmsClientPassword').value;
 
             try {
-                // Create Firebase Auth user
+                // Save current admin auth state
+                const currentAdmin = firebase.auth().currentUser;
+                const adminEmail = currentAdmin.email;
+
+                // Create Firebase Auth user (this will log out the admin temporarily)
                 const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
+                const newUserId = user.uid;
+
+                // Sign out the new user
+                await firebase.auth().signOut();
+
+                // Admin needs to re-authenticate - prompt for password
+                const adminPassword = prompt('Creating CMS user requires re-authentication.\n\nPlease enter your admin password to continue:');
+                if (!adminPassword) {
+                    throw new Error('Admin re-authentication cancelled');
+                }
+
+                // Re-authenticate as admin
+                await firebase.auth().signInWithEmailAndPassword(adminEmail, adminPassword);
 
                 // Generate client ID
                 const clientId = clientName.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Date.now();
@@ -4231,10 +4248,10 @@ Start with Phase 1 and work through systematically. Show your progress after eac
                 await db.collection('cmsClients').doc(clientId).set({
                     clientName: clientName,
                     email: email,
-                    userId: user.uid,
+                    userId: newUserId,
                     active: true,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    createdBy: firebase.auth().currentUser.email
+                    createdBy: adminEmail
                 });
 
                 // Initialize website content structure
