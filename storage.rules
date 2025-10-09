@@ -25,6 +25,32 @@ service firebase.storage {
       allow read: if isRep() && request.auth.uid == repId;
     }
 
+    // Website Quote uploads - Allow unauthenticated uploads (clients filling discovery form)
+    match /websiteQuotes/{quoteId}/{allPaths=**} {
+      // Admins can read/write all quote files
+      allow read, write: if isAdmin();
+
+      // Allow anyone to upload (clients are unauthenticated)
+      allow write: if true;
+
+      // Allow anyone to read (for preview purposes)
+      allow read: if true;
+    }
+
+    // CMS Website Content - Images uploaded by CMS clients
+    match /websiteContent/{clientId}/{allPaths=**} {
+      // Admins can read/write all
+      allow read, write: if isAdmin();
+
+      // CMS users can upload to their own folder
+      allow write: if request.auth != null &&
+                      firestore.exists(/databases/(default)/documents/cmsClients/$(clientId)) &&
+                      firestore.get(/databases/(default)/documents/cmsClients/$(clientId)).data.email == request.auth.token.email;
+
+      // Public read for website display
+      allow read: if true;
+    }
+
     // Deny all other access
     match /{allPaths=**} {
       allow read, write: if false;

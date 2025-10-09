@@ -2041,9 +2041,14 @@
                 currentSection: currentSection
             };
 
-            // Get all form inputs
-            const form = document.getElementById('websiteDiscoveryForm');
-            const inputs = form.querySelectorAll('input, textarea, select');
+            // Get all form inputs from the entire form container
+            const formContainer = document.querySelector('.form-container');
+            if (!formContainer) {
+                console.error('Form container not found');
+                return data;
+            }
+
+            const inputs = formContainer.querySelectorAll('input, textarea, select');
 
             inputs.forEach(input => {
                 if (input.type === 'checkbox') {
