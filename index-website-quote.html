@@ -884,12 +884,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="likesAboutLook">What do you love about the way it looks?</label>
-                    <textarea id="likesAboutLook" placeholder="Describe the visual design..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>What do you love about how it works?</label>
+                    <label>What do you love about it?</label>
                     <div class="checkbox-group">
                         <div class="checkbox-item">
                             <input type="checkbox" id="func1" value="easy-navigation">
@@ -954,14 +949,73 @@
                     </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="likesAboutColors">The colors:</label>
-                        <input type="text" id="likesAboutColors" placeholder="Describe the color scheme">
-                    </div>
-                    <div class="form-group">
-                        <label for="likesAboutLayout">The layout:</label>
-                        <input type="text" id="likesAboutLayout" placeholder="Describe the layout style">
+                <div class="form-group">
+                    <label>Design Elements You Like</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design1" value="modern-clean">
+                            <label for="design1">Modern & Clean</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design2" value="bold-colorful">
+                            <label for="design2">Bold & Colorful</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design3" value="minimalist">
+                            <label for="design3">Minimalist</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design4" value="professional-corporate">
+                            <label for="design4">Professional & Corporate</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design5" value="fun-playful">
+                            <label for="design5">Fun & Playful</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design6" value="elegant-sophisticated">
+                            <label for="design6">Elegant & Sophisticated</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design7" value="rustic-vintage">
+                            <label for="design7">Rustic/Vintage</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design8" value="high-tech-futuristic">
+                            <label for="design8">High-Tech/Futuristic</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design9" value="warm-inviting">
+                            <label for="design9">Warm & Inviting</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design10" value="monochromatic">
+                            <label for="design10">Monochromatic Color Scheme</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design11" value="vibrant-multicolor">
+                            <label for="design11">Vibrant Multi-Color Palette</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design12" value="pastel-colors">
+                            <label for="design12">Pastel Colors</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design13" value="dark-mode">
+                            <label for="design13">Dark Mode/Dark Theme</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design14" value="white-space">
+                            <label for="design14">Lots of White Space</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design15" value="full-width">
+                            <label for="design15">Full-Width Sections</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="design16" value="boxed-card">
+                            <label for="design16">Boxed/Card Layout</label>
+                        </div>
                     </div>
                 </div>
 
@@ -971,10 +1025,6 @@
                         <div class="checkbox-item">
                             <input type="checkbox" id="feat1" value="image-slider">
                             <label for="feat1">Image slider/carousel</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="feat2" value="parallax">
-                            <label for="feat2">Parallax scrolling effect</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="feat3" value="video-background">
@@ -1028,10 +1078,6 @@
                             <input type="checkbox" id="feat15" value="counters">
                             <label for="feat15">Animated counters</label>
                         </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="feat16" value="tabs">
-                            <label for="feat16">Tabbed content sections</label>
-                        </div>
                     </div>
                 </div>
 
@@ -1047,16 +1093,6 @@
                 <p class="section-description">Define your website's visual style</p>
 
                 <div class="form-group">
-                    <label for="logoFile">Your Logo File * (PNG preferred)</label>
-                    <input type="file" id="logoFile" accept="image/png,image/jpeg,image/svg+xml" style="padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; width: 100%;">
-                    <span class="helper-text">Upload your logo file (PNG, JPG, or SVG)</span>
-                    <div id="logoPreview" style="margin-top: 15px; display: none;">
-                        <img id="logoPreviewImg" style="max-width: 200px; max-height: 100px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px;">
-                        <p id="logoFileName" style="margin-top: 8px; font-size: 0.9rem; color: #6b7280;"></p>
-                    </div>
-                </div>
-
-                <div class="form-group">
                     <label>Brand Colors *</label>
                     <div class="form-row">
                         <div class="form-group">
@@ -1064,6 +1100,9 @@
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <input type="color" id="colorMainPicker" style="width: 60px; height: 45px; border: 1.5px solid #d1d5db; border-radius: 8px; cursor: pointer;">
                                 <input type="text" id="colorMain" placeholder="Navy Blue or #003366" style="flex: 1;">
+                                <button type="button" onclick="activateEyedropper('colorMain')" style="padding: 10px 16px; background: white; border: 1.5px solid #d1d5db; border-radius: 8px; cursor: pointer; font-size: 1.2rem; transition: all 0.2s ease;" title="Pick color from screen">
+                                    💧
+                                </button>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1071,6 +1110,9 @@
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <input type="color" id="colorSecondaryPicker" style="width: 60px; height: 45px; border: 1.5px solid #d1d5db; border-radius: 8px; cursor: pointer;">
                                 <input type="text" id="colorSecondary" placeholder="White or #FFFFFF" style="flex: 1;">
+                                <button type="button" onclick="activateEyedropper('colorSecondary')" style="padding: 10px 16px; background: white; border: 1.5px solid #d1d5db; border-radius: 8px; cursor: pointer; font-size: 1.2rem; transition: all 0.2s ease;" title="Pick color from screen">
+                                    💧
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1080,6 +1122,9 @@
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <input type="color" id="colorAccentPicker" style="width: 60px; height: 45px; border: 1.5px solid #d1d5db; border-radius: 8px; cursor: pointer;">
                                 <input type="text" id="colorAccent" placeholder="For buttons, highlights" style="flex: 1;">
+                                <button type="button" onclick="activateEyedropper('colorAccent')" style="padding: 10px 16px; background: white; border: 1.5px solid #d1d5db; border-radius: 8px; cursor: pointer; font-size: 1.2rem; transition: all 0.2s ease;" title="Pick color from screen">
+                                    💧
+                                </button>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1109,12 +1154,12 @@
                     <label for="customerAge">Customer Age Range *</label>
                     <div style="padding: 20px; background: #f9fafb; border-radius: 8px; border: 1.5px solid #d1d5db;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span id="ageMin" style="font-weight: 600; color: #05908C;">18</span>
-                            <span id="ageMax" style="font-weight: 600; color: #05908C;">65+</span>
+                            <span id="ageMin" style="font-weight: 600; color: #05908C;">13</span>
+                            <span id="ageMax" style="font-weight: 600; color: #05908C;">90+</span>
                         </div>
-                        <input type="range" id="customerAgeMin" min="18" max="80" value="18" style="width: 100%; margin-bottom: 10px;">
-                        <input type="range" id="customerAgeMax" min="18" max="80" value="65" style="width: 100%;">
-                        <input type="hidden" id="customerAge" value="18-65">
+                        <input type="range" id="customerAgeMin" min="13" max="90" value="13" style="width: 100%; margin-bottom: 10px;">
+                        <input type="range" id="customerAgeMax" min="13" max="90" value="90" style="width: 100%;">
+                        <input type="hidden" id="customerAge" value="13-90">
                     </div>
                 </div>
 
@@ -1219,6 +1264,7 @@
                 <div class="form-group">
                     <label for="otherPages">Other Pages Needed</label>
                     <textarea id="otherPages" placeholder="List any other pages you need..."></textarea>
+                    <span class="helper-text">Suggestions: Blog/News, Careers/We're Hiring, Events/Calendar, Case Studies, Locations/Find Us, Service Areas, Partners/Affiliates, Press/Media Kit, Before & After Gallery, Process/How It Works, Certifications/Awards, Client Portal/Login, Online Booking/Scheduler, Virtual Tour, Gift Cards/Shop</span>
                 </div>
 
                 <div class="form-group">
@@ -1667,82 +1713,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Online Reviews</label>
-                    <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 15px;">Select which platforms you have reviews on and rate them</p>
-
-                    <div style="display: grid; gap: 15px;">
-                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 8px;">
-                            <input type="checkbox" id="reviewGoogle" value="google" style="width: 20px; height: 20px;">
-                            <label for="reviewGoogle" style="font-weight: 600; min-width: 120px; margin: 0;">Google</label>
-                            <select id="reviewGoogleStars" style="padding: 8px; border-radius: 6px; border: 1.5px solid #d1d5db;">
-                                <option value="">Stars...</option>
-                                <option value="5">⭐⭐⭐⭐⭐ (5.0)</option>
-                                <option value="4.5">⭐⭐⭐⭐½ (4.5)</option>
-                                <option value="4">⭐⭐⭐⭐ (4.0)</option>
-                                <option value="3.5">⭐⭐⭐½ (3.5)</option>
-                                <option value="3">⭐⭐⭐ (3.0)</option>
-                            </select>
-                        </div>
-
-                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 8px;">
-                            <input type="checkbox" id="reviewYelp" value="yelp" style="width: 20px; height: 20px;">
-                            <label for="reviewYelp" style="font-weight: 600; min-width: 120px; margin: 0;">Yelp</label>
-                            <select id="reviewYelpStars" style="padding: 8px; border-radius: 6px; border: 1.5px solid #d1d5db;">
-                                <option value="">Stars...</option>
-                                <option value="5">⭐⭐⭐⭐⭐ (5.0)</option>
-                                <option value="4.5">⭐⭐⭐⭐½ (4.5)</option>
-                                <option value="4">⭐⭐⭐⭐ (4.0)</option>
-                                <option value="3.5">⭐⭐⭐½ (3.5)</option>
-                                <option value="3">⭐⭐⭐ (3.0)</option>
-                            </select>
-                        </div>
-
-                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 8px;">
-                            <input type="checkbox" id="reviewFacebook" value="facebook" style="width: 20px; height: 20px;">
-                            <label for="reviewFacebook" style="font-weight: 600; min-width: 120px; margin: 0;">Facebook</label>
-                            <select id="reviewFacebookStars" style="padding: 8px; border-radius: 6px; border: 1.5px solid #d1d5db;">
-                                <option value="">Stars...</option>
-                                <option value="5">⭐⭐⭐⭐⭐ (5.0)</option>
-                                <option value="4.5">⭐⭐⭐⭐½ (4.5)</option>
-                                <option value="4">⭐⭐⭐⭐ (4.0)</option>
-                                <option value="3.5">⭐⭐⭐½ (3.5)</option>
-                                <option value="3">⭐⭐⭐ (3.0)</option>
-                            </select>
-                        </div>
-
-                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 8px;">
-                            <input type="checkbox" id="reviewTrustpilot" value="trustpilot" style="width: 20px; height: 20px;">
-                            <label for="reviewTrustpilot" style="font-weight: 600; min-width: 120px; margin: 0;">Trustpilot</label>
-                            <select id="reviewTrustpilotStars" style="padding: 8px; border-radius: 6px; border: 1.5px solid #d1d5db;">
-                                <option value="">Stars...</option>
-                                <option value="5">⭐⭐⭐⭐⭐ (5.0)</option>
-                                <option value="4.5">⭐⭐⭐⭐½ (4.5)</option>
-                                <option value="4">⭐⭐⭐⭐ (4.0)</option>
-                                <option value="3.5">⭐⭐⭐½ (3.5)</option>
-                                <option value="3">⭐⭐⭐ (3.0)</option>
-                            </select>
-                        </div>
-
-                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 8px;">
-                            <input type="checkbox" id="reviewTripadvisor" value="tripadvisor" style="width: 20px; height: 20px;">
-                            <label for="reviewTripadvisor" style="font-weight: 600; min-width: 120px; margin: 0;">TripAdvisor</label>
-                            <select id="reviewTripadvisorStars" style="padding: 8px; border-radius: 6px; border: 1.5px solid #d1d5db;">
-                                <option value="">Stars...</option>
-                                <option value="5">⭐⭐⭐⭐⭐ (5.0)</option>
-                                <option value="4.5">⭐⭐⭐⭐½ (4.5)</option>
-                                <option value="4">⭐⭐⭐⭐ (4.0)</option>
-                                <option value="3.5">⭐⭐⭐½ (3.5)</option>
-                                <option value="3">⭐⭐⭐ (3.0)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 20px;">
-                        <label style="display: flex; align-items: center; gap: 10px;">
-                            <input type="checkbox" id="showReviewsOnWebsite" style="width: 20px; height: 20px;">
-                            <span style="font-weight: 600;">Display reviews on website</span>
-                        </label>
-                    </div>
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="showReviewsOnWebsite" style="width: 20px; height: 20px;">
+                        <span style="font-weight: 600;">Display reviews on website</span>
+                    </label>
                 </div>
 
                 <div class="btn-group">
@@ -1888,6 +1862,32 @@
         let quoteId = null;
         let autoSaveInterval = null;
         let formData = {};
+
+        // ===================================
+        // EYEDROPPER FUNCTIONALITY
+        // ===================================
+        window.activateEyedropper = async function(colorFieldName) {
+            // Check if browser supports EyeDropper API
+            if (!('EyeDropper' in window)) {
+                alert('Your browser doesn\'t support the eyedropper tool yet. Please use the color picker or enter a hex code manually.');
+                return;
+            }
+
+            try {
+                const eyeDropper = new EyeDropper();
+                const result = await eyeDropper.open();
+
+                // Update both the color picker and text input
+                const colorPicker = document.getElementById(colorFieldName + 'Picker');
+                const colorInput = document.getElementById(colorFieldName);
+
+                if (colorPicker) colorPicker.value = result.sRGBHex;
+                if (colorInput) colorInput.value = result.sRGBHex;
+            } catch (error) {
+                // User cancelled or error occurred
+                console.log('Eyedropper cancelled or failed:', error);
+            }
+        };
 
         // ===================================
         // INITIALIZATION
