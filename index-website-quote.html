@@ -2215,9 +2215,14 @@
                 // Save to Firestore
                 await db.collection('websiteQuotes').doc(quoteId).update(finalData);
 
-                // Hide form content
-                document.querySelector('.form-content').style.display = 'none';
-                document.querySelector('.sections-nav').style.display = 'none';
+                // Hide form content and progress
+                const formContent = document.querySelector('.form-content');
+                const progressSection = document.querySelector('.progress-section');
+                const sectionsNav = document.querySelector('.sections-nav');
+
+                if (formContent) formContent.style.display = 'none';
+                if (progressSection) progressSection.style.display = 'none';
+                if (sectionsNav) sectionsNav.style.display = 'none';
 
                 // Show completion screen
                 document.getElementById('completionScreen').classList.add('active');
