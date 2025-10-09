@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Quote Details - Drive Lead Media</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Young+Serif:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+            padding: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-family: 'Young Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #85C7B3;
+            font-size: 1rem;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            border-left: 4px solid #05908C;
+            padding-left: 24px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #012E40;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .question-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .question-answer {
+            color: #012E40;
+            font-size: 1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .question-answer.empty {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .badge-primary {
+            background: #E8F5F3;
+            color: #05908C;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .business-info {
+            background: linear-gradient(135deg, #E8F5F3 0%, #DFF5F3 100%);
+            border: 2px solid #05908C;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .business-info h2 {
+            color: #012E40;
+            margin-bottom: 12px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 8px;
+        }
+
+        .info-item strong {
+            color: #05908C;
+            min-width: 100px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(5, 144, 140, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #05908C;
+            border: 2px solid #05908C;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(5, 144, 140, 0.05);
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Website Discovery Form - Detailed View</h1>
+            <p>Complete responses from client</p>
+        </div>
+
+        <div class="content">
+            <div class="loading" id="loading">
+                <p>Loading quote details...</p>
+            </div>
+
+            <div id="quoteContent" style="display: none;">
+                <div class="top-bar">
+                    <div>
+                        <button class="btn btn-secondary" onclick="window.location.href='admin.html'">← Back to Admin</button>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+                    </div>
+                </div>
+
+                <div class="business-info" id="businessInfo"></div>
+
+                <div id="sections"></div>
+            </div>
+
+            <div class="error" id="error" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <!-- Configuration -->
+    <script src="config.js"></script>
+
+    <script>
+        // Get quote ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const quoteId = urlParams.get('id');
+
+        if (!quoteId) {
+            showError('No quote ID provided. Please access this page from the admin dashboard.');
+        } else {
+            loadQuote();
+        }
+
+        async function loadQuote() {
+            try {
+                const doc = await db.collection('websiteQuotes').doc(quoteId).get();
+
+                if (!doc.exists) {
+                    showError('Quote not found.');
+                    return;
+                }
+
+                const data = doc.data();
+                displayQuote(data);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('quoteContent').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading quote:', error);
+                showError('Error loading quote: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = message;
+        }
+
+        function displayQuote(data) {
+            // Business Info Summary
+            const businessInfo = document.getElementById('businessInfo');
+            businessInfo.innerHTML = `
+                <h2>${data.businessName || 'Unnamed Business'}</h2>
+                <div class="info-grid">
+                    <div class="info-item"><strong>Contact:</strong> ${data.ownerName || 'N/A'}</div>
+                    <div class="info-item"><strong>Email:</strong> ${data.email || 'N/A'}</div>
+                    <div class="info-item"><strong>Phone:</strong> ${data.phone || 'N/A'}</div>
+                    <div class="info-item"><strong>Type:</strong> ${data.businessType || 'N/A'}</div>
+                    <div class="info-item"><strong>Budget:</strong> ${data.budgetRange || 'N/A'}</div>
+                    <div class="info-item"><strong>Status:</strong> ${data.status || 'incomplete'}</div>
+                </div>
+            `;
+
+            // Build all sections
+            const sections = document.getElementById('sections');
+            sections.innerHTML = buildAllSections(data);
+        }
+
+        function buildAllSections(data) {
+            return `
+                ${buildSection1(data)}
+                ${buildSection2(data)}
+                ${buildSection3(data)}
+                ${buildSection4(data)}
+                ${buildSection5(data)}
+                ${buildSection6(data)}
+                ${buildSection7(data)}
+                ${buildSection8(data)}
+                ${buildSection9(data)}
+                ${buildSection10(data)}
+                ${buildSection11(data)}
+                ${buildSection12(data)}
+            `;
+        }
+
+        function buildSection1(data) {
+            return `
+                <div class="section">
+                    <div class="section-title">Section 1: The Business</div>
+                    ${buildQuestion('Business Name', data.businessName)}
+                    ${buildQuestion('Owner/Contact Person', data.ownerName)}
+                    ${buildQuestion('Phone Number', data.phone)}
+                    ${buildQuestion('Email', data.email)}
+                    ${buildQuestion('What Does Your Business Do?', data.businessDescription)}
+                    ${buildQuestion('How Long in Business?', data.yearsInBusiness)}
+                    ${buildQuestion('Type of Business', data.businessType)}
+                    ${buildQuestion('Your Location(s)', data.locations)}
+                    ${buildQuestion('Budget Range', data.budgetRange)}
+                    ${buildQuestion('Competitor Website 1', data.competitor1Url)}
+                    ${buildQuestion('Competitor Website 2', data.competitor2Url)}
+                </div>
+            `;
+        }
+
+        function buildSection2(data) {
+            return `
+                <div class="section">
+                    <div class="section-title">Section 2: Current Website</div>
+                    ${buildQuestion('Do you have a current website?', data.hasCurrentWebsite)}
+                    ${buildQuestion('Current Website URL', data.currentWebsiteUrl)}
+                    ${buildQuestion('How Old Is It?', data.websiteAge)}
+                    ${buildQuestion('Who Built It?', data.builtBy)}
+                    ${buildQuestion('What\'s Wrong With Your Current Website?', formatArray(data.currentProblems))}
+                    ${buildQuestion('What\'s Working Well?', data.whatWorksWell)}
+                    ${buildQuestion('Monthly Visitors', data.monthlyVisitors)}
+                    ${buildQuestion('Where Do Visitors Come From?', data.trafficSources)}
+                </div>
+            `;
+        }
+
+        function buildSection3(data) {
+            const fav = data.favoriteWebsite || {};
+            return `
+                <div class="section">
+                    <div class="section-title">Section 3: Websites You Like</div>
+                    ${buildQuestion('Your Favorite Website (Reference)', fav.url)}
+                    ${buildQuestion('What do you love about the way it looks?', fav.likesAboutLook)}
+                    ${buildQuestion('What do you love about how it works?', formatArray(fav.likesAboutFunction))}
+                    ${buildQuestion('The colors', fav.likesAboutColors)}
+                    ${buildQuestion('The layout', fav.likesAboutLayout)}
+                    ${buildQuestion('Specific Features You Like', formatArray(fav.specificFeatures))}
+                </div>
+            `;
+        }
+
+        function buildSection4(data) {
+            const colors = data.brandColors || {};
+            return `
+                <div class="section">
+                    <div class="section-title">Section 4: Look & Feel</div>
+                    ${buildQuestion('Logo File', data.logoFileName ? `✓ Uploaded: ${data.logoFileName}` : 'Not uploaded')}
+                    ${buildQuestion('Main Color', colors.main)}
+                    ${buildQuestion('Secondary Color', colors.secondary)}
+                    ${buildQuestion('Accent Color', colors.accent)}
+                    ${buildQuestion('Background Preference', colors.background)}
+                </div>
+            `;
+        }
+
+        function buildSection5(data) {
+            const customer = data.customerProfile || {};
+            return `
+                <div class="section">
+                    <div class="section-title">Section 5: Your Customers</div>
+                    ${buildQuestion('Customer Age Range', data.customerAge || customer.ageRange)}
+                    ${buildQuestion('Customer Location', customer.location || data.customerLocation)}
+                    ${buildQuestion('How Do Customers Find You Now?', formatArray(data.howCustomersFind))}
+                </div>
+            `;
+        }
+
+        function buildSection6(data) {
+            return `
+                <div class="section">
+                    <div class="section-title">Section 6: Pages Needed</div>
+                    ${buildQuestion('Main Pages', formatArray(data.pagesNeeded))}
+                    ${buildQuestion('Other Pages Needed', data.otherPages)}
+                    ${buildQuestion('Service/Product Pages Approach', data.servicePages)}
+                    ${buildQuestion('Legal Pages', formatArray(data.legalPages))}
+                </div>
+            `;
+        }
+
+        function buildSection7(data) {
+            return `
+                <div class="section">
+                    <div class="section-title">Section 7: Features & Functionality</div>
+                    ${buildQuestion('Contact Features', formatArray(data.contactFeatures))}
+                    ${buildQuestion('Forms You Need', data.formsNeeded)}
+                    ${buildSocialMediaQuestion(data)}
+                    ${buildQuestion('Special Features', formatArray(data.specialFeatures))}
+                    ${buildQuestion('Do you need E-commerce/Online Sales?', data.needsEcommerce)}
+                    ${buildQuestion('E-commerce Features Needed', formatArray(data.ecommerceFeatures))}
+                    ${buildQuestion('Approximately how many products?', data.productCount)}
+                </div>
+            `;
+        }
+
+        function buildSection8(data) {
+            return `
+                <div class="section">
+                    <div class="section-title">Section 8: Content</div>
+                    ${buildQuestion('Written Content', data.writtenContent)}
+                    ${buildQuestion('What Content Will You Provide?', data.contentProvided)}
+                    ${buildQuestion('Photos/Videos', formatArray(data.photosVideos))}
+                    ${buildQuestion('Documents to Include', data.documents)}
+                </div>
+            `;
+        }
+
+        function buildSection9(data) {
+            return `
+                <div class="section">
+                    <div class="section-title">Section 9: Updates & Maintenance</div>
+                    ${buildQuestion('What Do You Want to Update Yourself?', formatArray(data.updateYourself))}
+                    ${buildQuestion('How Often Will You Update?', data.updateFrequency)}
+                    ${buildQuestion('Who Will Update It?', data.whoUpdates)}
+                </div>
+            `;
+        }
+
+        function buildSection10(data) {
+            return `
+                <div class="section">
+                    <div class="section-title">Section 10: Marketing & SEO</div>
+                    ${buildQuestion('What Do People Search For?', data.searchKeywords)}
+                    ${buildQuestion('Your Service Area', data.serviceArea)}
+                    ${buildQuestion('Marketing You Currently Do', formatArray(data.currentMarketing))}
+                    ${buildReviewsQuestion(data)}
+                    ${buildQuestion('Display reviews on website?', data.showReviewsOnWebsite ? 'Yes' : 'No')}
+                </div>
+            `;
+        }
+
+        function buildSection11(data) {
+            return `
+                <div class="section">
+                    <div class="section-title">Section 11: Technical Needs</div>
+                    ${buildQuestion('Domain Name Status', data.domainStatus)}
+                    ${buildQuestion('Domain Name', data.domainName)}
+                </div>
+            `;
+        }
+
+        function buildSection12(data) {
+            return `
+                <div class="section">
+                    <div class="section-title">Section 12: Special Requests</div>
+                    ${buildQuestion('Specific Things You Want', data.specificWants)}
+                    ${buildQuestion('Things You DON\'T Want', data.dontWant)}
+                    ${buildQuestion('What Are You Worried About?', data.concerns)}
+                    ${buildQuestion('Questions for Us', data.additionalQuestions)}
+                    ${buildQuestion('Additional Notes', data.additionalNotes)}
+                </div>
+            `;
+        }
+
+        function buildQuestion(label, answer) {
+            const isEmpty = !answer || (Array.isArray(answer) && answer.length === 0);
+            const displayAnswer = isEmpty ? 'Not answered' : answer;
+            const answerClass = isEmpty ? 'question-answer empty' : 'question-answer';
+
+            return `
+                <div class="question">
+                    <div class="question-label">${label}</div>
+                    <div class="${answerClass}">${displayAnswer}</div>
+                </div>
+            `;
+        }
+
+        function buildSocialMediaQuestion(data) {
+            const socials = [];
+            if (data.facebookUrl) socials.push(`Facebook: ${data.facebookUrl}`);
+            if (data.instagramUrl) socials.push(`Instagram: ${data.instagramUrl}`);
+            if (data.xUrl) socials.push(`X: ${data.xUrl}`);
+            if (data.youtubeUrl) socials.push(`YouTube: ${data.youtubeUrl}`);
+            if (data.linkedinUrl) socials.push(`LinkedIn: ${data.linkedinUrl}`);
+            if (data.tiktokUrl) socials.push(`TikTok: ${data.tiktokUrl}`);
+
+            const content = socials.length > 0 ? socials.join('<br>') : 'Not answered';
+            return buildQuestion('Social Media Links', content);
+        }
+
+        function buildReviewsQuestion(data) {
+            const reviews = data.onlineReviews || [];
+            if (reviews.length === 0) {
+                return buildQuestion('Online Reviews', 'Not answered');
+            }
+
+            const reviewsHtml = reviews.map(r => {
+                const stars = '⭐'.repeat(Math.floor(r.stars));
+                return `${r.platform}: ${stars} (${r.stars})`;
+            }).join('<br>');
+
+            return buildQuestion('Online Reviews', reviewsHtml);
+        }
+
+        function formatArray(arr) {
+            if (!arr || !Array.isArray(arr) || arr.length === 0) {
+                return '';
+            }
+            return arr.map(item => `<span class="badge badge-primary">${item}</span>`).join(' ');
+        }
+    </script>
+</body>
+</html>
