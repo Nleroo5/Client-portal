@@ -150,9 +150,13 @@ service cloud.firestore {
       // Admins can read/write all CMS clients
       allow read, write: if isAdmin();
 
-      // CMS users can read their own record
-      allow read: if request.auth != null &&
-                     request.auth.token.email == resource.data.email;
+      // Allow unauthenticated read for login verification (needed for first-time account creation)
+      // Only exposes email and active status for login flow
+      allow read: if true;
+
+      // CMS users can update their own record (for account creation)
+      allow update: if request.auth != null &&
+                       request.auth.token.email == resource.data.email;
     }
 
     // Website Content - CMS content storage

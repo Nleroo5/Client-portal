@@ -4220,38 +4220,20 @@ Start with Phase 1 and work through systematically. Show your progress after eac
             const password = document.getElementById('cmsClientPassword').value;
 
             try {
-                // Save current admin auth state
-                const currentAdmin = firebase.auth().currentUser;
-                const adminEmail = currentAdmin.email;
-
-                // Create Firebase Auth user (this will log out the admin temporarily)
-                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                const newUserId = user.uid;
-
-                // Sign out the new user
-                await firebase.auth().signOut();
-
-                // Admin needs to re-authenticate - prompt for password
-                const adminPassword = prompt('Creating CMS user requires re-authentication.\n\nPlease enter your admin password to continue:');
-                if (!adminPassword) {
-                    throw new Error('Admin re-authentication cancelled');
-                }
-
-                // Re-authenticate as admin
-                await firebase.auth().signInWithEmailAndPassword(adminEmail, adminPassword);
-
                 // Generate client ID
                 const clientId = clientName.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Date.now();
 
-                // Create CMS client document
+                // Create CMS client document with temporary password
+                // User will create their Firebase Auth account on first login
                 await db.collection('cmsClients').doc(clientId).set({
                     clientName: clientName,
                     email: email,
-                    userId: newUserId,
+                    tempPassword: password,  // Temporary password for first login
+                    userId: null,  // Will be set when user first logs in
                     active: true,
+                    accountCreated: false,  // Flag to indicate account needs to be created
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    createdBy: adminEmail
+                    createdBy: firebase.auth().currentUser.email
                 });
 
                 // Initialize website content structure

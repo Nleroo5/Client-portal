@@ -239,11 +239,7 @@
             loginBtn.textContent = 'Logging in...';
 
             try {
-                // Sign in with Firebase Auth
-                const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-
-                // Check if user has CMS access
+                // First, check if this is a first-time login (account not created yet)
                 const cmsAccessQuery = await db.collection('cmsClients')
                     .where('email', '==', email)
                     .where('active', '==', true)
@@ -256,6 +252,31 @@
 
                 const clientData = cmsAccessQuery.docs[0].data();
                 const clientId = cmsAccessQuery.docs[0].id;
+
+                // Check if account needs to be created
+                if (clientData.accountCreated === false) {
+                    // Verify temp password matches
+                    if (password !== clientData.tempPassword) {
+                        throw new Error('Invalid password. Please use the password provided by your administrator.');
+                    }
+
+                    // Create Firebase Auth account
+                    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                    const user = userCredential.user;
+
+                    // Update CMS client record
+                    await db.collection('cmsClients').doc(clientId).update({
+                        userId: user.uid,
+                        accountCreated: true,
+                        tempPassword: firebase.firestore.FieldValue.delete()  // Remove temp password
+                    });
+
+                    showAlert('Account created! Welcome to your CMS!', 'success');
+                } else {
+                    // Regular login for existing account
+                    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                    const user = userCredential.user;
+                }
 
                 // Store client ID in session
                 sessionStorage.setItem('cmsClientId', clientId);
@@ -281,7 +302,9 @@
                     errorMessage = 'Invalid email address format.';
                 } else if (error.code === 'auth/too-many-requests') {
                     errorMessage = 'Too many failed attempts. Please try again later.';
-                } else if (error.message.includes('CMS')) {
+                } else if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'An account with this email already exists. Please try logging in normally.';
+                } else if (error.message.includes('CMS') || error.message.includes('password')) {
                     errorMessage = error.message;
                 }
 
