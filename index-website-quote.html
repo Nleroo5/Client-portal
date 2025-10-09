@@ -1093,6 +1093,16 @@
                 <p class="section-description">Define your website's visual style</p>
 
                 <div class="form-group">
+                    <label for="logoFile">Your Logo File * (PNG preferred)</label>
+                    <input type="file" id="logoFile" accept="image/png,image/jpeg,image/svg+xml" style="padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; width: 100%;">
+                    <span class="helper-text">Upload your logo file (PNG, JPG, or SVG)</span>
+                    <div id="logoPreview" style="margin-top: 15px; display: none;">
+                        <img id="logoPreviewImg" style="max-width: 200px; max-height: 100px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px;">
+                        <p id="logoFileName" style="margin-top: 8px; font-size: 0.9rem; color: #6b7280;"></p>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label>Brand Colors *</label>
                     <div class="form-row">
                         <div class="form-group">
