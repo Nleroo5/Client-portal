@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Editor - CMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #012E40;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #012E40 0%, #05908C 100%);
+            color: white;
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-left a:hover {
+            opacity: 0.8;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .btn-primary {
+            background: #F2A922;
+            color: #012E40;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: #d99520;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(242, 169, 34, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        /* Page Title */
+        .page-title {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .page-title h1 {
+            font-family: 'Bitter', serif;
+            font-size: 2rem;
+            color: #012E40;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #64748b;
+        }
+
+        /* Section */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .section-header .icon {
+            font-size: 1.8rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.3rem;
+            color: #012E40;
+        }
+
+        /* Form Group */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #012E40;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="url"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #05908C;
+            background: #E8F5F3;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-group .helper-text {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        /* Image Upload */
+        .image-upload {
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .image-upload:hover {
+            border-color: #05908C;
+            background: #E8F5F3;
+        }
+
+        .image-upload.has-image {
+            border-style: solid;
+            border-color: #05908C;
+        }
+
+        .image-upload input[type="file"] {
+            display: none;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .upload-text strong {
+            color: #05908C;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 20px;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+
+            .header-right {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <a href="dashboard.html">← Back to Dashboard</a>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-secondary" onclick="previewChanges()">👁️ Preview</button>
+            <button class="btn btn-primary" id="saveBtn" onclick="savePageContent()">💾 Save & Publish</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Page Title -->
+        <div class="page-title">
+            <h1 id="pageTitle">Loading...</h1>
+            <p>Edit the content below and click "Save & Publish" when done</p>
+        </div>
+
+        <!-- Editor Content (will be loaded dynamically) -->
+        <div id="editorContent">
+            <div style="text-align: center; padding: 60px 20px;">
+                <div class="loading-spinner"></div>
+                <p style="margin-top: 20px; color: #64748b;">Loading editor...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script src="../config.js"></script>
+
+    <!-- CMS Functions -->
+    <script src="cms-functions.js"></script>
+
+    <script>
+        let currentClient = null;
+        let currentPage = null;
+        let pageData = {};
+
+        // Get page parameter from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageName = urlParams.get('page') || 'homepage';
+
+        // Initialize editor
+        async function initEditor() {
+            // Verify access
+            const hasAccess = await verifyCMSAccess();
+            if (!hasAccess) return;
+
+            // Get client info
+            currentClient = getCurrentCMSClient();
+            if (!currentClient) return;
+
+            currentPage = pageName;
+
+            // Load page content
+            await loadEditor();
+        }
+
+        // Load editor
+        async function loadEditor() {
+            try {
+                pageData = await loadPageContent(currentClient.clientId, currentPage);
+
+                // Set page title
+                const pageTitles = {
+                    homepage: '🏠 Homepage',
+                    about: '👥 About Us',
+                    services: '🛠️ Services',
+                    contact: '📞 Contact'
+                };
+
+                document.getElementById('pageTitle').textContent = pageTitles[currentPage] || currentPage;
+
+                // Render appropriate editor
+                if (currentPage === 'homepage') {
+                    renderHomepageEditor();
+                } else if (currentPage === 'about') {
+                    renderAboutEditor();
+                } else if (currentPage === 'services') {
+                    renderServicesEditor();
+                } else if (currentPage === 'contact') {
+                    renderContactEditor();
+                }
+
+            } catch (error) {
+                console.error('Error loading editor:', error);
+                showToast('Error loading page content', 'error');
+            }
+        }
+
+        // Render Homepage Editor
+        function renderHomepageEditor() {
+            document.getElementById('editorContent').innerHTML = `
+                <!-- Hero Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">🎯</span>
+                        <h2>Hero Section</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Main Headline</label>
+                        <input type="text" id="heroHeadline" value="${pageData.heroHeadline || ''}" placeholder="Welcome to Our Company">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subheadline</label>
+                        <input type="text" id="heroSubheadline" value="${pageData.heroSubheadline || ''}" placeholder="We deliver exceptional results">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hero Image</label>
+                        <div class="image-upload ${pageData.heroImage ? 'has-image' : ''}" onclick="document.getElementById('heroImageInput').click()">
+                            ${pageData.heroImage ? `<img src="${pageData.heroImage}" class="image-preview" id="heroImagePreview">` : ''}
+                            <p class="upload-text">
+                                <strong>Click to upload</strong> or drag and drop<br>
+                                <span style="font-size: 0.8rem;">PNG, JPG up to 5MB</span>
+                            </p>
+                        </div>
+                        <input type="file" id="heroImageInput" accept="image/*" onchange="handleImageUpload('heroImage', this)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Button Text</label>
+                        <input type="text" id="heroButtonText" value="${pageData.heroButtonText || 'Get Started'}" placeholder="Get Started">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Button Link</label>
+                        <input type="text" id="heroButtonLink" value="${pageData.heroButtonLink || '/contact'}" placeholder="/contact">
+                        <p class="helper-text">Use /contact, /about, or full URL like https://example.com</p>
+                    </div>
+                </div>
+
+                <!-- About Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">📝</span>
+                        <h2>About Section</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Headline</label>
+                        <input type="text" id="aboutHeadline" value="${pageData.aboutHeadline || ''}" placeholder="About Our Company">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Content</label>
+                        <textarea id="aboutText" placeholder="Tell your story...">${pageData.aboutText || ''}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>About Image</label>
+                        <div class="image-upload ${pageData.aboutImage ? 'has-image' : ''}" onclick="document.getElementById('aboutImageInput').click()">
+                            ${pageData.aboutImage ? `<img src="${pageData.aboutImage}" class="image-preview" id="aboutImagePreview">` : ''}
+                            <p class="upload-text">
+                                <strong>Click to upload</strong> or drag and drop
+                            </p>
+                        </div>
+                        <input type="file" id="aboutImageInput" accept="image/*" onchange="handleImageUpload('aboutImage', this)">
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render About Page Editor
+        function renderAboutEditor() {
+            document.getElementById('editorContent').innerHTML = `
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">👥</span>
+                        <h2>About Page Content</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Page Title</label>
+                        <input type="text" id="pageTitle" value="${pageData.pageTitle || 'About Us'}" placeholder="About Us">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Main Headline</label>
+                        <input type="text" id="headline" value="${pageData.headline || ''}" placeholder="Our Story">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Main Content</label>
+                        <textarea id="mainContent" placeholder="Write your company story here...">${pageData.mainContent || ''}</textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render Services Page Editor
+        function renderServicesEditor() {
+            document.getElementById('editorContent').innerHTML = `
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">🛠️</span>
+                        <h2>Services Page Content</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Page Title</label>
+                        <input type="text" id="pageTitle" value="${pageData.pageTitle || 'Our Services'}" placeholder="Our Services">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Main Headline</label>
+                        <input type="text" id="headline" value="${pageData.headline || ''}" placeholder="What We Offer">
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render Contact Page Editor
+        function renderContactEditor() {
+            document.getElementById('editorContent').innerHTML = `
+                <div class="section">
+                    <div class="section-header">
+                        <span class="icon">📞</span>
+                        <h2>Contact Page Content</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Page Title</label>
+                        <input type="text" id="pageTitle" value="${pageData.pageTitle || 'Contact Us'}" placeholder="Contact Us">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Main Headline</label>
+                        <input type="text" id="headline" value="${pageData.headline || ''}" placeholder="Get In Touch">
+                    </div>
+                </div>
+            `;
+        }
+
+        // Handle image upload
+        async function handleImageUpload(fieldName, input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Show loading
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            try {
+                // Upload to Firebase
+                const imageUrl = await uploadImage(currentClient.clientId, file, 'images');
+
+                // Update preview
+                pageData[fieldName] = imageUrl;
+
+                const preview = document.getElementById(fieldName + 'Preview');
+                if (preview) {
+                    preview.src = imageUrl;
+                } else {
+                    // Create preview
+                    const uploadDiv = input.previousElementSibling;
+                    const img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.className = 'image-preview';
+                    img.id = fieldName + 'Preview';
+                    uploadDiv.prepend(img);
+                    uploadDiv.classList.add('has-image');
+                }
+
+                showToast('Image uploaded successfully!', 'success');
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showToast('Error uploading image', 'error');
+            } finally {
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
+        }
+
+        // Save page content
+        async function savePageContent() {
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            try {
+                // Collect form data based on page type
+                let contentData = {};
+
+                if (currentPage === 'homepage') {
+                    contentData = {
+                        heroHeadline: document.getElementById('heroHeadline')?.value || '',
+                        heroSubheadline: document.getElementById('heroSubheadline')?.value || '',
+                        heroImage: pageData.heroImage || '',
+                        heroButtonText: document.getElementById('heroButtonText')?.value || '',
+                        heroButtonLink: document.getElementById('heroButtonLink')?.value || '',
+                        aboutHeadline: document.getElementById('aboutHeadline')?.value || '',
+                        aboutText: document.getElementById('aboutText')?.value || '',
+                        aboutImage: pageData.aboutImage || ''
+                    };
+                } else {
+                    // For other pages
+                    contentData = {
+                        pageTitle: document.getElementById('pageTitle')?.value || '',
+                        headline: document.getElementById('headline')?.value || '',
+                        mainContent: document.getElementById('mainContent')?.value || ''
+                    };
+                }
+
+                // Save to Firebase
+                await savePageContent(currentClient.clientId, currentPage, contentData);
+
+                showToast('Page saved and published!', 'success');
+
+                // Redirect to dashboard after short delay
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+
+            } catch (error) {
+                console.error('Save error:', error);
+                showToast('Error saving page', 'error');
+                saveBtn.disabled = false;
+                saveBtn.textContent = '💾 Save & Publish';
+            } finally {
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
+        }
+
+        // Preview changes
+        function previewChanges() {
+            showToast('Preview feature coming soon!', 'info');
+        }
+
+        // Initialize on load
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                initEditor();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

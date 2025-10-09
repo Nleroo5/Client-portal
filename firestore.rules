@@ -145,6 +145,31 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // CMS Clients - Website CMS user access
+    match /cmsClients/{clientId} {
+      // Admins can read/write all CMS clients
+      allow read, write: if isAdmin();
+
+      // CMS users can read their own record
+      allow read: if request.auth != null &&
+                     request.auth.token.email == resource.data.email;
+    }
+
+    // Website Content - CMS content storage
+    match /websiteContent/{clientId}/{document=**} {
+      // Admins can read/write all content
+      allow read, write: if isAdmin();
+
+      // CMS users can read/write their own content
+      allow read, write: if request.auth != null &&
+                            exists(/databases/$(database)/documents/cmsClients/$(clientId)) &&
+                            get(/databases/$(database)/documents/cmsClients/$(clientId)).data.email == request.auth.token.email &&
+                            get(/databases/$(database)/documents/cmsClients/$(clientId)).data.active == true;
+
+      // Allow public read for website templates (so websites can load)
+      allow read: if true;
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

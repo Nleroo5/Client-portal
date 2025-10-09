@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #012E40;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 600px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(1, 46, 64, 0.6);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            padding: 40px 20px;
+        }
+
+        .hero h1 {
+            font-family: 'Bitter', serif;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 40px;
+            background: #05908C;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #047772;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(5, 144, 140, 0.4);
+        }
+
+        /* About Section */
+        .about {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about h2 {
+            font-family: 'Bitter', serif;
+            font-size: 2.5rem;
+            margin-bottom: 24px;
+            color: #012E40;
+        }
+
+        .about p {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+
+        .about img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: #012E40;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .footer p {
+            opacity: 0.8;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #05908C;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <h1 id="heroHeadline">Welcome to Our Company</h1>
+            <p id="heroSubheadline">We deliver exceptional results</p>
+            <a href="#" class="btn" id="heroButton">Get Started</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="about-content">
+            <div>
+                <h2 id="aboutHeadline">About Us</h2>
+                <p id="aboutText">We are a leading company in our industry...</p>
+            </div>
+            <div>
+                <img id="aboutImage" src="" alt="About us" style="display: none;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p id="footerText">© 2025 Company Name. All rights reserved.</p>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script src="../../config.js"></script>
+
+    <script>
+        const db = firebase.firestore();
+
+        // Get client ID from URL path
+        function getClientIdFromPath() {
+            const path = window.location.pathname;
+            const parts = path.split('/');
+            // URL: /sites/abc-construction-123/
+            const sitesIndex = parts.indexOf('sites');
+            if (sitesIndex !== -1 && parts[sitesIndex + 1]) {
+                return parts[sitesIndex + 1];
+            }
+            return null;
+        }
+
+        // Load and render website
+        async function loadWebsite() {
+            try {
+                const clientId = getClientIdFromPath();
+
+                if (!clientId) {
+                    throw new Error('Client ID not found in URL');
+                }
+
+                // Load homepage content
+                const doc = await db.collection('websiteContent')
+                    .doc(clientId)
+                    .collection('pages')
+                    .doc('homepage')
+                    .get();
+
+                if (!doc.exists) {
+                    throw new Error('Website content not found');
+                }
+
+                const content = doc.data();
+
+                // Update title
+                document.title = content.heroHeadline || 'Welcome';
+
+                // Update hero section
+                if (content.heroHeadline) {
+                    document.getElementById('heroHeadline').textContent = content.heroHeadline;
+                }
+
+                if (content.heroSubheadline) {
+                    document.getElementById('heroSubheadline').textContent = content.heroSubheadline;
+                }
+
+                if (content.heroImage) {
+                    document.getElementById('hero').style.backgroundImage = `url(${content.heroImage})`;
+                }
+
+                if (content.heroButtonText) {
+                    document.getElementById('heroButton').textContent = content.heroButtonText;
+                }
+
+                if (content.heroButtonLink) {
+                    document.getElementById('heroButton').href = content.heroButtonLink;
+                }
+
+                // Update about section
+                if (content.aboutHeadline) {
+                    document.getElementById('aboutHeadline').textContent = content.aboutHeadline;
+                }
+
+                if (content.aboutText) {
+                    document.getElementById('aboutText').textContent = content.aboutText;
+                }
+
+                if (content.aboutImage) {
+                    const aboutImg = document.getElementById('aboutImage');
+                    aboutImg.src = content.aboutImage;
+                    aboutImg.style.display = 'block';
+                }
+
+                // Load site settings for footer
+                const settingsDoc = await db.collection('websiteContent')
+                    .doc(clientId)
+                    .collection('settings')
+                    .doc('siteConfig')
+                    .get();
+
+                if (settingsDoc.exists) {
+                    const settings = settingsDoc.data();
+                    if (settings.siteName) {
+                        document.getElementById('footerText').textContent = `© 2025 ${settings.siteName}. All rights reserved.`;
+                    }
+                }
+
+                // Hide loading screen
+                document.getElementById('loading').style.display = 'none';
+
+            } catch (error) {
+                console.error('Error loading website:', error);
+                document.getElementById('loading').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <h2 style="color: #ef4444; margin-bottom: 16px;">Website Not Found</h2>
+                        <p style="color: #64748b;">This website has not been set up yet.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load website on page load
+        loadWebsite();
+    </script>
+</body>
+</html>
