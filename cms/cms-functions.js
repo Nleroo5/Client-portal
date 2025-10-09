@@ -3,8 +3,7 @@
 // Handles content loading, saving, and management
 // ============================================
 
-const db = firebase.firestore();
-const storage = firebase.storage();
+// db and storage are already declared in config.js
 
 // ============================================
 // AUTHENTICATION & ACCESS

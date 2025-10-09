@@ -207,12 +207,13 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
     <!-- Firebase Config -->
     <script src="../config.js"></script>
 
     <script>
-        const db = firebase.firestore();
+        // db is already declared in config.js
 
         // Show alert message
         function showAlert(message, type = 'error') {
