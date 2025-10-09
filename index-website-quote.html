@@ -1867,40 +1867,389 @@
     <script src="website-quote-functions.js"></script>
 
     <script>
-        // Toggle social media input fields
+        // ===================================
+        // GLOBAL VARIABLES
+        // ===================================
+        let currentSection = 1;
+        const totalSections = 12;
+        let quoteId = null;
+        let autoSaveInterval = null;
+        let formData = {};
+
+        // ===================================
+        // INITIALIZATION
+        // ===================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Get or create quote ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            quoteId = urlParams.get('id');
+
+            if (!quoteId) {
+                // Create new quote
+                quoteId = generateQuoteId();
+                window.history.replaceState({}, '', `?id=${quoteId}`);
+                await initializeNewQuote();
+            } else {
+                // Load existing quote
+                await loadExistingQuote();
+            }
+
+            // Show first section
+            showSection(1);
+
+            // Start auto-save
+            startAutoSave();
+
+            // Set current URL for sharing
+            const currentUrl = window.location.origin + window.location.pathname;
+            const formLinkInput = document.getElementById('formLinkInput');
+            const currentUrlDisplay = document.getElementById('currentUrlDisplay');
+            if (formLinkInput) formLinkInput.value = currentUrl;
+            if (currentUrlDisplay) currentUrlDisplay.textContent = currentUrl;
+        });
+
+        // ===================================
+        // QUOTE ID GENERATION
+        // ===================================
+        function generateQuoteId() {
+            return 'quote_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // ===================================
+        // INITIALIZE NEW QUOTE
+        // ===================================
+        async function initializeNewQuote() {
+            try {
+                await db.collection('websiteQuotes').doc(quoteId).set({
+                    status: 'incomplete',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                    currentSection: 1,
+                    completedSections: []
+                });
+            } catch (error) {
+                console.error('Error creating quote:', error);
+            }
+        }
+
+        // ===================================
+        // LOAD EXISTING QUOTE
+        // ===================================
+        async function loadExistingQuote() {
+            try {
+                const doc = await db.collection('websiteQuotes').doc(quoteId).get();
+                if (doc.exists) {
+                    formData = doc.data();
+                    currentSection = formData.currentSection || 1;
+
+                    // Populate form fields
+                    populateFormFields(formData);
+
+                    // Update progress
+                    updateProgress();
+                }
+            } catch (error) {
+                console.error('Error loading quote:', error);
+            }
+        }
+
+        // ===================================
+        // POPULATE FORM FIELDS
+        // ===================================
+        function populateFormFields(data) {
+            Object.keys(data).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = data[key] === true;
+                    } else if (element.type === 'radio') {
+                        if (element.value === data[key]) {
+                            element.checked = true;
+                        }
+                    } else {
+                        element.value = data[key];
+                    }
+                }
+            });
+        }
+
+        // ===================================
+        // SECTION NAVIGATION
+        // ===================================
+        function showSection(sectionNumber) {
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show target section
+            const targetSection = document.querySelector(`[data-section="${sectionNumber}"]`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            // Update navigation items
+            document.querySelectorAll('.section-item').forEach((item, index) => {
+                item.classList.remove('active');
+                if (index + 1 === sectionNumber) {
+                    item.classList.add('active');
+                }
+            });
+
+            currentSection = sectionNumber;
+            updateProgress();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.nextSection = async function() {
+            // Save current section data
+            await saveFormData();
+
+            if (currentSection < totalSections) {
+                showSection(currentSection + 1);
+            } else {
+                // Final submission
+                await submitForm();
+            }
+        };
+
+        window.prevSection = function() {
+            if (currentSection > 1) {
+                showSection(currentSection - 1);
+            }
+        };
+
+        // Click on section item to navigate
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.section-item')) {
+                const sectionItem = e.target.closest('.section-item');
+                const sectionNumber = parseInt(sectionItem.dataset.section);
+                if (sectionNumber) {
+                    showSection(sectionNumber);
+                }
+            }
+        });
+
+        // ===================================
+        // COLLECT FORM DATA
+        // ===================================
+        function collectFormData() {
+            const data = {
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                currentSection: currentSection
+            };
+
+            // Get all form inputs
+            const form = document.getElementById('websiteDiscoveryForm');
+            const inputs = form.querySelectorAll('input, textarea, select');
+
+            inputs.forEach(input => {
+                if (input.type === 'checkbox') {
+                    data[input.id] = input.checked;
+                } else if (input.type === 'radio') {
+                    if (input.checked) {
+                        data[input.name] = input.value;
+                    }
+                } else if (input.id) {
+                    data[input.id] = input.value;
+                }
+            });
+
+            return data;
+        }
+
+        // ===================================
+        // SAVE FORM DATA
+        // ===================================
+        async function saveFormData(showIndicator = true) {
+            try {
+                if (showIndicator) {
+                    showSaveIndicator('saving');
+                }
+
+                const data = collectFormData();
+
+                await db.collection('websiteQuotes').doc(quoteId).update(data);
+
+                if (showIndicator) {
+                    showSaveIndicator('saved');
+                }
+            } catch (error) {
+                console.error('Error saving form:', error);
+                if (showIndicator) {
+                    showSaveIndicator('error');
+                }
+            }
+        }
+
+        // ===================================
+        // AUTO-SAVE
+        // ===================================
+        function startAutoSave() {
+            autoSaveInterval = setInterval(async () => {
+                await saveFormData(true);
+            }, 30000); // Every 30 seconds
+        }
+
+        window.saveAndExit = async function() {
+            await saveFormData(false);
+            alert('Your progress has been saved! You can return to this form anytime using the same link.');
+        };
+
+        // ===================================
+        // SAVE INDICATOR
+        // ===================================
+        function showSaveIndicator(status) {
+            const indicator = document.getElementById('saveIndicator');
+            const statusText = document.getElementById('saveStatus');
+
+            if (status === 'saving') {
+                indicator.classList.remove('saved');
+                indicator.classList.add('saving');
+                statusText.textContent = 'Saving...';
+                indicator.style.display = 'inline';
+            } else if (status === 'saved') {
+                indicator.classList.remove('saving');
+                indicator.classList.add('saved');
+                statusText.textContent = 'Saved';
+                indicator.style.display = 'inline';
+
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                }, 3000);
+            } else if (status === 'error') {
+                statusText.textContent = 'Error saving';
+                indicator.style.color = '#dc2626';
+                indicator.style.display = 'inline';
+            }
+        }
+
+        // ===================================
+        // UPDATE PROGRESS
+        // ===================================
+        function updateProgress() {
+            const percentage = Math.round((currentSection / totalSections) * 100);
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+
+            if (progressBar) {
+                progressBar.style.width = percentage + '%';
+            }
+
+            if (progressText) {
+                progressText.textContent = `Section ${currentSection} of ${totalSections} complete`;
+            }
+        }
+
+        // ===================================
+        // SUBMIT FORM
+        // ===================================
+        async function submitForm() {
+            try {
+                // Collect all data
+                const finalData = collectFormData();
+                finalData.status = 'completed';
+                finalData.completedAt = firebase.firestore.FieldValue.serverTimestamp();
+
+                // Save to Firestore
+                await db.collection('websiteQuotes').doc(quoteId).update(finalData);
+
+                // Hide form content
+                document.querySelector('.form-content').style.display = 'none';
+                document.querySelector('.sections-nav').style.display = 'none';
+
+                // Show completion screen
+                document.getElementById('completionScreen').classList.add('active');
+
+                // Calculate and show ballpark quote
+                calculateBallparkQuote(finalData);
+
+                // Stop auto-save
+                if (autoSaveInterval) {
+                    clearInterval(autoSaveInterval);
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('Error submitting form. Please try again.');
+            }
+        }
+
+        // ===================================
+        // CALCULATE BALLPARK QUOTE
+        // ===================================
+        function calculateBallparkQuote(data) {
+            let basePrice = 2000;
+            let maxPrice = 3000;
+
+            // Add for number of pages
+            const pageCheckboxes = document.querySelectorAll('[id^="page"]:checked');
+            const pageCount = pageCheckboxes.length;
+            basePrice += pageCount * 300;
+            maxPrice += pageCount * 500;
+
+            // Add for features
+            const featureCheckboxes = document.querySelectorAll('[id^="contact"], [id^="integration"], [id^="booking"]');
+            let featureCount = 0;
+            featureCheckboxes.forEach(cb => { if (cb.checked) featureCount++; });
+            basePrice += featureCount * 400;
+            maxPrice += featureCount * 600;
+
+            // Add for content writing
+            if (data.writtenContent === 'you-write') {
+                basePrice += 1000;
+                maxPrice += 1500;
+            }
+
+            // Display in ballpark section
+            const priceDisplay = document.querySelector('#ballparkQuote');
+            if (priceDisplay) {
+                const priceSection = priceDisplay.querySelector('div[style*="text-align: center"]');
+                if (priceSection) {
+                    priceSection.innerHTML = `
+                        <div style="font-size: 2.5rem; font-weight: 700; color: #05908C; margin-bottom: 10px;">
+                            $${basePrice.toLocaleString()} - $${maxPrice.toLocaleString()}
+                        </div>
+                        <p style="color: #6b7280; font-size: 0.95rem;">Estimated project cost based on your requirements</p>
+                    `;
+                }
+            }
+        }
+
+        // ===================================
+        // TOGGLE FUNCTIONS
+        // ===================================
+        window.toggleCurrentWebsiteSection = function() {
+            const hasWebsite = document.getElementById('hasWebsiteYes').checked;
+            const section = document.getElementById('currentWebsiteDetails');
+            if (section) {
+                section.classList.toggle('active', hasWebsite);
+            }
+        };
+
         window.toggleSocialInput = function(platform) {
             const checkbox = document.getElementById(`social${platform}`);
             const inputSection = document.getElementById(`social${platform}Input`);
 
-            if (checkbox.checked) {
-                inputSection.classList.add('active');
-            } else {
-                inputSection.classList.remove('active');
-                // Clear the input when unchecked
-                const input = inputSection.querySelector('input[type="text"]');
-                if (input) input.value = '';
+            if (checkbox && inputSection) {
+                if (checkbox.checked) {
+                    inputSection.classList.add('active');
+                } else {
+                    inputSection.classList.remove('active');
+                    const input = inputSection.querySelector('input[type="text"]');
+                    if (input) input.value = '';
+                }
             }
         };
 
-        // Set the current page URL on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentUrl = window.location.origin + window.location.pathname;
-            const formLinkInput = document.getElementById('formLinkInput');
-            const currentUrlDisplay = document.getElementById('currentUrlDisplay');
-
-            if (formLinkInput) {
-                formLinkInput.value = currentUrl;
-            }
-            if (currentUrlDisplay) {
-                currentUrlDisplay.textContent = currentUrl;
-            }
-        });
-
-        // Copy form link to clipboard
+        // ===================================
+        // COPY FORM LINK
+        // ===================================
         window.copyFormLink = function() {
             const input = document.getElementById('formLinkInput');
             input.select();
-            input.setSelectionRange(0, 99999); // For mobile devices
+            input.setSelectionRange(0, 99999);
 
             navigator.clipboard.writeText(input.value).then(() => {
                 const button = event.target;
