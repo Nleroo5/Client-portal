@@ -663,6 +663,19 @@
                     <strong>Auto-saves every 30 seconds</strong> — Your progress is safe! Take your time and come back anytime.
                 </span>
             </div>
+
+            <!-- Unique URL Reminder -->
+            <div id="urlReminder" style="background: #FEF3C7; padding: 14px 16px; border-radius: 8px; border-left: 4px solid #F59E0B; margin-top: 12px; display: none;">
+                <div style="color: #92400E; font-size: 0.9rem; margin-bottom: 8px;">
+                    <strong>Bookmark this page!</strong> Your unique link to continue later:
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="uniqueFormUrl" readonly style="flex: 1; padding: 8px 12px; border: 1px solid #F59E0B; border-radius: 6px; background: white; font-family: monospace; font-size: 0.85rem; color: #92400E;">
+                    <button onclick="copyUniqueUrl()" style="background: #F59E0B; color: white; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-weight: 600; white-space: nowrap;">
+                        Copy Link
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Form Content -->
@@ -1900,6 +1913,9 @@
             // Start auto-save
             startAutoSave();
 
+            // Show unique URL reminder
+            showUniqueUrlReminder();
+
             // Set current URL for sharing
             const currentUrl = window.location.origin + window.location.pathname;
             const formLinkInput = document.getElementById('formLinkInput');
@@ -1907,6 +1923,43 @@
             if (formLinkInput) formLinkInput.value = currentUrl;
             if (currentUrlDisplay) currentUrlDisplay.textContent = currentUrl;
         });
+
+        // ===================================
+        // SHOW UNIQUE URL REMINDER
+        // ===================================
+        function showUniqueUrlReminder() {
+            const urlReminder = document.getElementById('urlReminder');
+            const uniqueUrlInput = document.getElementById('uniqueFormUrl');
+
+            if (urlReminder && uniqueUrlInput) {
+                const fullUrl = window.location.href;
+                uniqueUrlInput.value = fullUrl;
+                urlReminder.style.display = 'block';
+            }
+        }
+
+        // ===================================
+        // COPY UNIQUE URL
+        // ===================================
+        window.copyUniqueUrl = function() {
+            const input = document.getElementById('uniqueFormUrl');
+            input.select();
+            input.setSelectionRange(0, 99999);
+
+            navigator.clipboard.writeText(input.value).then(() => {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#059669';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#F59E0B';
+                }, 2000);
+            }).catch(err => {
+                alert('Link copied: ' + input.value);
+            });
+        };
 
         // ===================================
         // QUOTE ID GENERATION
@@ -2100,7 +2153,8 @@
 
         window.saveAndExit = async function() {
             await saveFormData(false);
-            alert('Your progress has been saved! You can return to this form anytime using the same link.');
+            const currentUrl = window.location.href;
+            alert(`Your progress has been saved!\n\nBookmark this page or copy the link above to continue later.\n\nYour unique link:\n${currentUrl}`);
         };
 
         // ===================================
