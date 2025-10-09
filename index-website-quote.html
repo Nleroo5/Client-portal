@@ -615,16 +615,15 @@
                     <div class="progress-text">
                         <span id="progressText">Section 0 of 16 complete</span>
                         <span class="save-indicator" id="saveIndicator" style="color: #10b981; font-weight: 600;">
-                            <span id="saveStatus">Saved ✓</span>
+                            <span id="saveStatus">Saved</span>
                         </span>
                     </div>
                 </div>
                 <button onclick="window.saveAndExit()" style="background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: #EEF4D9; border: 2px solid #000000; border-radius: 10px; padding: 12px 24px; font-size: 1rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(5, 144, 140, 0.3);">
-                    💾 Save & Continue Later
+                    Save & Continue Later
                 </button>
             </div>
-            <div style="background: #E8F5F3; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #05908C; display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 1.2rem;">🔄</span>
+            <div style="background: #E8F5F3; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #05908C;">
                 <span style="color: #012E40; font-size: 0.9rem;">
                     <strong>Auto-saves every 30 seconds</strong> — Your progress is safe! Take your time and come back anytime.
                 </span>
@@ -1766,7 +1765,7 @@
 
                 <div class="btn-group">
                     <button type="button" class="btn btn-secondary" onclick="prevSection()">← Previous</button>
-                    <button type="button" class="btn btn-primary" onclick="nextSection()">Complete Form ✓</button>
+                    <button type="button" class="btn btn-primary" onclick="nextSection()">Complete Form</button>
                 </div>
             </div>
 
@@ -1871,7 +1870,7 @@
             navigator.clipboard.writeText(input.value).then(() => {
                 const button = event.target;
                 const originalText = button.textContent;
-                button.textContent = 'Copied! ✓';
+                button.textContent = 'Copied!';
                 button.style.background = '#059669';
 
                 setTimeout(() => {
