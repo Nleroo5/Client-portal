@@ -3373,57 +3373,57 @@
             if (!quote) return;
 
             const details = `
-                <div style="max-height: 70vh; overflow-y: auto;">
+                <div style="max-height: 70vh; overflow-y: auto; color: #000000;">
                     <h3 style="font-size: 1.5rem; margin-bottom: 20px; color: #012E40;">Quote Details</h3>
 
                     <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                         <h4 style="color: #05908C; margin-bottom: 15px;">Business Information</h4>
-                        <p><strong>Business Name:</strong> ${quote.businessName || 'N/A'}</p>
-                        <p><strong>Owner:</strong> ${quote.ownerName || 'N/A'}</p>
-                        <p><strong>Email:</strong> ${quote.email || 'N/A'}</p>
-                        <p><strong>Phone:</strong> ${quote.phone || 'N/A'}</p>
-                        <p><strong>Type:</strong> ${quote.businessType || 'N/A'}</p>
-                        <p><strong>Years in Business:</strong> ${quote.yearsInBusiness || 'N/A'}</p>
-                        <p><strong>Locations:</strong> ${quote.locations || 'N/A'}</p>
-                        <p style="margin-top: 10px;"><strong>Description:</strong><br>${quote.businessDescription || 'N/A'}</p>
-                        <p style="margin-top: 10px;"><strong>What Makes Them Special:</strong><br>${quote.whatMakesSpecial || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Business Name:</strong> ${quote.businessName || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Owner:</strong> ${quote.ownerName || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Email:</strong> ${quote.email || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Phone:</strong> ${quote.phone || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Type:</strong> ${quote.businessType || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Years in Business:</strong> ${quote.yearsInBusiness || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Locations:</strong> ${quote.locations || 'N/A'}</p>
+                        <p style="margin-top: 10px; color: #000000;"><strong>Description:</strong><br>${quote.businessDescription || 'N/A'}</p>
+                        <p style="margin-top: 10px; color: #000000;"><strong>What Makes Them Special:</strong><br>${quote.whatMakesSpecial || 'N/A'}</p>
                     </div>
 
                     <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                         <h4 style="color: #05908C; margin-bottom: 15px;">Project Details</h4>
-                        <p><strong>Budget:</strong> ${quote.budgetRange || 'N/A'}</p>
-                        <p><strong>Deadline:</strong> ${quote.deadlineDate || 'Flexible'}</p>
-                        <p><strong>Decision Maker:</strong> ${quote.decisionMaker || 'N/A'}</p>
-                        <p style="margin-top: 10px;"><strong>Why Now:</strong><br>${quote.whyNow || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Budget:</strong> ${quote.budgetRange || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Deadline:</strong> ${quote.deadlineDate || 'Flexible'}</p>
+                        <p style="color: #000000;"><strong>Decision Maker:</strong> ${quote.decisionMaker || 'N/A'}</p>
+                        <p style="margin-top: 10px; color: #000000;"><strong>Why Now:</strong><br>${quote.whyNow || 'N/A'}</p>
                     </div>
 
                     <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                         <h4 style="color: #05908C; margin-bottom: 15px;">Design Preferences</h4>
-                        <p><strong>Logo Location:</strong> ${quote.logoLocation || 'N/A'}</p>
-                        <p><strong>Main Color:</strong> ${quote.brandColors?.main || 'N/A'}</p>
-                        <p><strong>Secondary Color:</strong> ${quote.brandColors?.secondary || 'N/A'}</p>
-                        <p><strong>Accent Color:</strong> ${quote.brandColors?.accent || 'N/A'}</p>
-                        <p><strong>Overall Style:</strong> ${quote.overallStyle?.join(', ') || 'N/A'}</p>
-                        <p><strong>Font Style:</strong> ${quote.fontStyle?.join(', ') || 'N/A'}</p>
-                        <p><strong>Image Style:</strong> ${quote.imageStyle?.join(', ') || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Logo Location:</strong> ${quote.logoLocation || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Main Color:</strong> ${quote.brandColors?.main || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Secondary Color:</strong> ${quote.brandColors?.secondary || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Accent Color:</strong> ${quote.brandColors?.accent || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Overall Style:</strong> ${quote.overallStyle?.join(', ') || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Font Style:</strong> ${quote.fontStyle?.join(', ') || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Image Style:</strong> ${quote.imageStyle?.join(', ') || 'N/A'}</p>
                     </div>
 
                     <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                         <h4 style="color: #05908C; margin-bottom: 15px;">Favorite Website</h4>
-                        <p><strong>URL:</strong> <a href="${quote.favoriteWebsite?.url}" target="_blank" style="color: #05908C;">${quote.favoriteWebsite?.url || 'N/A'}</a></p>
-                        <p><strong>Likes About Look:</strong> ${quote.favoriteWebsite?.likesAboutLook || 'N/A'}</p>
-                        <p><strong>Likes About Function:</strong> ${quote.favoriteWebsite?.likesAboutFunction || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>URL:</strong> <a href="${quote.favoriteWebsite?.url}" target="_blank" style="color: #05908C;">${quote.favoriteWebsite?.url || 'N/A'}</a></p>
+                        <p style="color: #000000;"><strong>Likes About Look:</strong> ${quote.favoriteWebsite?.likesAboutLook || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Likes About Function:</strong> ${quote.favoriteWebsite?.likesAboutFunction || 'N/A'}</p>
                     </div>
 
                     <div style="background: #f9fafb; padding: 20px; border-radius: 8px;">
                         <h4 style="color: #05908C; margin-bottom: 15px;">Customer Profile</h4>
-                        <p><strong>Age Range:</strong> ${quote.customerProfile?.ageRange || 'N/A'}</p>
-                        <p><strong>Gender:</strong> ${quote.customerProfile?.gender || 'N/A'}</p>
-                        <p><strong>Income Level:</strong> ${quote.customerProfile?.incomeLevel || 'N/A'}</p>
-                        <p><strong>Location:</strong> ${quote.customerProfile?.location || 'N/A'}</p>
-                        <p><strong>Tech Comfort:</strong> ${quote.customerProfile?.techComfort || 'N/A'}</p>
-                        <p><strong>Care About:</strong> ${quote.customerCareAbout?.join(', ') || 'N/A'}</p>
-                        <p><strong>Find Via:</strong> ${quote.howCustomersFind?.join(', ') || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Age Range:</strong> ${quote.customerProfile?.ageRange || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Gender:</strong> ${quote.customerProfile?.gender || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Income Level:</strong> ${quote.customerProfile?.incomeLevel || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Location:</strong> ${quote.customerProfile?.location || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Tech Comfort:</strong> ${quote.customerProfile?.techComfort || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Care About:</strong> ${quote.customerCareAbout?.join(', ') || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Find Via:</strong> ${quote.howCustomersFind?.join(', ') || 'N/A'}</p>
                     </div>
                 </div>
             `;
