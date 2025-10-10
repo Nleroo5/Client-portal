@@ -1,4 +1,25 @@
 (function() {
+    // Global settings object - loaded from Firestore, falls back to config.js
+    let APP_SETTINGS = null;
+
+    // Load settings from Firestore
+    async function loadSettings() {
+        try {
+            const settingsDoc = await db.collection('settings').doc('config').get();
+            if (settingsDoc.exists) {
+                APP_SETTINGS = settingsDoc.data();
+                console.log('Settings loaded from Firestore');
+            } else {
+                // Fallback to config.js
+                APP_SETTINGS = DLM_CONFIG;
+                console.log('Using default settings from config.js');
+            }
+        } catch (error) {
+            console.error('Error loading settings, using config.js:', error);
+            APP_SETTINGS = DLM_CONFIG;
+        }
+    }
+
     // Portal State - Month-to-Month Version
     let portalState = {
         "1": false,
@@ -401,7 +422,7 @@
             `Platform: ${platformText || 'Not specified'}\n\n` +
             `Please install tracking and remove access when complete.`;
 
-        window.open(`mailto:${DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+        window.open(`mailto:${APP_SETTINGS.support.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
     }
 
     // Fireworks display
@@ -483,11 +504,12 @@
             return;
         }
         const subject = 'Creative Revision Request';
-        window.open(`mailto:${DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(notes)}`);
+        window.open(`mailto:${APP_SETTINGS.support.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(notes)}`);
     }
 
     // Initialize on DOM ready
     document.addEventListener('DOMContentLoaded', async function() {
+        await loadSettings(); // Load settings from Firestore first
         await loadState();
         updateStepStates();
 
@@ -498,23 +520,23 @@
         const uploadBtn = document.getElementById('uploadBtn');
 
         if (serviceAgreementBtn && !portalState.docuSignLinks?.serviceAgreement) {
-            serviceAgreementBtn.href = DLM_CONFIG.docuSign.serviceAgreement;
+            serviceAgreementBtn.href = APP_SETTINGS.docuSign.serviceAgreement;
         }
         if (dpaBtn && !portalState.docuSignLinks?.dpa) {
-            dpaBtn.href = DLM_CONFIG.docuSign.dpa;
+            dpaBtn.href = APP_SETTINGS.docuSign.dpa;
         }
         if (invoiceBtn && !portalState.invoiceLink) {
-            invoiceBtn.href = DLM_CONFIG.stripeLinks.invoiceLink;
+            invoiceBtn.href = APP_SETTINGS.stripeLinks.invoiceLink;
         }
         if (uploadBtn && !portalState.googleDriveLink) {
-            uploadBtn.href = DLM_CONFIG.googleDrive.defaultUploadLink;
+            uploadBtn.href = APP_SETTINGS.googleDrive.defaultUploadLink;
         }
 
         // Set contact info
         const contactEmail = document.getElementById('contactEmail');
         const contactPhone = document.getElementById('contactPhone');
-        if (contactEmail) contactEmail.textContent = DLM_CONFIG.support.opsEmail;
-        if (contactPhone) contactPhone.textContent = DLM_CONFIG.support.opsPhone;
+        if (contactEmail) contactEmail.textContent = APP_SETTINGS.support.email;
+        if (contactPhone) contactPhone.textContent = APP_SETTINGS.support.phone;
 
         // Step 4 website access event listeners
         document.querySelectorAll('input[name="websiteAccess"]').forEach(radio => {

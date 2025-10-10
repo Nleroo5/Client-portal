@@ -1,4 +1,25 @@
 (function() {
+    // Global settings object - loaded from Firestore, falls back to config.js
+    let APP_SETTINGS = null;
+
+    // Load settings from Firestore
+    async function loadSettings() {
+        try {
+            const settingsDoc = await db.collection('settings').doc('config').get();
+            if (settingsDoc.exists) {
+                APP_SETTINGS = settingsDoc.data();
+                console.log('Settings loaded from Firestore');
+            } else {
+                // Fallback to config.js
+                APP_SETTINGS = DLM_CONFIG;
+                console.log('Using default settings from config.js');
+            }
+        } catch (error) {
+            console.error('Error loading settings, using config.js:', error);
+            APP_SETTINGS = DLM_CONFIG;
+        }
+    }
+
     // Portal State
     let portalState = {
         "1": false,
@@ -338,10 +359,10 @@
         if (service12 && serviceBtn) {
             if (service12.checked) {
                 serviceBtn.textContent = 'Sign Service Agreement (12-month)';
-                serviceBtn.href = portalState.docuSignLinks?.service12 || DLM_CONFIG.docuSign.service12;
+                serviceBtn.href = portalState.docuSignLinks?.service12 || APP_SETTINGS.docuSign.service12;
             } else {
                 serviceBtn.textContent = 'Sign Service Agreement (6-month)';
-                serviceBtn.href = portalState.docuSignLinks?.service6 || DLM_CONFIG.docuSign.service6;
+                serviceBtn.href = portalState.docuSignLinks?.service6 || APP_SETTINGS.docuSign.service6;
             }
             updatePaymentOptions();
         }
@@ -372,7 +393,7 @@
             if (portalState.stripeLinks?.[serviceTerm]?.[paymentType]) {
                 paymentLink = portalState.stripeLinks[serviceTerm][paymentType];
             } else {
-                paymentLink = DLM_CONFIG.stripeLinks[serviceTerm][paymentType];
+                paymentLink = APP_SETTINGS.stripeLinks[serviceTerm][paymentType];
             }
             stripeBtn.href = paymentLink;
         }
@@ -500,7 +521,7 @@
             `Platform: ${platformText || 'Not specified'}\n\n` +
             `Please install tracking and remove access when complete.`;
         
-        window.open(`mailto:${DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+        window.open(`mailto:${APP_SETTINGS.support.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
     }
 
     // Fireworks display
@@ -582,18 +603,19 @@
             return;
         }
         const subject = 'Creative Revision Request';
-        window.open(`mailto:${DLM_CONFIG.support.opsEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(notes)}`);
+        window.open(`mailto:${APP_SETTINGS.support.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(notes)}`);
     }
 
     // Initialize on DOM ready - USES FIREBASE LOADING
     document.addEventListener('DOMContentLoaded', async function() {
+        await loadSettings(); // Load settings from Firestore first
         await loadState(); // This loads from Firebase
         updateStepStates();
         
         // Set default DocuSign DPA link if no custom link
         const dpaBtn = document.getElementById('dpaBtn');
         if (dpaBtn && !portalState.docuSignLinks?.dpa) {
-            dpaBtn.href = DLM_CONFIG.docuSign.dpa;
+            dpaBtn.href = APP_SETTINGS.docuSign.dpa;
         }
         
         // Initialize Service Agreement
@@ -602,8 +624,8 @@
         // Set contact info
         const contactEmail = document.getElementById('contactEmail');
         const contactPhone = document.getElementById('contactPhone');
-        if (contactEmail) contactEmail.textContent = DLM_CONFIG.support.opsEmail;
-        if (contactPhone) contactPhone.textContent = DLM_CONFIG.support.opsPhone;
+        if (contactEmail) contactEmail.textContent = APP_SETTINGS.support.email;
+        if (contactPhone) contactPhone.textContent = APP_SETTINGS.support.phone;
         
         // Event listeners
         document.querySelectorAll('input[name="serviceTerm"]').forEach(radio => {
