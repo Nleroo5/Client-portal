@@ -1264,21 +1264,168 @@
         <!-- Tab: Settings (NEW - Placeholder) -->
         <div class="admin-tab-content" id="tab-settings">
             <div class="admin-section">
-                <h2 style="font-family: 'Bitter', serif; color: #000000; margin-bottom: 16px;">Settings</h2>
-                <p style="color: #000000; margin-bottom: 24px;">System configuration and preferences</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h2 style="font-family: 'Bitter', serif; color: #000000; margin-bottom: 8px;">Settings</h2>
+                        <p style="color: #6b7280; font-size: 0.95rem;">Manage system configuration and integrations</p>
+                    </div>
+                    <button onclick="saveAllSettings()" style="padding: 12px 28px; background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3); transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(5, 144, 140, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(5, 144, 140, 0.3)'">
+                        💾 Save All Changes
+                    </button>
+                </div>
 
-                <div style="background: #E8F5F3; border-left: 4px solid #05908C; padding: 20px; border-radius: 8px;">
-                    <h3 style="color: #012E40; margin-bottom: 12px;">Coming Soon</h3>
-                    <p style="color: #000000; margin-bottom: 16px;">The Settings tab will include:</p>
-                    <ul style="color: #000000; margin-left: 20px; line-height: 1.8;">
-                        <li>Account management</li>
-                        <li>Email notification preferences</li>
-                        <li>Default templates and links</li>
-                        <li>Integration settings (Stripe, DocuSign, etc.)</li>
-                        <li>Branding customization</li>
-                        <li>User permissions</li>
-                        <li>Data export/backup</li>
-                    </ul>
+                <!-- Company Information -->
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                    <h3 style="color: #012E40; font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        🏢 Company Information
+                    </h3>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div>
+                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Support Email</label>
+                            <input type="email" id="settingsSupportEmail" placeholder="support@company.com" style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                        </div>
+                        <div>
+                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Support Phone</label>
+                            <input type="tel" id="settingsSupportPhone" placeholder="(555) 123-4567" style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Default Google Drive Upload Folder</label>
+                        <input type="url" id="settingsGoogleDriveLink" placeholder="https://drive.google.com/drive/folders/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                        <span style="font-size: 0.85rem; color: #6b7280; margin-top: 6px; display: block;">Used for client file uploads in the portal</span>
+                    </div>
+                </div>
+
+                <!-- DocuSign Integration -->
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                    <h3 style="color: #012E40; font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        📝 DocuSign Integration
+                    </h3>
+
+                    <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                        <p style="color: #92400E; font-size: 0.9rem; font-weight: 600; margin-bottom: 4px;">💡 How to get DocuSign template links:</p>
+                        <ol style="color: #78350F; font-size: 0.85rem; margin-left: 20px; margin-top: 8px; line-height: 1.6;">
+                            <li>Login to DocuSign</li>
+                            <li>Create/open your template</li>
+                            <li>Click "Use" → "Get Link"</li>
+                            <li>Copy the signing URL</li>
+                            <li>Paste below</li>
+                        </ol>
+                    </div>
+
+                    <div style="display: grid; gap: 20px;">
+                        <div>
+                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">DPA (Data Processing Agreement)</label>
+                            <input type="url" id="settingsDocuSignDPA" placeholder="https://na4.docusign.net/Member/PowerFormSigning.aspx?..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                        </div>
+                        <div>
+                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">6-Month Service Agreement</label>
+                            <input type="url" id="settingsDocuSign6Month" placeholder="https://na4.docusign.net/Member/PowerFormSigning.aspx?..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                        </div>
+                        <div>
+                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">12-Month Service Agreement</label>
+                            <input type="url" id="settingsDocuSign12Month" placeholder="https://na4.docusign.net/Member/PowerFormSigning.aspx?..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                        </div>
+                        <div>
+                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Month-to-Month Service Agreement</label>
+                            <input type="url" id="settingsDocuSignM2M" placeholder="https://na4.docusign.net/Member/PowerFormSigning.aspx?..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stripe Payment Links -->
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                    <h3 style="color: #012E40; font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        💳 Stripe Payment Links
+                    </h3>
+
+                    <div style="background: #DBEAFE; border-left: 4px solid #3B82F6; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                        <p style="color: #1E3A8A; font-size: 0.9rem; font-weight: 600; margin-bottom: 4px;">💡 How to get Stripe payment links:</p>
+                        <ol style="color: #1E40AF; font-size: 0.85rem; margin-left: 20px; margin-top: 8px; line-height: 1.6;">
+                            <li>Login to Stripe Dashboard</li>
+                            <li>Go to "Products" → "Payment Links"</li>
+                            <li>Create or open payment link</li>
+                            <li>Copy the link URL</li>
+                            <li>Paste below</li>
+                        </ol>
+                    </div>
+
+                    <div style="margin-bottom: 28px;">
+                        <h4 style="color: #05908C; font-weight: 700; margin-bottom: 16px; font-size: 1.1rem;">6-Month Contract</h4>
+                        <div style="display: grid; gap: 16px;">
+                            <div>
+                                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Monthly Payment Plan</label>
+                                <input type="url" id="settingsStripe6MonthMonthly" placeholder="https://buy.stripe.com/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                            </div>
+                            <div>
+                                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Pay Upfront (Discount)</label>
+                                <input type="url" id="settingsStripe6MonthUpfront" placeholder="https://buy.stripe.com/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 28px;">
+                        <h4 style="color: #05908C; font-weight: 700; margin-bottom: 16px; font-size: 1.1rem;">12-Month Contract</h4>
+                        <div style="display: grid; gap: 16px;">
+                            <div>
+                                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Monthly Payment Plan</label>
+                                <input type="url" id="settingsStripe12MonthMonthly" placeholder="https://buy.stripe.com/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                            </div>
+                            <div>
+                                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Pay Upfront (Discount)</label>
+                                <input type="url" id="settingsStripe12MonthUpfront" placeholder="https://buy.stripe.com/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 style="color: #05908C; font-weight: 700; margin-bottom: 16px; font-size: 1.1rem;">Month-to-Month</h4>
+                        <div>
+                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Invoice Payment Link</label>
+                            <input type="url" id="settingsStripeM2MInvoice" placeholder="https://buy.stripe.com/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                    <h3 style="color: #012E40; font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        🔔 Notification Preferences
+                    </h3>
+
+                    <div style="background: #F3F4F6; padding: 20px; border-radius: 10px;">
+                        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 16px;">
+                            <input type="checkbox" id="settingsNotifyNewQuotes" style="width: 20px; height: 20px; cursor: pointer;">
+                            <span style="color: #374151; font-weight: 600;">Notify me when new website quotes are submitted</span>
+                        </label>
+
+                        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 16px;">
+                            <input type="checkbox" id="settingsNotifyNewMessages" style="width: 20px; height: 20px; cursor: pointer;">
+                            <span style="color: #374151; font-weight: 600;">Notify me when clients send messages</span>
+                        </label>
+
+                        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 16px;">
+                            <input type="checkbox" id="settingsNotifyDealChanges" style="width: 20px; height: 20px; cursor: pointer;">
+                            <span style="color: #374151; font-weight: 600;">Notify me when deal stages change</span>
+                        </label>
+
+                        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                            <input type="checkbox" id="settingsNotifyNewClients" style="width: 20px; height: 20px; cursor: pointer;">
+                            <span style="color: #374151; font-weight: 600;">Notify me when new clients are added</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Save Button (Bottom) -->
+                <div style="display: flex; justify-content: flex-end; gap: 12px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+                    <button onclick="loadSettings()" style="padding: 12px 28px; background: white; color: #6b7280; border: 2px solid #d1d5db; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.95rem; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af'" onmouseout="this.style.borderColor='#d1d5db'">
+                        🔄 Reset to Saved
+                    </button>
+                    <button onclick="saveAllSettings()" style="padding: 12px 28px; background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3); transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(5, 144, 140, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(5, 144, 140, 0.3)'">
+                        💾 Save All Changes
+                    </button>
                 </div>
             </div>
         </div>
@@ -4152,6 +4299,118 @@ Start with Phase 1 and work through systematically. Show your progress after eac
                 showAlert('Error deleting quote: ' + error.message, 'error');
             }
         };
+
+        // ============================================
+        // SETTINGS MANAGEMENT
+        // ============================================
+
+        // Load settings from Firestore
+        window.loadSettings = async function() {
+            try {
+                const settingsDoc = await db.collection('settings').doc('config').get();
+
+                if (settingsDoc.exists) {
+                    const settings = settingsDoc.data();
+
+                    // Company Information
+                    document.getElementById('settingsSupportEmail').value = settings.support?.email || '';
+                    document.getElementById('settingsSupportPhone').value = settings.support?.phone || '';
+                    document.getElementById('settingsGoogleDriveLink').value = settings.googleDrive?.defaultUploadLink || '';
+
+                    // DocuSign
+                    document.getElementById('settingsDocuSignDPA').value = settings.docuSign?.dpa || '';
+                    document.getElementById('settingsDocuSign6Month').value = settings.docuSign?.service6 || '';
+                    document.getElementById('settingsDocuSign12Month').value = settings.docuSign?.service12 || '';
+                    document.getElementById('settingsDocuSignM2M').value = settings.docuSign?.serviceAgreement || '';
+
+                    // Stripe
+                    document.getElementById('settingsStripe6MonthMonthly').value = settings.stripeLinks?.service6?.monthly || '';
+                    document.getElementById('settingsStripe6MonthUpfront').value = settings.stripeLinks?.service6?.upfront || '';
+                    document.getElementById('settingsStripe12MonthMonthly').value = settings.stripeLinks?.service12?.monthly || '';
+                    document.getElementById('settingsStripe12MonthUpfront').value = settings.stripeLinks?.service12?.upfront || '';
+                    document.getElementById('settingsStripeM2MInvoice').value = settings.stripeLinks?.invoiceLink || '';
+
+                    // Notifications
+                    document.getElementById('settingsNotifyNewQuotes').checked = settings.notifications?.newQuotes || false;
+                    document.getElementById('settingsNotifyNewMessages').checked = settings.notifications?.newMessages || false;
+                    document.getElementById('settingsNotifyDealChanges').checked = settings.notifications?.dealChanges || false;
+                    document.getElementById('settingsNotifyNewClients').checked = settings.notifications?.newClients || false;
+
+                    showAlert('Settings loaded successfully', 'success');
+                } else {
+                    // No settings exist yet, load from config.js defaults
+                    document.getElementById('settingsSupportEmail').value = DLM_CONFIG.support.opsEmail;
+                    document.getElementById('settingsSupportPhone').value = DLM_CONFIG.support.opsPhone;
+                    document.getElementById('settingsGoogleDriveLink').value = DLM_CONFIG.googleDrive.defaultUploadLink;
+
+                    showAlert('Loaded default settings. Click "Save All Changes" to persist them.', 'info');
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                showAlert('Error loading settings: ' + error.message, 'error');
+            }
+        };
+
+        // Save all settings to Firestore
+        window.saveAllSettings = async function() {
+            try {
+                const settings = {
+                    support: {
+                        email: document.getElementById('settingsSupportEmail').value,
+                        phone: document.getElementById('settingsSupportPhone').value
+                    },
+                    googleDrive: {
+                        defaultUploadLink: document.getElementById('settingsGoogleDriveLink').value
+                    },
+                    docuSign: {
+                        dpa: document.getElementById('settingsDocuSignDPA').value,
+                        service6: document.getElementById('settingsDocuSign6Month').value,
+                        service12: document.getElementById('settingsDocuSign12Month').value,
+                        serviceAgreement: document.getElementById('settingsDocuSignM2M').value
+                    },
+                    stripeLinks: {
+                        service6: {
+                            monthly: document.getElementById('settingsStripe6MonthMonthly').value,
+                            upfront: document.getElementById('settingsStripe6MonthUpfront').value
+                        },
+                        service12: {
+                            monthly: document.getElementById('settingsStripe12MonthMonthly').value,
+                            upfront: document.getElementById('settingsStripe12MonthUpfront').value
+                        },
+                        invoiceLink: document.getElementById('settingsStripeM2MInvoice').value
+                    },
+                    notifications: {
+                        newQuotes: document.getElementById('settingsNotifyNewQuotes').checked,
+                        newMessages: document.getElementById('settingsNotifyNewMessages').checked,
+                        dealChanges: document.getElementById('settingsNotifyDealChanges').checked,
+                        newClients: document.getElementById('settingsNotifyNewClients').checked
+                    },
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: firebase.auth().currentUser?.email || 'unknown'
+                };
+
+                await db.collection('settings').doc('config').set(settings, { merge: true });
+
+                showAlert('Settings saved successfully!', 'success');
+
+                // Update global DLM_CONFIG object
+                Object.assign(DLM_CONFIG, settings);
+
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                showAlert('Error saving settings: ' + error.message, 'error');
+            }
+        };
+
+        // Load settings when switching to settings tab
+        document.addEventListener('DOMContentLoaded', function() {
+            const settingsTab = document.querySelector('[data-tab="settings"]');
+            if (settingsTab) {
+                settingsTab.addEventListener('click', function() {
+                    setTimeout(loadSettings, 100);
+                });
+            }
+        });
 
         // ============================================
         // NOTIFICATIONS SYSTEM
