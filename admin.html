@@ -4133,14 +4133,9 @@ Start with Phase 1 and work through systematically. Show your progress after eac
         // Delete quote
         window.deleteQuote = async function(quoteId, businessName) {
             // Confirmation dialog
-            const confirmMessage = `Are you sure you want to delete the quote for "${businessName}"?\n\nThis action cannot be undone and will permanently remove:\n- All form responses\n- Uploaded files\n- Quote history\n\nType "DELETE" to confirm:`;
+            const confirmed = confirm(`Are you sure you want to delete the quote for "${businessName}"?\n\nThis action cannot be undone and will permanently remove all form responses and uploaded files.`);
 
-            const userInput = prompt(confirmMessage);
-
-            if (userInput !== 'DELETE') {
-                if (userInput !== null) {
-                    showAlert('Delete cancelled. You must type "DELETE" to confirm.', 'warning');
-                }
+            if (!confirmed) {
                 return;
             }
 
