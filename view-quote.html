@@ -369,10 +369,13 @@
 
         function buildSection4(data) {
             const colors = data.brandColors || {};
+            const logoDisplay = data.logoUrl
+                ? `<a href="${data.logoUrl}" target="_blank" style="color: #05908C; text-decoration: underline; font-weight: 600;">📥 Download ${data.logoFileName || 'logo'}</a>`
+                : 'Not uploaded';
             return `
                 <div class="section">
                     <div class="section-title">Section 4: Look & Feel</div>
-                    ${buildQuestion('Logo File', data.logoFileName ? `✓ Uploaded: ${data.logoFileName}` : 'Not uploaded')}
+                    ${buildQuestion('Logo File', logoDisplay)}
                     ${buildQuestion('Main Color', colors.main)}
                     ${buildQuestion('Secondary Color', colors.secondary)}
                     ${buildQuestion('Accent Color', colors.accent)}

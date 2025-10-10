@@ -3402,7 +3402,7 @@
 
                     <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                         <h4 style="color: #05908C; margin-bottom: 15px;">Design Preferences</h4>
-                        <p style="color: #000000;"><strong>Logo Location:</strong> ${quote.logoLocation || 'N/A'}</p>
+                        <p style="color: #000000;"><strong>Logo File:</strong> ${quote.logoUrl ? `<a href="${quote.logoUrl}" target="_blank" style="color: #05908C; text-decoration: underline;">📥 Download ${quote.logoFileName || 'logo'}</a>` : 'Not uploaded'}</p>
                         <p style="color: #000000;"><strong>Main Color:</strong> ${quote.brandColors?.main || 'N/A'}</p>
                         <p style="color: #000000;"><strong>Secondary Color:</strong> ${quote.brandColors?.secondary || 'N/A'}</p>
                         <p style="color: #000000;"><strong>Accent Color:</strong> ${quote.brandColors?.accent || 'N/A'}</p>
