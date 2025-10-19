@@ -56,6 +56,57 @@
         }
     }
 
+    // Validate and sanitize email address
+    function validateAndSanitizeEmail(email) {
+        if (!email || typeof email !== 'string') return null;
+
+        // Trim whitespace
+        email = email.trim();
+
+        // Check minimum length
+        if (email.length === 0 || email.length > 254) return null;
+
+        // RFC 5322 compliant email regex (simplified but robust)
+        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+        if (!emailRegex.test(email)) return null;
+
+        // Normalize to lowercase for consistency
+        return email.toLowerCase();
+    }
+
+    // Check for duplicate form by email when email is entered
+    async function checkForDuplicateByEmail(email) {
+        // Validate and sanitize the email first
+        const sanitizedEmail = validateAndSanitizeEmail(email);
+
+        if (!sanitizedEmail) {
+            console.log('Invalid email format, skipping duplicate check');
+            return null;
+        }
+
+        try {
+            const snapshot = await db.collection('websiteQuotes')
+                .where('email', '==', sanitizedEmail)
+                .limit(1)
+                .get();
+
+            if (!snapshot.empty) {
+                const existingDoc = snapshot.docs[0];
+                const existingId = existingDoc.id;
+
+                // Only redirect if it's a different form than the current one
+                if (existingId !== window.currentQuoteId) {
+                    return existingId;
+                }
+            }
+            return null;
+        } catch (error) {
+            console.error('Error checking for duplicate:', error);
+            return null;
+        }
+    }
+
     // Populate form with existing data
     function populateForm(data) {
         // Section 1: Business
@@ -91,6 +142,34 @@
         }
 
         // Section 3: Websites They Like
+        // Load multiple reference websites
+        if (data.referenceWebsites && Array.isArray(data.referenceWebsites) && data.referenceWebsites.length > 0) {
+            const container = document.getElementById('referenceWebsitesContainer');
+            container.innerHTML = ''; // Clear existing entries
+
+            data.referenceWebsites.forEach((url, index) => {
+                const entry = document.createElement('div');
+                entry.className = 'reference-website-entry';
+                entry.setAttribute('data-index', index);
+                if (index > 0) entry.style.marginTop = '10px';
+
+                entry.innerHTML = `
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="url" class="favoriteWebsiteUrl" data-index="${index}" ${index === 0 ? 'required' : ''} placeholder="https://www.example.com" style="flex: 1;" value="${url}">
+                        ${index > 0 ? `<button type="button" onclick="removeReferenceWebsite(${index})" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">×</button>` : ''}
+                    </div>
+                `;
+
+                container.appendChild(entry);
+            });
+
+            referenceWebsiteCount = data.referenceWebsites.length;
+        } else if (data.favoriteWebsite?.url) {
+            // Fallback for old data format (single URL)
+            const firstInput = document.querySelector('.favoriteWebsiteUrl[data-index="0"]');
+            if (firstInput) firstInput.value = data.favoriteWebsite.url;
+        }
+
         setValue('favoriteWebsiteUrl', data.favoriteWebsite?.url);
         setValue('likesAboutLook', data.favoriteWebsite?.likesAboutLook);
 
@@ -335,13 +414,17 @@
         }
 
         try {
+            // Validate and sanitize email
+            const emailValue = getValue('email');
+            const normalizedEmail = validateAndSanitizeEmail(emailValue) || '';
+
             // Collect all form data
             const formData = {
                 // Section 1: Business
                 businessName: getValue('businessName'),
                 ownerName: getValue('ownerName'),
                 phone: getValue('phone'),
-                email: getValue('email'),
+                email: normalizedEmail,
                 businessDescription: getValue('businessDescription'),
                 yearsInBusiness: getValue('yearsInBusiness'),
                 businessType: getValue('businessType'),
@@ -361,6 +444,7 @@
                 trafficSources: getValue('trafficSources'),
 
                 // Section 3: Websites They Like
+                referenceWebsites: getReferenceWebsites(),
                 favoriteWebsite: {
                     url: getValue('favoriteWebsiteUrl'),
                     likesAboutLook: getValue('likesAboutLook'),
@@ -508,6 +592,19 @@
         return socialLinks;
     }
 
+    function getReferenceWebsites() {
+        const websites = [];
+        const inputs = document.querySelectorAll('.favoriteWebsiteUrl');
+
+        inputs.forEach(input => {
+            if (input.value && input.value.trim() !== '') {
+                websites.push(input.value.trim());
+            }
+        });
+
+        return websites;
+    }
+
     // Calculate completion percentage
     function calculateCompletionPercent() {
         let totalFields = 0;
@@ -525,9 +622,10 @@
         totalFields++;
         if (getRadioValue('hasCurrentWebsite')) filledFields++;
 
-        // Section 3: Inspiration (at least 1 field)
+        // Section 3: Inspiration (at least 1 reference website)
         totalFields++;
-        if (getValue('favoriteWebsiteUrl')) filledFields++;
+        const refWebsites = getReferenceWebsites();
+        if (refWebsites.length > 0) filledFields++;
 
         // Section 4: Look & Feel - Colors (at least 1 color)
         totalFields++;
@@ -701,7 +799,7 @@
 
             // Auto-create CRM Deal at "Lead" stage
             const dealData = {
-                companyName: quoteData.businessName || 'Website Quote Lead',
+                companyName: quoteData.businessName || 'Website Discovery Lead',
                 contactName: quoteData.ownerName || null,
                 email: quoteData.email || null,
                 phone: quoteData.phone || null,
@@ -711,23 +809,23 @@
                 contractLength: 0,
                 clientPortalId: null,
                 websiteQuoteId: window.currentQuoteId, // Link to the website quote
-                notes: `Auto-generated from Website Quote submission.\nBusiness: ${quoteData.businessName || 'N/A'}\nIndustry: ${quoteData.businessType || 'N/A'}\nLocation: ${quoteData.locations || 'N/A'}`,
+                notes: `Auto-generated from Website Discovery Form submission.\nBusiness: ${quoteData.businessName || 'N/A'}\nIndustry: ${quoteData.businessType || 'N/A'}\nLocation: ${quoteData.locations || 'N/A'}`,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                 archived: false
             };
 
             const dealRef = await db.collection('deals').add(dealData);
-            console.log('✓ CRM Deal auto-created from website quote');
+            console.log('✓ CRM Deal auto-created from website discovery form');
 
-            // Create notification for admin about new quote submission
+            // Create notification for admin about new form submission
             if (window.createNotification) {
                 await window.createNotification({
                     type: 'QUOTE_SUBMITTED',
                     recipientId: 'admin',
                     recipientType: 'admin',
-                    message: `New website quote from ${quoteData.businessName || 'Unknown Business'}`,
-                    actionUrl: `admin.html?tab=website-quotes`,
+                    message: `New website discovery form from ${quoteData.businessName || 'Unknown Business'}`,
+                    actionUrl: `admin.html?tab=website-forms`,
                     relatedId: window.currentQuoteId,
                     metadata: {
                         businessName: quoteData.businessName,
@@ -735,7 +833,7 @@
                         dealId: dealRef.id
                     }
                 });
-                console.log('✓ Admin notification created for quote submission');
+                console.log('✓ Admin notification created for form submission');
             }
 
             // Hide all sections
@@ -743,8 +841,12 @@
                 section.classList.remove('active');
             });
 
-            // Calculate and display ballpark quote
-            calculateBallparkQuote(quoteData);
+            // Personalize completion message with client name
+            const clientName = quoteData.ownerName || quoteData.businessName || 'there';
+            const completionHeading = document.getElementById('completionClientName');
+            if (completionHeading) {
+                completionHeading.textContent = `Thank You, ${clientName}!`;
+            }
 
             // Show completion screen
             document.getElementById('completionScreen').classList.add('active');
@@ -755,11 +857,19 @@
             document.querySelectorAll('.section-content').forEach(section => {
                 section.classList.remove('active');
             });
+
+            // Personalize with available data
+            const clientName = quoteData?.ownerName || quoteData?.businessName || 'there';
+            const completionHeading = document.getElementById('completionClientName');
+            if (completionHeading) {
+                completionHeading.textContent = `Thank You, ${clientName}!`;
+            }
+
             document.getElementById('completionScreen').classList.add('active');
         }
     }
 
-    // Calculate ballpark quote based on form data
+    // Calculate ballpark quote based on form data (DEPRECATED - keeping for reference)
     function calculateBallparkQuote(data) {
         let basePrice = 2000;
         let maxPrice = 4000;
@@ -933,6 +1043,49 @@
         }
     });
 
+    // Reference Websites Management
+    let referenceWebsiteCount = 1;
+
+    window.addReferenceWebsite = function() {
+        const container = document.getElementById('referenceWebsitesContainer');
+        const newIndex = referenceWebsiteCount;
+
+        const newEntry = document.createElement('div');
+        newEntry.className = 'reference-website-entry';
+        newEntry.setAttribute('data-index', newIndex);
+        newEntry.style.marginTop = '10px';
+        newEntry.innerHTML = `
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="url" class="favoriteWebsiteUrl" data-index="${newIndex}" placeholder="https://www.example.com" style="flex: 1;">
+                <button type="button" onclick="removeReferenceWebsite(${newIndex})" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">×</button>
+            </div>
+        `;
+
+        container.appendChild(newEntry);
+        referenceWebsiteCount++;
+
+        // Setup auto-save on the new input
+        const newInput = newEntry.querySelector('.favoriteWebsiteUrl');
+        newInput.addEventListener('blur', () => {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                saveFormData(false);
+            }, 1000);
+        });
+    };
+
+    window.removeReferenceWebsite = function(index) {
+        const entry = document.querySelector(`.reference-website-entry[data-index="${index}"]`);
+        if (entry) {
+            entry.remove();
+            // Auto-save after removal
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                saveFormData(false);
+            }, 1000);
+        }
+    };
+
     // Age Range Slider Handler
     const ageMinSlider = document.getElementById('customerAgeMin');
     const ageMaxSlider = document.getElementById('customerAgeMax');
@@ -960,6 +1113,38 @@
 
     ageMinSlider?.addEventListener('input', updateAgeRange);
     ageMaxSlider?.addEventListener('input', updateAgeRange);
+
+    // Email duplicate check - redirect to existing form if email already exists
+    const emailInput = document.getElementById('email');
+    let emailCheckTimeout = null;
+
+    emailInput?.addEventListener('blur', async function() {
+        const email = this.value.trim();
+
+        if (!email || !email.includes('@')) return;
+
+        // Clear any pending checks
+        clearTimeout(emailCheckTimeout);
+
+        // Wait a bit to avoid checking on every keystroke
+        emailCheckTimeout = setTimeout(async () => {
+            const existingFormId = await checkForDuplicateByEmail(email);
+
+            if (existingFormId) {
+                const businessName = quoteData?.businessName || 'this business';
+                const confirmed = confirm(
+                    `📋 We found an existing form for ${email}!\n\n` +
+                    `It looks like you've already started a discovery form. Would you like to continue with that form instead?\n\n` +
+                    `Click OK to load your existing form, or Cancel to continue with this one.`
+                );
+
+                if (confirmed) {
+                    // Redirect to existing form
+                    window.location.href = `index-website-quote.html?c=${existingFormId}`;
+                }
+            }
+        }, 500);
+    });
 
     // Save and Exit function
     window.saveAndExit = async function() {
@@ -1027,5 +1212,32 @@
             alert('There was an error saving your progress. Please try again.');
         }
     };
+
+    // Global error boundary - catch unhandled errors
+    window.addEventListener('error', function(event) {
+        console.error('Critical error:', event.error);
+        showErrorBoundary('An unexpected error occurred. Please refresh the page or contact support.');
+    });
+
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error('Unhandled promise rejection:', event.reason);
+        showErrorBoundary('A connection error occurred. Please check your internet connection and try again.');
+    });
+
+    function showErrorBoundary(message) {
+        const errorBoundary = document.getElementById('errorBoundary');
+        const errorMessage = document.getElementById('errorMessage');
+        const loadingScreen = document.getElementById('loadingScreen');
+
+        if (errorMessage) {
+            errorMessage.textContent = message;
+        }
+        if (errorBoundary) {
+            errorBoundary.style.display = 'flex';
+        }
+        if (loadingScreen) {
+            loadingScreen.style.display = 'none';
+        }
+    }
 
 })();

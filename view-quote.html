@@ -370,7 +370,14 @@
         function buildSection4(data) {
             const colors = data.brandColors || {};
             const logoDisplay = data.logoUrl
-                ? `<a href="${data.logoUrl}" target="_blank" style="color: #05908C; text-decoration: underline; font-weight: 600;">📥 Download ${data.logoFileName || 'logo'}</a>`
+                ? `
+                    <div>
+                        <a href="${data.logoUrl}" target="_blank" download style="color: #05908C; text-decoration: underline; font-weight: 600; display: inline-block; margin-bottom: 12px;">📥 Download ${data.logoFileName || 'logo'}</a>
+                        <div style="margin-top: 12px;">
+                            <img src="${data.logoUrl}" alt="Business Logo" style="max-width: 400px; max-height: 300px; border: 2px solid #e5e7eb; border-radius: 8px; padding: 16px; background: white; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" onclick="window.open('${data.logoUrl}', '_blank')" title="Click to view full size"/>
+                        </div>
+                    </div>
+                `
                 : 'Not uploaded';
             return `
                 <div class="section">

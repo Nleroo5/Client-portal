@@ -36,6 +36,7 @@ service cloud.firestore {
                                 'ga4PropertyId', 'ga4MeasurementId', 'googleAnalyticsEmail',
                                 'websiteAccessMethod', 'websiteUrl', 'websiteUsername',
                                 'websitePassword', 'hostingProvider', 'hasUnreviewedWebsiteAccess',
+                                'websiteDirectAccess', 'websiteAdminContact',
                                 'currentStep', 'completedSteps', 'progress',
                                 'lastUpdated', 'updatedAt']);
     }

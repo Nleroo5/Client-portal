@@ -1073,4 +1073,31 @@
     window.approveCreatives = approveCreatives;
     window.requestRevisions = requestRevisions;
     window.submitRevisions = submitRevisions;
+
+    // Global error boundary - catch unhandled errors
+    window.addEventListener('error', function(event) {
+        console.error('Critical error:', event.error);
+        showErrorBoundary('An unexpected error occurred. Please refresh the page or contact support.');
+    });
+
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error('Unhandled promise rejection:', event.reason);
+        showErrorBoundary('A connection error occurred. Please check your internet connection and try again.');
+    });
+
+    function showErrorBoundary(message) {
+        const errorBoundary = document.getElementById('errorBoundary');
+        const errorMessage = document.getElementById('errorMessage');
+        const loadingScreen = document.getElementById('loadingScreen');
+
+        if (errorMessage) {
+            errorMessage.textContent = message;
+        }
+        if (errorBoundary) {
+            errorBoundary.style.display = 'flex';
+        }
+        if (loadingScreen) {
+            loadingScreen.style.display = 'none';
+        }
+    }
 })();

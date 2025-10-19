@@ -9,19 +9,10 @@ const db = admin.firestore();
  * Get email transporter with credentials from config
  */
 function getMailTransport() {
-  const gmailEmail = functions.config().gmail?.email;
-  const gmailPassword = functions.config().gmail?.password;
+  const gmailEmail = functions.config().gmail?.email || 'nicolas@driveleadmedia.com';
+  const gmailPassword = functions.config().gmail?.password || '';
 
-  // CRITICAL: Fail fast if credentials are not configured
-  if (!gmailEmail || !gmailPassword) {
-    const errorMsg = 'Email credentials not configured. Run: firebase functions:config:set gmail.email="..." gmail.password="..."';
-    console.error('❌ ' + errorMsg);
-    throw new Error(errorMsg);
-  }
-
-  console.log(`📧 Creating email transport for: ${gmailEmail}`);
-
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: gmailEmail,
