@@ -132,19 +132,16 @@
                 portalState.stripeLinks.service12.upfront = data.stripe12Upfront;
             }
             
-            // Load Google Drive link
-            if (data.googleDriveLink) {
-                portalState.googleDriveLink = data.googleDriveLink;
-                const uploadBtn = document.getElementById('uploadBtn');
-                if (uploadBtn) uploadBtn.href = data.googleDriveLink;
+            // Load brand assets
+            if (data.brandAssets && data.brandAssets.length > 0) {
+                displayBrandAssets(data.brandAssets);
             }
-            
-            // Load creative link
-            if (data.creativeLink) {
-                portalState.creativeLink = data.creativeLink;
-                updateCreativeGallery(data.creativeLink);
+
+            // Load creatives
+            if (data.creatives && data.creatives.length > 0) {
+                displayCreativesGallery(data.creatives);
             }
-            
+
             // Store client ID for saving
             window.currentClientId = clientId;
             
@@ -1289,6 +1286,243 @@
             icon.textContent = '▼';
         }
     };
+
+    // Handle brand assets upload
+    window.handleBrandAssetsUpload = async function(input) {
+        const files = Array.from(input.files);
+
+        if (files.length === 0) return;
+
+        // Validate file count
+        if (files.length > 10) {
+            alert('You can upload up to 10 files at a time');
+            return;
+        }
+
+        // Validate file sizes
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        const oversizedFiles = files.filter(f => f.size > maxSize);
+        if (oversizedFiles.length > 0) {
+            alert(`These files are too large (max 10MB): ${oversizedFiles.map(f => f.name).join(', ')}`);
+            return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('id') || urlParams.get('c');
+
+        if (!clientId) {
+            alert('Error: Client ID not found');
+            return;
+        }
+
+        try {
+            const storageRef = firebase.storage().ref();
+            const uploadedFiles = [];
+
+            // Show upload progress
+            const fileListContainer = document.getElementById('brandAssetsFileList');
+            const filesContainer = document.getElementById('brandAssetsFiles');
+            fileListContainer.style.display = 'block';
+            filesContainer.innerHTML = '<p style="color: #6b7280; font-style: italic;">Uploading files...</p>';
+
+            // Upload each file
+            for (const file of files) {
+                const fileName = `${Date.now()}-${file.name}`;
+                const fileRef = storageRef.child(`clients/${clientId}/brand-assets/${fileName}`);
+
+                await fileRef.put(file);
+                const fileUrl = await fileRef.getDownloadURL();
+
+                uploadedFiles.push({
+                    name: file.name,
+                    url: fileUrl,
+                    size: file.size,
+                    type: file.type,
+                    uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+
+            // Save file metadata to Firestore
+            const clientDoc = await db.collection('clients').doc(clientId).get();
+            const existingAssets = clientDoc.data().brandAssets || [];
+
+            await db.collection('clients').doc(clientId).update({
+                brandAssets: [...existingAssets, ...uploadedFiles],
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // Display uploaded files
+            displayBrandAssets([...existingAssets, ...uploadedFiles]);
+
+            alert(`Successfully uploaded ${files.length} file(s)!`);
+
+        } catch (error) {
+            console.error('Error uploading brand assets:', error);
+            alert('Error uploading files. Please try again.');
+        }
+    };
+
+    // Display brand assets
+    function displayBrandAssets(assets) {
+        const fileListContainer = document.getElementById('brandAssetsFileList');
+        const filesContainer = document.getElementById('brandAssetsFiles');
+
+        if (!assets || assets.length === 0) {
+            fileListContainer.style.display = 'none';
+            return;
+        }
+
+        fileListContainer.style.display = 'block';
+        filesContainer.innerHTML = assets.map((file, index) => `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f9fafb; border-radius: 6px; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                    <span style="font-size: 1.2rem;">${getFileIcon(file.type || file.name)}</span>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="color: #012E40; font-weight: 600; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</div>
+                        <div style="color: #6b7280; font-size: 0.75rem;">${formatFileSize(file.size)}</div>
+                    </div>
+                </div>
+                <a href="${file.url}" target="_blank" style="padding: 6px 12px; background: #05908C; color: white; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600; white-space: nowrap;">Download</a>
+            </div>
+        `).join('');
+    }
+
+    // Get file icon based on type
+    function getFileIcon(type) {
+        if (type.includes('pdf')) return '📄';
+        if (type.includes('font') || type.includes('ttf') || type.includes('otf') || type.includes('woff')) return '🔤';
+        if (type.includes('image') || type.includes('png') || type.includes('jpg') || type.includes('jpeg') || type.includes('svg')) return '🖼️';
+        return '📁';
+    }
+
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    // Display creatives gallery
+    function displayCreativesGallery(creatives) {
+        const placeholder = document.getElementById('galleryPlaceholder');
+        const gallery = document.getElementById('creativesGallery');
+        const grid = document.getElementById('creativesGrid');
+
+        if (!creatives || creatives.length === 0) {
+            if (placeholder) placeholder.style.display = 'block';
+            if (gallery) gallery.style.display = 'none';
+            return;
+        }
+
+        if (placeholder) placeholder.style.display = 'none';
+        if (gallery) gallery.style.display = 'block';
+
+        if (grid) {
+            grid.innerHTML = creatives.map((creative, index) => `
+                <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer;" onclick="window.openLightbox(${index})">
+                    <img src="${creative.url}" alt="${creative.name}" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block;">
+                    <div style="padding: 12px;">
+                        <div style="color: #012E40; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">${creative.name || `Creative ${index + 1}`}</div>
+                        <div style="color: #6b7280; font-size: 0.75rem;">${creative.type || 'Image'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Store creatives globally for lightbox
+        window.currentCreatives = creatives;
+    }
+
+    // Open lightbox to view creative full-size
+    window.openLightbox = function(index) {
+        const creatives = window.currentCreatives;
+        if (!creatives || !creatives[index]) return;
+
+        const lightbox = document.createElement('div');
+        lightbox.id = 'creativeLightbox';
+        lightbox.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(1, 46, 64, 0.95);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        `;
+
+        lightbox.innerHTML = `
+            <div style="position: relative; max-width: 90vw; max-height: 90vh;">
+                <button onclick="window.closeLightbox()" style="position: absolute; top: -40px; right: 0; background: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">&times;</button>
+                <img src="${creatives[index].url}" alt="${creatives[index].name}" style="max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                <div style="text-align: center; margin-top: 15px; color: white;">
+                    <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 5px;">${creatives[index].name || `Creative ${index + 1}`}</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">${index + 1} of ${creatives.length}</div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(lightbox);
+        document.body.style.overflow = 'hidden';
+
+        // Close on background click
+        lightbox.addEventListener('click', function(e) {
+            if (e.target === lightbox) {
+                window.closeLightbox();
+            }
+        });
+
+        // Close on ESC key
+        document.addEventListener('keydown', handleLightboxEscape);
+    };
+
+    function handleLightboxEscape(e) {
+        if (e.key === 'Escape') {
+            window.closeLightbox();
+        }
+    }
+
+    // Close lightbox
+    window.closeLightbox = function() {
+        const lightbox = document.getElementById('creativeLightbox');
+        if (lightbox) {
+            lightbox.remove();
+            document.body.style.overflow = 'auto';
+            document.removeEventListener('keydown', handleLightboxEscape);
+        }
+    };
+
+    // Setup drag & drop for brand assets
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropZone = document.getElementById('brandAssetsDropZone');
+        const fileInput = document.getElementById('brandAssetsInput');
+
+        if (dropZone && fileInput) {
+            dropZone.onclick = () => fileInput.click();
+
+            dropZone.ondragover = (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#F2A922';
+                dropZone.style.background = '#FBE9D1';
+            };
+
+            dropZone.ondragleave = () => {
+                dropZone.style.borderColor = '#F2A922';
+                dropZone.style.background = 'white';
+            };
+
+            dropZone.ondrop = (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = '#F2A922';
+                dropZone.style.background = 'white';
+                fileInput.files = e.dataTransfer.files;
+                window.handleBrandAssetsUpload(fileInput);
+            };
+        }
+    });
 
     // Expose functions globally
     window.markStepComplete = markStepComplete;
