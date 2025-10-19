@@ -2693,9 +2693,17 @@
                                 <!-- Logo & Colors -->
                                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: ${data.brandAssets && data.brandAssets.length > 0 ? '12px' : '0'};">
                                     ${data.brandLogoUrl ? `
-                                        <a href="${data.brandLogoUrl}" target="_blank" download title="Click to download logo" style="display: block; transition: all 0.2s ease; cursor: pointer;" onmouseover="this.style.transform='scale(1.05)'; this.style.opacity='0.8'" onmouseout="this.style.transform='scale(1)'; this.style.opacity='1'">
+                                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
                                             <img src="${data.brandLogoUrl}" alt="${data.clientName} logo" style="width: 60px; height: 60px; object-fit: contain; border-radius: 6px; background: white; padding: 4px; border: 1px solid #d1d5db;" />
-                                        </a>
+                                            <div style="display: flex; gap: 4px;">
+                                                <a href="${data.brandLogoUrl}" target="_blank" style="padding: 3px 8px; background: #e8f5f3; color: #05908C; border-radius: 4px; font-size: 0.65rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border: 1px solid #05908C; white-space: nowrap;" onmouseover="this.style.background='#d1fae5'" onmouseout="this.style.background='#e8f5f3'">
+                                                    👁️ Preview
+                                                </a>
+                                                <a href="${data.brandLogoUrl}" download style="padding: 3px 8px; background: #05908C; color: white; border-radius: 4px; font-size: 0.65rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; white-space: nowrap;" onmouseover="this.style.background='#047a77'" onmouseout="this.style.background='#05908C'">
+                                                    📥 Download
+                                                </a>
+                                            </div>
+                                        </div>
                                     ` : ''}
                                     ${(data.brandColors && data.brandColors.length > 0) || data.brandPrimaryColor || data.brandSecondaryColor ? `
                                         <div style="flex: 1;">
@@ -2733,11 +2741,16 @@
                                         <div style="font-size: 0.7rem; color: #012E40; margin-bottom: 8px; font-weight: 600;">${data.brandAssets.length} Additional File${data.brandAssets.length > 1 ? 's' : ''}</div>
                                         <div style="display: flex; flex-direction: column; gap: 6px;">
                                             ${data.brandAssets.map(file => `
-                                                <a href="${file.url}" target="_blank" download style="display: flex; align-items: center; gap: 8px; padding: 6px; background: white; border-radius: 6px; text-decoration: none; transition: all 0.2s ease; border: 1px solid #d1d5db;" onmouseover="this.style.background='#f9fafb'; this.style.borderColor='#05908C'" onmouseout="this.style.background='white'; this.style.borderColor='#d1d5db'">
+                                                <div style="display: flex; align-items: center; gap: 8px; padding: 6px; background: white; border-radius: 6px; transition: all 0.2s ease; border: 1px solid #d1d5db;">
                                                     <span style="font-size: 1rem;">${getFileIcon(file.type || file.name)}</span>
                                                     <span style="flex: 1; color: #012E40; font-size: 0.75rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${file.name}">${file.name}</span>
-                                                    <span style="color: #05908C; font-size: 0.7rem; font-weight: 600;">📥 Download</span>
-                                                </a>
+                                                    <a href="${file.url}" target="_blank" style="padding: 4px 10px; background: #e8f5f3; color: #05908C; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border: 1px solid #05908C;" onmouseover="this.style.background='#d1fae5'" onmouseout="this.style.background='#e8f5f3'">
+                                                        👁️ Preview
+                                                    </a>
+                                                    <a href="${file.url}" download style="padding: 4px 10px; background: #05908C; color: white; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.background='#047a77'" onmouseout="this.style.background='#05908C'">
+                                                        📥 Download
+                                                    </a>
+                                                </div>
                                             `).join('')}
                                         </div>
                                     </div>
@@ -2789,11 +2802,19 @@
                                     <div style="font-size: 0.7rem; color: #012E40; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">${data.creatives.length} Creative${data.creatives.length > 1 ? 's' : ''} Uploaded</div>
                                     <button class="btn btn-small" onclick="uploadCreatives('${docId}', '${data.clientName}')" style="padding: 6px 12px; font-size: 0.75rem; background: #F2A922; color: #012E40;">Add More</button>
                                 </div>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 6px;">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px;">
                                     ${data.creatives.slice(0, 4).map(creative => `
-                                        <a href="${creative.url}" target="_blank" download title="Click to download ${creative.name}" style="display: block; transition: all 0.2s ease; cursor: pointer;" onmouseover="this.style.opacity='0.8'; this.style.transform='scale(1.05)'" onmouseout="this.style.opacity='1'; this.style.transform='scale(1)'">
+                                        <div style="display: flex; flex-direction: column; gap: 4px;">
                                             <img src="${creative.url}" alt="${creative.name}" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px; border: 2px solid #F2A922;">
-                                        </a>
+                                            <div style="display: flex; gap: 2px;">
+                                                <a href="${creative.url}" target="_blank" style="flex: 1; padding: 3px 6px; background: #fef3c7; color: #92400e; border-radius: 4px; font-size: 0.6rem; font-weight: 600; text-decoration: none; text-align: center; transition: all 0.2s ease; border: 1px solid #F2A922; white-space: nowrap;" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='#fef3c7'">
+                                                    👁️
+                                                </a>
+                                                <a href="${creative.url}" download style="flex: 1; padding: 3px 6px; background: #F2A922; color: #012E40; border-radius: 4px; font-size: 0.6rem; font-weight: 600; text-decoration: none; text-align: center; transition: all 0.2s ease; white-space: nowrap;" onmouseover="this.style.background='#f59e0b'" onmouseout="this.style.background='#F2A922'">
+                                                    📥
+                                                </a>
+                                            </div>
+                                        </div>
                                     `).join('')}
                                 </div>
                                 ${data.creatives.length > 4 ? `<div style="text-align: center; margin-top: 6px; color: #6b7280; font-size: 0.7rem;">+${data.creatives.length - 4} more</div>` : ''}
