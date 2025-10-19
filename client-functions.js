@@ -1490,16 +1490,16 @@
 
         if (grid) {
             grid.innerHTML = creatives.map((creative, index) => `
-                <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); transition: all 0.3s ease;">
                     <img src="${creative.url}" alt="${creative.name}" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block;">
-                    <div style="padding: 15px;">
-                        <div style="color: #012E40; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">${creative.name || `Creative ${index + 1}`}</div>
-                        <div style="color: #6b7280; font-size: 0.75rem; margin-bottom: 12px;">${creative.type || 'Image'}</div>
-                        <div style="display: flex; gap: 8px;">
-                            <button onclick="window.openLightbox(${index})" style="flex: 1; padding: 8px 16px; background: #E8F5F3; color: #05908C; border: 1px solid #05908C; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='#D1F2EB'" onmouseout="this.style.background='#E8F5F3'">
+                    <div style="padding: 10px;">
+                        <div style="color: #012E40; font-weight: 600; font-size: 0.8rem; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${creative.name || `Creative ${index + 1}`}</div>
+                        <div style="color: #6b7280; font-size: 0.7rem; margin-bottom: 8px;">${creative.type || 'Image'}</div>
+                        <div style="display: flex; gap: 6px;">
+                            <button onclick="window.openLightbox(${index})" style="flex: 1; padding: 6px 10px; background: #E8F5F3; color: #05908C; border: 1px solid #05908C; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='#D1F2EB'" onmouseout="this.style.background='#E8F5F3'">
                                 👁️ Preview
                             </button>
-                            <button onclick="downloadFile('${creative.url}', '${creative.name || `creative-${index + 1}`}')" style="flex: 1; padding: 8px 16px; background: #05908C; color: white; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='#047a77'" onmouseout="this.style.background='#05908C'">
+                            <button onclick="downloadFile('${creative.url}', '${creative.name || `creative-${index + 1}`}')" style="flex: 1; padding: 6px 10px; background: #05908C; color: white; border: none; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='#047a77'" onmouseout="this.style.background='#05908C'">
                                 📥 Download
                             </button>
                         </div>
