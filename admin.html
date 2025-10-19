@@ -3861,6 +3861,45 @@
                     }
                 });
 
+                // Fetch all active clients without linked deals and create virtual deals
+                const clientsSnapshot = await db.collection('clients').get();
+                clientsSnapshot.forEach(clientDoc => {
+                    const clientData = clientDoc.data();
+                    const clientId = clientDoc.id;
+
+                    // Only create virtual deal if:
+                    // 1. Client is active
+                    // 2. Client has no linked deal
+                    // 3. Client has started onboarding (at least one step complete OR has progress)
+                    if (clientData.active && !clientData.linkedDealId) {
+                        const hasProgress = clientData.step1Complete ||
+                                          clientData.step2Complete ||
+                                          clientData.step3Complete ||
+                                          clientData.step4Complete ||
+                                          clientData.step5Complete;
+
+                        if (hasProgress) {
+                            // Create a virtual deal for this client
+                            deals.push({
+                                id: `virtual-${clientId}`,
+                                companyName: clientData.clientName,
+                                contactName: clientData.clientEmail,
+                                email: clientData.clientEmail,
+                                phone: null,
+                                assignedTo: 'unassigned',
+                                stage: 'onboarding-portal',
+                                mrr: 0,
+                                contractLength: 0,
+                                clientPortalId: clientId,
+                                notes: null,
+                                isVirtualDeal: true, // Flag to identify this as a virtual deal
+                                createdAt: clientData.createdAt,
+                                updatedAt: clientData.lastUpdated || clientData.createdAt
+                            });
+                        }
+                    }
+                });
+
                 // Render pipeline board
                 renderPipelineBoard(deals);
 
@@ -3898,7 +3937,15 @@
         let draggedDealStage = null;
 
         function handleDealDragStart(event) {
-            draggedDealId = event.target.getAttribute('data-deal-id');
+            const dealId = event.target.getAttribute('data-deal-id');
+
+            // Prevent dragging virtual deals
+            if (dealId && dealId.startsWith('virtual-')) {
+                event.preventDefault();
+                return false;
+            }
+
+            draggedDealId = dealId;
             draggedDealStage = event.target.getAttribute('data-deal-stage');
             event.target.style.opacity = '0.5';
             event.dataTransfer.effectAllowed = 'move';
@@ -4016,29 +4063,45 @@
                         ].filter(Boolean).length;
                         const progressPercent = Math.round((completedSteps / 5) * 100);
 
-                        // Update both compressed and full views
-                        const compressedInfo = document.querySelector(`#client-info-compressed-${deal.id} .client-portal-data`);
-                        const fullInfo = document.querySelector(`#client-info-full-${deal.id} .client-portal-data`);
+                        // Update virtual deal cards
+                        if (deal.isVirtualDeal) {
+                            const virtualInfo = document.querySelector(`#client-info-virtual-${deal.id} .client-portal-data`);
+                            if (virtualInfo) {
+                                virtualInfo.innerHTML = `
+                                    <div style="margin-bottom: 4px;">${clientData.portalType === 'm2m' ? 'M2M' : 'Contract'} Portal</div>
+                                    <div style="background: #d1d5db; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 6px;">
+                                        <div style="background: #05908C; height: 100%; width: ${progressPercent}%;"></div>
+                                    </div>
+                                    <div style="text-align: center; margin-top: 4px; font-weight: 600;">${progressPercent}% Complete (${completedSteps}/5)</div>
+                                `;
+                            }
+                        } else {
+                            // Update regular deal cards (compressed and full views)
+                            const compressedInfo = document.querySelector(`#client-info-compressed-${deal.id} .client-portal-data`);
+                            const fullInfo = document.querySelector(`#client-info-full-${deal.id} .client-portal-data`);
 
-                        const infoHTML = `
-                            <div style="margin-bottom: 4px;"><strong>${clientData.clientName}</strong></div>
-                            <div style="margin-bottom: 4px;">${clientData.portalType === 'm2m' ? 'M2M' : 'Contract'} Portal • ${clientData.active ? 'Active' : 'Inactive'}</div>
-                            <div style="background: #d1d5db; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 6px;">
-                                <div style="background: #05908C; height: 100%; width: ${progressPercent}%;"></div>
-                            </div>
-                            <div style="text-align: center; margin-top: 4px; font-weight: 600;">${progressPercent}% Complete</div>
-                        `;
+                            const infoHTML = `
+                                <div style="margin-bottom: 4px;"><strong>${clientData.clientName}</strong></div>
+                                <div style="margin-bottom: 4px;">${clientData.portalType === 'm2m' ? 'M2M' : 'Contract'} Portal • ${clientData.active ? 'Active' : 'Inactive'}</div>
+                                <div style="background: #d1d5db; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 6px;">
+                                    <div style="background: #05908C; height: 100%; width: ${progressPercent}%;"></div>
+                                </div>
+                                <div style="text-align: center; margin-top: 4px; font-weight: 600;">${progressPercent}% Complete</div>
+                            `;
 
-                        if (compressedInfo) compressedInfo.innerHTML = infoHTML;
-                        if (fullInfo) fullInfo.innerHTML = infoHTML;
+                            if (compressedInfo) compressedInfo.innerHTML = infoHTML;
+                            if (fullInfo) fullInfo.innerHTML = infoHTML;
+                        }
                     } else {
                         // Client not found
                         const compressedInfo = document.querySelector(`#client-info-compressed-${deal.id} .client-portal-data`);
                         const fullInfo = document.querySelector(`#client-info-full-${deal.id} .client-portal-data`);
+                        const virtualInfo = document.querySelector(`#client-info-virtual-${deal.id} .client-portal-data`);
 
                         const errorHTML = '<div style="color: #991b1b;">⚠️ Client not found</div>';
                         if (compressedInfo) compressedInfo.innerHTML = errorHTML;
                         if (fullInfo) fullInfo.innerHTML = errorHTML;
+                        if (virtualInfo) virtualInfo.innerHTML = errorHTML;
                     }
                 } catch (error) {
                     console.error('Error loading client data for deal:', error);
@@ -4073,6 +4136,51 @@
 
         // Render deal card with compressed/full view
         function renderDealCard(deal, stageCount) {
+            // SPECIAL HANDLING FOR VIRTUAL DEALS (clients without linked deals)
+            if (deal.isVirtualDeal) {
+                return `
+                    <div class="deal-card virtual-deal-card"
+                         id="deal-${deal.id}"
+                         draggable="false"
+                         style="background: linear-gradient(135deg, #E8F5F3 0%, #d1fae5 100%);
+                                border-radius: 8px;
+                                padding: 12px;
+                                margin-bottom: 8px;
+                                border-left: 4px solid #05908C;
+                                border: 2px solid #05908C;
+                                cursor: pointer;
+                                transition: all 0.15s ease;
+                                box-shadow: 0 2px 6px rgba(5, 144, 140, 0.3);"
+                         onclick="viewLinkedClient('${deal.clientPortalId}')">
+
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #012E40; font-size: 0.9rem; margin-bottom: 4px;">
+                                    ${deal.companyName || 'Unnamed Client'}
+                                </div>
+                                <div style="font-size: 0.75rem; color: #64748B;">
+                                    ${deal.contactName || 'No contact'}
+                                </div>
+                            </div>
+                            <span style="background: #05908C; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.65rem; font-weight: 600;">
+                                PORTAL ONLY
+                            </span>
+                        </div>
+
+                        <div id="client-info-virtual-${deal.id}" style="background: white; border-radius: 6px; padding: 8px; margin-bottom: 8px;">
+                            <div style="font-size: 0.7rem; color: #05908C; font-weight: 600; margin-bottom: 4px;">📊 Client Portal Progress</div>
+                            <div class="client-portal-data" style="font-size: 0.7rem; color: #012E40;">Loading...</div>
+                        </div>
+
+                        <div style="background: #FBE9D1; border-radius: 6px; padding: 8px; border: 1px solid #F2A922;">
+                            <div style="font-size: 0.7rem; color: #92400e; font-weight: 600;">💡 No Deal Linked</div>
+                            <div style="font-size: 0.65rem; color: #92400e; margin-top: 2px;">Click to view portal or create deal</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // REGULAR DEAL RENDERING
             const repName = repsMap[deal.assignedTo] || 'Unassigned';
             const isCompressed = stageCount > 1;
 
