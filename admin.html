@@ -2762,7 +2762,14 @@
                                         ${hasPendingRevision ? '<span class="badge badge-danger" style="font-size: 0.7rem; background: #ef4444; animation: pulse 2s infinite;">Revision Request</span>' : ''}
                                         ${hasUnreviewedWebsiteAccess ? '<span class="badge badge-danger" style="font-size: 0.7rem; background: #ef4444; animation: pulse 2s infinite;">Website Access</span>' : ''}
                                     </div>
-                                    <p style="color: #000000; font-size: 0.85rem; margin: 0;">${data.clientEmail || 'No email provided'}</p>
+                                    <p style="color: #000000; font-size: 0.85rem; margin: 0 0 8px 0;">${data.clientEmail || 'No email provided'}</p>
+                                    <!-- Progress Bar in Header -->
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="flex: 1; background: #e5e7eb; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000000;">
+                                            <div style="background: linear-gradient(90deg, #05908C 0%, #47a5a3 100%); height: 100%; width: ${progressPercent}%; transition: width 0.3s ease;"></div>
+                                        </div>
+                                        <span style="font-size: 0.75rem; font-weight: 700; color: #000000; min-width: 45px; text-align: right;">${completedSteps}/5</span>
+                                    </div>
                                 </div>
                             </div>
                             <span class="badge badge-${data.active ? 'success' : 'secondary'}" onclick="event.stopPropagation()">${data.active ? 'Active' : 'Inactive'}</span>
