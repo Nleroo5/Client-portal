@@ -2673,7 +2673,9 @@
                                 <!-- Logo & Colors -->
                                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: ${data.brandAssets && data.brandAssets.length > 0 ? '12px' : '0'};">
                                     ${data.brandLogoUrl ? `
-                                        <img src="${data.brandLogoUrl}" alt="${data.clientName} logo" style="width: 60px; height: 60px; object-fit: contain; border-radius: 6px; background: white; padding: 4px; border: 1px solid #d1d5db;" />
+                                        <a href="${data.brandLogoUrl}" target="_blank" title="Click to open and download logo" style="display: block; transition: all 0.2s ease; cursor: pointer;" onmouseover="this.style.transform='scale(1.05)'; this.style.opacity='0.8'" onmouseout="this.style.transform='scale(1)'; this.style.opacity='1'">
+                                            <img src="${data.brandLogoUrl}" alt="${data.clientName} logo" style="width: 60px; height: 60px; object-fit: contain; border-radius: 6px; background: white; padding: 4px; border: 1px solid #d1d5db;" />
+                                        </a>
                                     ` : ''}
                                     ${(data.brandColors && data.brandColors.length > 0) || data.brandPrimaryColor || data.brandSecondaryColor ? `
                                         <div style="flex: 1;">
