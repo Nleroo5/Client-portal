@@ -319,10 +319,14 @@
                     .where('active', '==', true)
                     .get();
 
-                // Sort reps alphabetically by name
+                // Sort reps alphabetically by name (exclude admins)
                 const reps = [];
                 snapshot.forEach(doc => {
-                    reps.push({ id: doc.id, ...doc.data() });
+                    const data = doc.data();
+                    // Only add sales reps, not admins
+                    if (data.role !== 'admin') {
+                        reps.push({ id: doc.id, ...data });
+                    }
                 });
                 reps.sort((a, b) => a.name.localeCompare(b.name));
 
