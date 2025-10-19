@@ -1586,8 +1586,15 @@
         // Wait for Firebase to be fully loaded
         let isAuthChecked = false;
 
+        // Authorized admin emails
+        const ADMIN_EMAILS = [
+            'nicolas@driveleadmedia.com',
+            'brenna@driveleadmedia.com',
+            'tommy@driveleadmedia.com'
+        ];
+
         firebase.auth().onAuthStateChanged(async (user) => {
-            if (!user || user.email !== 'admin@driveleadmedia.com') {
+            if (!user || !ADMIN_EMAILS.includes(user.email)) {
                 // Not authenticated or not admin - redirect to login
                 console.warn('Unauthorized access attempt to admin dashboard');
                 window.location.href = 'index.html';
