@@ -184,10 +184,13 @@ service cloud.firestore {
       allow read: if true;
     }
 
-    // Settings - System configuration (admin-only)
+    // Settings - System configuration
     match /settings/{settingId} {
-      // Only admins can read and write settings
-      allow read, write: if isAdmin();
+      // Anyone can read settings (needed for client portals to load branding/contact info)
+      allow read: if true;
+
+      // Only admins can write settings
+      allow write: if isAdmin();
     }
 
     // Deny all other access

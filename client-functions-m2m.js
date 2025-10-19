@@ -1,4 +1,7 @@
+// Version 2.1 - Fixed null reference errors
 (function() {
+    'use strict';
+
     // Global settings object - loaded from Firestore, falls back to config.js
     let APP_SETTINGS = null;
 
@@ -964,13 +967,15 @@
     }
 
     // Send message from client
-    document.getElementById('clientMessageForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    const messageForm = document.getElementById('clientMessageForm');
+    if (messageForm) {
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const clientId = urlParams.get('c');
+            const urlParams = new URLSearchParams(window.location.search);
+            const clientId = urlParams.get('c');
 
-        if (!clientId) return;
+            if (!clientId) return;
 
         const input = document.getElementById('clientMessageInput');
         const messageText = input.value.trim();
@@ -1009,7 +1014,8 @@
             console.error('Error sending message:', error);
             alert('Error sending message. Please try again.');
         }
-    });
+        });
+    }
 
     // Reset Portal Data Function
     window.resetClientPortal = async function() {

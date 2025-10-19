@@ -613,16 +613,14 @@
         }
 
         /* Pipeline Board Styles for CRM */
-        #crmPipelineBoard,
-        #dashboardPipelineBoard {
+        #crmPipelineBoard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             margin-top: 24px;
         }
 
-        #crmPipelineBoard > div,
-        #dashboardPipelineBoard > div {
+        #crmPipelineBoard > div {
             background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
             border-radius: 12px;
             padding: 18px;
@@ -631,14 +629,12 @@
             transition: all 0.3s ease;
         }
 
-        #crmPipelineBoard > div:hover,
-        #dashboardPipelineBoard > div:hover {
+        #crmPipelineBoard > div:hover {
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
             border-color: #d0d0d0;
         }
 
-        #crmPipelineBoard h3,
-        #dashboardPipelineBoard h3 {
+        #crmPipelineBoard h3 {
             font-size: 0.85rem;
             font-weight: 700;
             margin: 0 0 16px 0;
@@ -819,32 +815,15 @@
             <div class="admin-section">
                 <h2 style="font-family: 'Bitter', serif; color: #000000; margin-bottom: 16px;">Quick Actions</h2>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                    <button onclick="switchAdminTab('clients')" style="background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: white; border: none; border-radius: 10px; padding: 20px; font-weight: 600; cursor: pointer; text-align: left; box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3); transition: all 0.3s ease;">
-                        <div style="font-size: 1.5rem; margin-bottom: 8px;">👥</div>
-                        <div>Create Client Portal</div>
+                    <button onclick="switchAdminTab('clients')" style="background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: white; border: none; border-radius: 10px; padding: 20px; font-weight: 600; cursor: pointer; text-align: center; box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3); transition: all 0.3s ease;">
+                        <div style="font-family: 'Bitter', serif; font-size: 1.3rem;">Create Client Portal</div>
                     </button>
-                    <button onclick="openDealModal()" style="background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%); color: white; border: none; border-radius: 10px; padding: 20px; font-weight: 600; cursor: pointer; text-align: left; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); transition: all 0.3s ease;">
-                        <div style="font-size: 1.5rem; margin-bottom: 8px;">💰</div>
-                        <div>Add New Deal</div>
+                    <button onclick="openDealModal()" style="background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%); color: white; border: none; border-radius: 10px; padding: 20px; font-weight: 600; cursor: pointer; text-align: center; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); transition: all 0.3s ease;">
+                        <div style="font-family: 'Bitter', serif; font-size: 1.3rem;">Add New Deal</div>
                     </button>
-                    <button onclick="switchAdminTab('website-forms')" style="background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%); color: white; border: none; border-radius: 10px; padding: 20px; font-weight: 600; cursor: pointer; text-align: left; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
-                        <div style="font-size: 1.5rem; margin-bottom: 8px;">📝</div>
-                        <div>View Website Forms</div>
+                    <button onclick="switchAdminTab('website-forms')" style="background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%); color: white; border: none; border-radius: 10px; padding: 20px; font-weight: 600; cursor: pointer; text-align: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); transition: all 0.3s ease;">
+                        <div style="font-family: 'Bitter', serif; font-size: 1.3rem;">View Website Forms</div>
                     </button>
-                </div>
-            </div>
-
-            <!-- Pipeline Board (Dashboard View) -->
-            <div class="admin-section" style="background: linear-gradient(135deg, #012E40 0%, #05908C 100%);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <div>
-                        <h2 style="margin-bottom: 4px; font-family: 'Bitter', serif; color: #FFFFFF;">Sales Pipeline</h2>
-                        <p style="color: #E0F2F1; font-size: 0.9rem; margin: 0;">Track deals across all stages of your sales process</p>
-                    </div>
-                    <button class="btn btn-primary" onclick="openDealModal()">+ Add New Deal</button>
-                </div>
-                <div id="dashboardPipelineBoard" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px;">
-                    <!-- Pipeline columns will be rendered here -->
                 </div>
             </div>
 
@@ -1250,12 +1229,6 @@
                             <input type="tel" id="settingsSupportPhone" placeholder="(555) 123-4567" style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
                         </div>
                     </div>
-
-                    <div style="margin-top: 20px;">
-                        <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Default Google Drive Upload Folder</label>
-                        <input type="url" id="settingsGoogleDriveLink" placeholder="https://drive.google.com/drive/folders/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
-                        <span style="font-size: 0.85rem; color: #6b7280; margin-top: 6px; display: block;">Used for client file uploads in the portal</span>
-                    </div>
                 </div>
 
                 <!-- DocuSign Integration -->
@@ -1559,7 +1532,63 @@
             </form>
         </div>
     </div>
-    
+
+    <!-- Reset Portal Confirmation Modal -->
+    <div class="modal-overlay" id="resetPortalModal" style="display: none;">
+        <div class="modal" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2 style="color: #F2584E; font-family: 'Bitter', serif;">⚠️ Reset Portal Data</h2>
+                <button type="button" class="close-btn" onclick="closeResetPortalModal()">&times;</button>
+            </div>
+
+            <div style="padding: 20px;">
+                <input type="hidden" id="resetClientId">
+                <input type="hidden" id="resetClientName">
+
+                <div style="background: #FEE2E2; border-left: 4px solid #F2584E; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                    <p style="color: #991B1B; font-weight: 600; margin-bottom: 8px;">This action will reset all portal data for:</p>
+                    <p style="color: #7F1D1D; font-size: 1.1rem; font-weight: 700; margin: 0;" id="resetClientNameDisplay"></p>
+                </div>
+
+                <div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <p style="font-weight: 600; color: #374151; margin-bottom: 12px;">The following will be cleared:</p>
+                    <ul style="color: #6B7280; margin-left: 20px; line-height: 1.8;">
+                        <li>All progress (0% completion)</li>
+                        <li>All completed steps</li>
+                        <li>Brand assets and logo</li>
+                        <li>Brand colors</li>
+                        <li>Uploaded creatives</li>
+                        <li>Meta Business Manager details</li>
+                        <li>Google Analytics configuration</li>
+                        <li>All form data</li>
+                    </ul>
+                </div>
+
+                <div style="background: #FFFBEB; border-left: 4px solid #F59E0B; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                    <p style="color: #92400E; font-size: 0.9rem; margin: 0;">
+                        <strong>Note:</strong> Client contact information, portal URL, and messages will NOT be deleted.
+                    </p>
+                </div>
+
+                <div style="background: white; border: 2px solid #F2584E; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                        <input type="checkbox" id="confirmResetCheckbox" style="width: 20px; height: 20px; cursor: pointer; accent-color: #F2584E;">
+                        <span style="color: #374151; font-weight: 600; font-size: 0.95rem;">
+                            I understand this action cannot be undone
+                        </span>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeResetPortalModal()">Cancel</button>
+                    <button type="button" id="confirmResetButton" class="btn btn-danger" onclick="confirmResetPortalData()" disabled style="opacity: 0.5; cursor: not-allowed;">
+                        Reset Portal Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -1660,8 +1689,7 @@
             loadDashboardData(); // Load dashboard first since it's the default tab
             loadClients();
 
-            // Initialize notifications
-            initializeNotifications();
+            // Old notification bell system removed - notifications now loaded via loadDashboardNotifications() in loadDashboardData()
         });
 
         // Your portal URL
@@ -2861,41 +2889,142 @@
             }
         }
 
-        // Reset client portal data
-        async function resetClientData(clientId, clientName) {
-            if (!confirm(`Are you sure you want to reset all portal data for "${clientName}"?\n\nThis will:\n- Reset all progress to 0%\n- Clear all completed steps\n- Remove brand assets and creatives\n- Reset all form data\n\nThis action cannot be undone.`)) {
-                return;
+        // Open reset portal confirmation modal
+        function resetClientData(clientId, clientName) {
+            // Store client info in hidden fields
+            document.getElementById('resetClientId').value = clientId;
+            document.getElementById('resetClientName').value = clientName;
+            document.getElementById('resetClientNameDisplay').textContent = clientName;
+
+            // Reset checkbox and button state
+            const checkbox = document.getElementById('confirmResetCheckbox');
+            const button = document.getElementById('confirmResetButton');
+            checkbox.checked = false;
+            button.disabled = true;
+            button.style.opacity = '0.5';
+            button.style.cursor = 'not-allowed';
+
+            // Show modal
+            document.getElementById('resetPortalModal').style.display = 'flex';
+        }
+
+        // Close reset portal modal
+        function closeResetPortalModal() {
+            document.getElementById('resetPortalModal').style.display = 'none';
+            document.getElementById('confirmResetCheckbox').checked = false;
+        }
+
+        // Enable/disable reset button based on checkbox
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkbox = document.getElementById('confirmResetCheckbox');
+            const button = document.getElementById('confirmResetButton');
+
+            if (checkbox && button) {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        button.disabled = false;
+                        button.style.opacity = '1';
+                        button.style.cursor = 'pointer';
+                    } else {
+                        button.disabled = true;
+                        button.style.opacity = '0.5';
+                        button.style.cursor = 'not-allowed';
+                    }
+                });
             }
 
+            // Close modal when clicking outside
+            const resetModal = document.getElementById('resetPortalModal');
+            if (resetModal) {
+                resetModal.addEventListener('click', function(e) {
+                    if (e.target === resetModal) {
+                        closeResetPortalModal();
+                    }
+                });
+            }
+        });
+
+        // Confirm and execute reset portal data
+        async function confirmResetPortalData() {
+            const clientId = document.getElementById('resetClientId').value;
+            const clientName = document.getElementById('resetClientName').value;
+
             try {
+                // Get current client data to preserve specific fields
+                const clientDoc = await db.collection('clients').doc(clientId).get();
+                const currentData = clientDoc.data();
+
+                // Reset all progress and form data
                 await db.collection('clients').doc(clientId).update({
+                    // Step completion flags
+                    step1Complete: false,
+                    step2Complete: false,
+                    step3Complete: false,
+                    step4Complete: false,
+                    step5Complete: false,
+                    step6Complete: false,
+
+                    // Progress tracking
                     currentStep: 0,
                     completedSteps: [],
+                    progress: 0,
+
+                    // Step-specific completion flags (old naming)
                     agreementsAccepted: false,
                     paymentCompleted: false,
                     brandKitCompleted: false,
                     metaSetupCompleted: false,
                     trackingSetupCompleted: false,
                     creativesApproved: false,
+
+                    // Brand assets
                     brandColors: [],
                     brandPrimaryColor: null,
                     brandSecondaryColor: null,
                     brandLogoUrl: null,
                     brandAssets: [],
+
+                    // Creatives
                     creatives: [],
+
+                    // Meta/Facebook setup
                     metaBusinessManagerId: null,
                     metaAdAccountId: null,
                     metaPageId: null,
                     metaPixelId: null,
+                    metaBusinessManagerUrl: null,
+                    metaBusinessManagerEmail: null,
+
+                    // Google Analytics
                     ga4PropertyId: null,
                     ga4MeasurementId: null,
+                    googleAnalyticsEmail: null,
+
+                    // Website access
+                    websiteAccessMethod: null,
+                    websiteUrl: null,
+                    websiteUsername: null,
+                    websitePassword: null,
+                    hostingProvider: null,
+                    hasUnreviewedWebsiteAccess: false,
+
+                    // Revision requests
+                    revisionRequests: [],
+
+                    // Contract/payment info (reset to null)
+                    contractType: currentData?.contractType || null,
+                    paymentPlan: null,
+
+                    // Timestamp
                     lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                showAlert(`Portal data reset successfully for ${clientName}`);
+
+                closeResetPortalModal();
+                showAlert(`Portal data reset successfully for ${clientName}`, 'success');
                 loadClients();
             } catch (error) {
                 console.error('Error resetting client data:', error);
-                showAlert('Error resetting client data', 'error');
+                showAlert('Error resetting client data: ' + error.message, 'error');
             }
         }
 
@@ -3650,44 +3779,39 @@
 
         // Render pipeline board
         function renderPipelineBoard(deals) {
-            // Render to both Sales Pipeline tab and Dashboard tab
-            const boards = [
-                document.getElementById('crmPipelineBoard'),
-                document.getElementById('dashboardPipelineBoard')
-            ];
+            // Render to Sales Pipeline tab only
+            const board = document.getElementById('crmPipelineBoard');
+            if (!board) return;
 
-            boards.forEach(board => {
-                if (!board) return;
-                board.innerHTML = '';
+            board.innerHTML = '';
 
-                PIPELINE_STAGES.forEach(stage => {
-                    const stageDeals = deals.filter(d => d.stage === stage.id);
+            PIPELINE_STAGES.forEach(stage => {
+                const stageDeals = deals.filter(d => d.stage === stage.id);
 
-                    const column = document.createElement('div');
-                    column.style.cssText = `
-                        background: linear-gradient(135deg, #FFECB3 0%, #FFF8E6 100%);
-                        border-radius: 10px;
-                        padding: 15px;
-                        min-height: 400px;
-                    `;
+                const column = document.createElement('div');
+                column.style.cssText = `
+                    background: linear-gradient(135deg, #FFECB3 0%, #FFF8E6 100%);
+                    border-radius: 10px;
+                    padding: 15px;
+                    min-height: 400px;
+                `;
 
-                    column.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h3 style="color: ${stage.color}; margin: 0; font-size: 1rem;">${stage.name}</h3>
-                            <span style="background: ${stage.color}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;">${stageDeals.length}</span>
-                        </div>
-                        <div class="pipeline-deals"
-                             data-stage="${stage.id}"
-                             ondragover="handleDealDragOver(event)"
-                             ondrop="handleDealDrop(event)"
-                             ondragleave="handleDealDragLeave(event)"
-                             style="min-height: 350px; transition: background-color 0.2s;">
-                            ${stageDeals.map(deal => renderDealCard(deal, stageDeals.length)).join('')}
-                        </div>
-                    `;
+                column.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="color: ${stage.color}; margin: 0; font-size: 1rem;">${stage.name}</h3>
+                        <span style="background: ${stage.color}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;">${stageDeals.length}</span>
+                    </div>
+                    <div class="pipeline-deals"
+                         data-stage="${stage.id}"
+                         ondragover="handleDealDragOver(event)"
+                         ondrop="handleDealDrop(event)"
+                         ondragleave="handleDealDragLeave(event)"
+                         style="min-height: 350px; transition: background-color 0.2s;">
+                        ${stageDeals.map(deal => renderDealCard(deal, stageDeals.length)).join('')}
+                    </div>
+                `;
 
-                    board.appendChild(column);
-                });
+                board.appendChild(column);
             });
         }
 
@@ -5374,76 +5498,11 @@ Start with Phase 1 and work through systematically. Show your progress after eac
         });
 
         // ============================================
-        // NOTIFICATIONS SYSTEM
+        // NOTIFICATIONS SYSTEM (OLD BELL ICON - REMOVED)
         // ============================================
-
-        let notificationsListener = null;
-        let adminNotifications = [];
-
-        // Toggle notifications dropdown
-        window.toggleNotifications = function() {
-            const dropdown = document.getElementById('notificationsDropdown');
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-        };
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('notificationsDropdown');
-            const bell = event.target.closest('button');
-
-            if (dropdown.style.display !== 'none' && !dropdown.contains(event.target) && (!bell || bell.onclick !== toggleNotifications)) {
-                dropdown.style.display = 'none';
-            }
-        });
-
-        // Initialize notifications for admin
-        function initializeNotifications() {
-            // Listen for notifications in real-time
-            notificationsListener = window.listenForNotifications('admin', 'admin', function(notifications) {
-                adminNotifications = notifications;
-                updateNotificationsBadge();
-                renderNotificationsList();
-            });
-        }
-
-        // Update badge with unread count
-        function updateNotificationsBadge() {
-            const badge = document.getElementById('notificationBadge');
-            const unreadCount = adminNotifications.filter(n => !n.read).length;
-
-            if (unreadCount > 0) {
-                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-                badge.style.display = 'block';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-
-        // Render notifications list
-        function renderNotificationsList() {
-            const container = document.getElementById('notificationsList');
-
-            if (adminNotifications.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: #6b7280;">
-                        <div style="font-size: 2rem; margin-bottom: 10px;">🔔</div>
-                        <div>No new notifications</div>
-                    </div>
-                `;
-                return;
-            }
-
-            const html = adminNotifications.map(notification => window.renderNotification(notification)).join('');
-            container.innerHTML = html;
-        }
-
-        // Mark all notifications as read
-        window.markAllNotificationsRead = async function() {
-            const unreadIds = adminNotifications.filter(n => !n.read).map(n => n.id);
-            if (unreadIds.length > 0) {
-                await window.markNotificationsRead(unreadIds);
-            }
-        };
+        // The old notification bell and dropdown system has been removed.
+        // Notifications are now displayed in a dedicated section on the Dashboard tab.
+        // See loadDashboardNotifications() and renderDashboardNotifications() functions.
 
         // ===================================
         // CMS CLIENTS FUNCTIONS
