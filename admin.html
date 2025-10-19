@@ -2852,7 +2852,7 @@
                                     <button class="btn btn-small" onclick="uploadCreatives('${docId}', '${data.clientName}')" style="padding: 6px 12px; font-size: 0.75rem; background: #F2A922; color: #012E40;">Add More</button>
                                 </div>
                                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px;">
-                                    ${data.creatives.slice(0, 4).map(creative => {
+                                    ${data.creatives.map(creative => {
                                         const isVideo = creative.type && creative.type.startsWith('video/');
                                         return `
                                         <div style="display: flex; flex-direction: column; gap: 4px;">
@@ -2876,7 +2876,6 @@
                                         `;
                                     }).join('')}
                                 </div>
-                                ${data.creatives.length > 4 ? `<div style="text-align: center; margin-top: 6px; color: #6b7280; font-size: 0.7rem;">+${data.creatives.length - 4} more</div>` : ''}
                             </div>
                         ` : `
                             <button class="btn btn-outline" onclick="uploadCreatives('${docId}', '${data.clientName}')" style="width: 100%; margin-bottom: 14px; padding: 10px; font-size: 0.85rem; border: 2px dashed #F2A922; color: #F2A922; background: #FBE9D1;">
