@@ -418,21 +418,25 @@
                 <div id="tempAccessForm" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
                     <h5 style="color: #012E40; margin-bottom: 10px;">Temporary Website Access:</h5>
                     <form id="tempAccessCredentialsForm" autocomplete="off">
+                        <!-- Hidden honeypot fields to trick browser autofill -->
+                        <input type="text" name="fakeusername" style="position: absolute; left: -9999px;" tabindex="-1" autocomplete="off">
+                        <input type="password" name="fakepassword" style="position: absolute; left: -9999px;" tabindex="-1" autocomplete="new-password">
+
                         <div class="form-group">
                             <label for="websiteUrl">Website URL *</label>
-                            <input type="url" id="websiteUrl" name="website-url" placeholder="https://yourwebsite.com" required autocomplete="off">
+                            <input type="url" id="websiteUrl" name="website-url" placeholder="https://yourwebsite.com" required autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
                         </div>
                         <div class="form-group">
                             <label for="loginUrl">Login URL</label>
-                            <input type="url" id="loginUrl" name="login-url" placeholder="https://yourwebsite.com/wp-admin" autocomplete="off">
+                            <input type="url" id="loginUrl" name="login-url" placeholder="https://yourwebsite.com/wp-admin" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
                         </div>
                         <div class="form-group">
                             <label for="tempUsername">Admin Username *</label>
-                            <input type="text" id="tempUsername" name="website-admin-username" required autocomplete="off">
+                            <input type="text" id="tempUsername" name="website-admin-username" required autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
                         </div>
                         <div class="form-group">
                             <label for="tempPassword">Admin Password *</label>
-                            <input type="password" id="tempPassword" name="website-admin-password" required autocomplete="off">
+                            <input type="password" id="tempPassword" name="website-admin-password" required autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');">
                         </div>
                         <div class="form-group">
                             <label for="sitePlatform">Website Platform</label>
