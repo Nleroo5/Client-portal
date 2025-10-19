@@ -119,6 +119,16 @@ service cloud.firestore {
       allow read, write, create: if true;
     }
 
+    // Website Quotes (hyphenated collection name - same as above)
+    match /website-quotes/{quoteId} {
+      // Admins can read/write all quotes
+      allow read, write: if isAdmin();
+
+      // Allow unauthenticated read/write for clients filling out their own form
+      // Protected by unique quote ID in URL
+      allow read, write, create: if true;
+    }
+
     // Notifications - In-portal notification system
     match /notifications/{notificationId} {
       // Admins can read all notifications
