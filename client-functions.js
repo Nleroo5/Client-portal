@@ -1524,6 +1524,52 @@
         }
     });
 
+    // Reset Portal Data Function
+    window.resetClientPortal = async function() {
+        if (!confirm('Are you sure you want to reset all portal data? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const clientId = new URLSearchParams(window.location.search).get('id');
+            if (!clientId) {
+                alert('No client ID found');
+                return;
+            }
+
+            // Reset all client data to initial state
+            await db.collection('clients').doc(clientId).update({
+                currentStep: 0,
+                completedSteps: [],
+                agreementsAccepted: false,
+                paymentCompleted: false,
+                brandKitCompleted: false,
+                metaSetupCompleted: false,
+                trackingSetupCompleted: false,
+                creativesApproved: false,
+                brandColors: [],
+                brandPrimaryColor: null,
+                brandSecondaryColor: null,
+                brandLogoUrl: null,
+                brandAssets: [],
+                creatives: [],
+                metaBusinessManagerId: null,
+                metaAdAccountId: null,
+                metaPageId: null,
+                metaPixelId: null,
+                ga4PropertyId: null,
+                ga4MeasurementId: null,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            alert('Portal data has been reset successfully. The page will now reload.');
+            window.location.reload();
+        } catch (error) {
+            console.error('Error resetting portal:', error);
+            alert('Error resetting portal data: ' + error.message);
+        }
+    };
+
     // Expose functions globally
     window.markStepComplete = markStepComplete;
     window.toggleBrandKitInfo = toggleBrandKitInfo;

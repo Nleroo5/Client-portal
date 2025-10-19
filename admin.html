@@ -2405,6 +2405,10 @@
                             </button>
                             <button class="btn btn-small" onclick="editClient('${docId}')" style="flex: 1; padding: 10px; font-size: 0.85rem;">Edit</button>
                         </div>
+
+                        <button class="btn btn-outline" onclick="resetClientData('${docId}', '${data.clientName}')" style="width: 100%; margin-top: 10px; padding: 10px; font-size: 0.85rem; border: 2px solid #F2584E; color: #F2584E; background: transparent;">
+                            Reset Portal Data
+                        </button>
                     `;
 
                     card.addEventListener('mouseenter', () => {
@@ -2448,7 +2452,45 @@
                 showAlert('Error updating client status', 'error');
             }
         }
-        
+
+        // Reset client portal data
+        async function resetClientData(clientId, clientName) {
+            if (!confirm(`Are you sure you want to reset all portal data for "${clientName}"?\n\nThis will:\n- Reset all progress to 0%\n- Clear all completed steps\n- Remove brand assets and creatives\n- Reset all form data\n\nThis action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                await db.collection('clients').doc(clientId).update({
+                    currentStep: 0,
+                    completedSteps: [],
+                    agreementsAccepted: false,
+                    paymentCompleted: false,
+                    brandKitCompleted: false,
+                    metaSetupCompleted: false,
+                    trackingSetupCompleted: false,
+                    creativesApproved: false,
+                    brandColors: [],
+                    brandPrimaryColor: null,
+                    brandSecondaryColor: null,
+                    brandLogoUrl: null,
+                    brandAssets: [],
+                    creatives: [],
+                    metaBusinessManagerId: null,
+                    metaAdAccountId: null,
+                    metaPageId: null,
+                    metaPixelId: null,
+                    ga4PropertyId: null,
+                    ga4MeasurementId: null,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showAlert(`Portal data reset successfully for ${clientName}`);
+                loadClients();
+            } catch (error) {
+                console.error('Error resetting client data:', error);
+                showAlert('Error resetting client data', 'error');
+            }
+        }
+
         // Edit client - Open modal with current data
         async function editClient(clientId) {
             try {
