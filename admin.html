@@ -2664,6 +2664,35 @@
             }
         };
 
+        // Toggle card collapse/expand
+        window.toggleCardCollapse = function(clientId) {
+            const content = document.getElementById(`content-${clientId}`);
+            const arrow = document.getElementById(`arrow-${clientId}`);
+
+            if (!content || !arrow) return;
+
+            const isCollapsed = content.style.maxHeight === '0px' || content.style.maxHeight === '';
+
+            if (isCollapsed) {
+                // Expand
+                content.style.maxHeight = content.scrollHeight + 'px';
+                arrow.style.transform = 'rotate(180deg)';
+                // After transition, set to 'none' to allow dynamic content changes
+                setTimeout(() => {
+                    if (content.style.maxHeight !== '0px') {
+                        content.style.maxHeight = 'none';
+                    }
+                }, 300);
+            } else {
+                // Collapse
+                content.style.maxHeight = content.scrollHeight + 'px';
+                // Force reflow
+                content.offsetHeight;
+                content.style.maxHeight = '0px';
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        };
+
         // Load existing clients
         async function loadClients() {
             try {
@@ -2722,18 +2751,26 @@
                     card.style.cssText = baseCardStyle + attentionStyle;
 
                     card.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 14px;">
-                            <div style="flex: 1;">
-                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-                                    <h3 style="font-size: 1.1rem; font-weight: 700; color: #000000; margin: 0;">${data.clientName}</h3>
-                                    <span class="badge badge-${portalType === 'm2m' ? 'warning' : 'success'}" style="font-size: 0.7rem;">${portalType === 'm2m' ? 'M2M' : 'Contract'}</span>
-                                    ${hasPendingRevision ? '<span class="badge badge-danger" style="font-size: 0.7rem; background: #ef4444; animation: pulse 2s infinite;">Revision Request</span>' : ''}
-                                    ${hasUnreviewedWebsiteAccess ? '<span class="badge badge-danger" style="font-size: 0.7rem; background: #ef4444; animation: pulse 2s infinite;">Website Access</span>' : ''}
+                        <!-- Collapsible Header -->
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; cursor: pointer; padding: 8px; margin: -8px -8px 14px -8px; border-radius: 8px; transition: background 0.2s ease;" onmouseover="this.style.background='rgba(5, 144, 140, 0.08)'" onmouseout="this.style.background='transparent'" onclick="toggleCardCollapse('${docId}')">
+                            <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                                <span class="collapse-arrow" id="arrow-${docId}" style="font-size: 1.2rem; transition: transform 0.3s ease; color: #05908C;">▼</span>
+                                <div style="flex: 1;">
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                                        <h3 style="font-size: 1.1rem; font-weight: 700; color: #000000; margin: 0;">${data.clientName}</h3>
+                                        <span class="badge badge-${portalType === 'm2m' ? 'warning' : 'success'}" style="font-size: 0.7rem;">${portalType === 'm2m' ? 'M2M' : 'Contract'}</span>
+                                        ${hasPendingRevision ? '<span class="badge badge-danger" style="font-size: 0.7rem; background: #ef4444; animation: pulse 2s infinite;">Revision Request</span>' : ''}
+                                        ${hasUnreviewedWebsiteAccess ? '<span class="badge badge-danger" style="font-size: 0.7rem; background: #ef4444; animation: pulse 2s infinite;">Website Access</span>' : ''}
+                                    </div>
+                                    <p style="color: #000000; font-size: 0.85rem; margin: 0;">${data.clientEmail || 'No email provided'}</p>
                                 </div>
-                                <p style="color: #000000; font-size: 0.85rem; margin: 0;">${data.clientEmail || 'No email provided'}</p>
                             </div>
-                            <span class="badge badge-${data.active ? 'success' : 'secondary'}">${data.active ? 'Active' : 'Inactive'}</span>
+                            <span class="badge badge-${data.active ? 'success' : 'secondary'}" onclick="event.stopPropagation()">${data.active ? 'Active' : 'Inactive'}</span>
                         </div>
+
+                        <!-- Collapsible Content -->
+                        <div class="card-content" id="content-${docId}" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+                            <div style="padding-top: 4px;">
 
                         ${data.brandLogoUrl || data.brandColors || data.brandPrimaryColor || data.brandSecondaryColor || (data.brandAssets && data.brandAssets.length > 0) ? `
                             <div style="background: #E8F5F3; border-radius: 8px; padding: 12px; margin-bottom: 14px; border: 1px solid #05908C;">
@@ -2946,6 +2983,8 @@
                         <button class="btn btn-outline" onclick="resetClientData('${docId}', '${data.clientName}')" style="width: 100%; margin-top: 10px; padding: 10px; font-size: 0.85rem; border: 2px solid #F2584E; color: #F2584E; background: transparent;">
                             Reset Portal Data
                         </button>
+                            </div>
+                        </div>
                     `;
 
                     card.addEventListener('mouseenter', () => {
