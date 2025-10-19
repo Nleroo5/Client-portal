@@ -1768,47 +1768,158 @@
         // Load Dashboard Notifications
         async function loadDashboardNotifications() {
             try {
+                // Get current user email to filter notifications
+                const currentUser = firebase.auth().currentUser;
+                const currentEmail = currentUser ? currentUser.email : '';
+
                 const clientsSnapshot = await db.collection('clients').get();
                 const notifications = [];
 
-                clientsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    const clientId = doc.id;
+                // NICOLAS NOTIFICATIONS (nicolas@driveleadmedia.com)
+                if (currentEmail === 'nicolas@driveleadmedia.com') {
+                    clientsSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        const clientId = doc.id;
 
-                    // Check for revision requests
-                    if (data.revisionRequests && data.revisionRequests.length > 0) {
-                        const pendingRevisions = data.revisionRequests.filter(r => r.status === 'pending');
-                        if (pendingRevisions.length > 0) {
-                            pendingRevisions.forEach(revision => {
-                                notifications.push({
-                                    type: 'revision',
-                                    icon: '⚠️',
-                                    title: `${data.clientName || 'Client'} requested revision`,
-                                    message: revision.message || 'No details provided',
-                                    clientId: clientId,
-                                    clientName: data.clientName,
-                                    timestamp: revision.timestamp?.toDate() || new Date(),
-                                    priority: 'high'
+                        // 1. Check for revision requests
+                        if (data.revisionRequests && data.revisionRequests.length > 0) {
+                            const pendingRevisions = data.revisionRequests.filter(r => r.status === 'pending');
+                            if (pendingRevisions.length > 0) {
+                                pendingRevisions.forEach(revision => {
+                                    notifications.push({
+                                        type: 'revision',
+                                        icon: '⚠️',
+                                        title: `${data.clientName || 'Client'} requested revision`,
+                                        message: revision.message || 'No details provided',
+                                        clientId: clientId,
+                                        clientName: data.clientName,
+                                        timestamp: revision.timestamp?.toDate() || new Date(),
+                                        priority: 'high',
+                                        adminOnly: 'nicolas'
+                                    });
                                 });
+                            }
+                        }
+
+                        // 2. Check for website access submissions
+                        if (data.hasUnreviewedWebsiteAccess && data.websiteAccessMethod) {
+                            const accessType = data.websiteAccessMethod === 'admin-contact' ? 'Admin Contact' : 'Direct Access';
+                            notifications.push({
+                                type: 'website-access',
+                                icon: '🌐',
+                                title: `${data.clientName || 'Client'} submitted website access`,
+                                message: `${accessType} information provided`,
+                                clientId: clientId,
+                                clientName: data.clientName,
+                                timestamp: data.websiteAdminDetails?.submittedAt?.toDate() || data.websiteDirectAccess?.submittedAt?.toDate() || new Date(),
+                                priority: 'medium',
+                                adminOnly: 'nicolas'
                             });
                         }
-                    }
+                    });
+                }
 
-                    // Check for website access submissions
-                    if (data.hasUnreviewedWebsiteAccess && data.websiteAccessMethod) {
-                        const accessType = data.websiteAccessMethod === 'admin-contact' ? 'Admin Contact' : 'Direct Access';
-                        notifications.push({
-                            type: 'website-access',
-                            icon: '🌐',
-                            title: `${data.clientName || 'Client'} submitted website access`,
-                            message: `${accessType} information provided`,
-                            clientId: clientId,
-                            clientName: data.clientName,
-                            timestamp: data.websiteAdminDetails?.submittedAt?.toDate() || data.websiteDirectAccess?.submittedAt?.toDate() || new Date(),
-                            priority: 'medium'
-                        });
-                    }
-                });
+                // BRENNA NOTIFICATIONS (brenna@driveleadmedia.com)
+                if (currentEmail === 'brenna@driveleadmedia.com') {
+                    clientsSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        const clientId = doc.id;
+
+                        // 4. Check for stuck portal (client hasn't progressed in 7+ days)
+                        const lastUpdated = data.lastUpdated?.toDate() || data.createdAt?.toDate();
+                        if (lastUpdated) {
+                            const daysSinceUpdate = Math.floor((new Date() - lastUpdated) / (1000 * 60 * 60 * 24));
+
+                            // Find which step they're stuck on
+                            let stuckStep = null;
+                            if (!data.step1Complete) stuckStep = 1;
+                            else if (!data.step2Complete) stuckStep = 2;
+                            else if (!data.step3Complete) stuckStep = 3;
+                            else if (!data.step4Complete) stuckStep = 4;
+                            else if (!data.step5Complete) stuckStep = 5;
+
+                            if (stuckStep && daysSinceUpdate >= 7) {
+                                const stepNames = {
+                                    1: 'Sign Documents',
+                                    2: 'Brand Assets',
+                                    3: 'Campaign Strategy',
+                                    4: 'Creative Review',
+                                    5: 'Website Access'
+                                };
+                                notifications.push({
+                                    type: 'stuck-portal',
+                                    icon: '⏱️',
+                                    title: `${data.clientName || 'Client'} stuck on Step ${stuckStep}`,
+                                    message: `No progress on "${stepNames[stuckStep]}" for ${daysSinceUpdate} days`,
+                                    clientId: clientId,
+                                    clientName: data.clientName,
+                                    timestamp: lastUpdated,
+                                    priority: 'high',
+                                    adminOnly: 'brenna'
+                                });
+                            }
+                        }
+
+                        // 5. Check for signature pending (DPA/Service Agreement not signed in 48+ hours)
+                        // Note: This requires tracking when docs were viewed vs signed
+                        // For now, we'll check if step 1 incomplete for 2+ days
+                        if (!data.step1Complete) {
+                            const createdDate = data.createdAt?.toDate();
+                            if (createdDate) {
+                                const hoursSinceCreation = (new Date() - createdDate) / (1000 * 60 * 60);
+                                if (hoursSinceCreation >= 48) {
+                                    notifications.push({
+                                        type: 'signature-pending',
+                                        icon: '📝',
+                                        title: `${data.clientName || 'Client'} - Signature Pending`,
+                                        message: `Portal created ${Math.floor(hoursSinceCreation / 24)} days ago but documents not signed`,
+                                        clientId: clientId,
+                                        clientName: data.clientName,
+                                        timestamp: createdDate,
+                                        priority: 'high',
+                                        adminOnly: 'brenna'
+                                    });
+                                }
+                            }
+                        }
+                    });
+
+                    // 6. Check for stalled deals (haven't moved in 14+ days)
+                    const dealsSnapshot = await db.collection('deals')
+                        .where('archived', '==', false)
+                        .get();
+
+                    dealsSnapshot.forEach(doc => {
+                        const deal = doc.data();
+                        const lastUpdated = deal.lastUpdated?.toDate() || deal.createdAt?.toDate();
+                        if (lastUpdated) {
+                            const daysSinceUpdate = Math.floor((new Date() - lastUpdated) / (1000 * 60 * 60 * 24));
+                            if (daysSinceUpdate >= 14 && deal.stage !== 'campaign-live' && deal.stage !== 'follow-up-resell') {
+                                const stageNames = {
+                                    'qualified': 'Qualified',
+                                    'proposal-sent': 'Proposal Sent',
+                                    'negotiation': 'Negotiation',
+                                    'verbal-commitment': 'Verbal Commitment',
+                                    'contract-sent': 'Contract Sent',
+                                    'contract-signed': 'Contract Signed'
+                                };
+                                notifications.push({
+                                    type: 'stalled-deal',
+                                    icon: '🚨',
+                                    title: `${deal.companyName || 'Deal'} stalled in pipeline`,
+                                    message: `Stuck in "${stageNames[deal.stage] || deal.stage}" for ${daysSinceUpdate} days`,
+                                    dealId: doc.id,
+                                    timestamp: lastUpdated,
+                                    priority: 'high',
+                                    adminOnly: 'brenna'
+                                });
+                            }
+                        }
+                    });
+                }
+
+                // NICOLAS: Website forms (completed in last 24 hours)
+                if (currentEmail === 'nicolas@driveleadmedia.com') {
 
                 // Check for completed website forms (from website-quotes collection)
                 // Wrap in try-catch in case permissions don't allow access
@@ -1834,7 +1945,8 @@
                                 message: `Form completed ${Math.round(hoursSinceCompletion)} hours ago`,
                                 quoteId: doc.id,
                                 timestamp: completedDate || new Date(),
-                                priority: 'low'
+                                priority: 'low',
+                                adminOnly: 'nicolas'
                             });
                         }
                     });
@@ -1842,6 +1954,7 @@
                     console.warn('Could not load website forms notifications (permissions may not be set):', quotesError.message);
                     // Continue without website form notifications
                 }
+                } // End Nicolas notifications
 
                 // Sort by priority and timestamp
                 const priorityOrder = { high: 1, medium: 2, low: 3 };
@@ -1920,7 +2033,7 @@
 
         // Handle notification click
         function handleNotificationClick(type, id) {
-            if (type === 'revision' || type === 'website-access') {
+            if (type === 'revision' || type === 'website-access' || type === 'stuck-portal' || type === 'signature-pending') {
                 // Navigate to Clients tab and scroll to client
                 switchAdminTab('clients');
                 setTimeout(() => {
@@ -1928,6 +2041,21 @@
                     if (clientCard) {
                         clientCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         clientCard.style.animation = 'pulse 1s ease 2';
+                    }
+                }, 300);
+            } else if (type === 'stalled-deal') {
+                // Navigate to Sales Pipeline tab
+                switchAdminTab('sales-pipeline');
+                setTimeout(() => {
+                    const dealCard = document.querySelector(`[data-deal-id="${id}"]`);
+                    if (dealCard) {
+                        dealCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Highlight the card
+                        const originalBg = dealCard.style.background;
+                        dealCard.style.background = 'linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%)';
+                        setTimeout(() => {
+                            dealCard.style.background = originalBg;
+                        }, 2000);
                     }
                 }, 300);
             } else if (type === 'website-form') {
