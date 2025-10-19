@@ -3560,13 +3560,13 @@
                         url: fileUrl,
                         type: file.type,
                         size: file.size,
-                        uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        uploadedAt: new Date().toISOString()
                     });
                 }
 
                 // Get existing creatives
                 const clientDoc = await db.collection('clients').doc(clientId).get();
-                const existingCreatives = clientDoc.data().creatives || [];
+                const existingCreatives = clientDoc.data()?.creatives || [];
 
                 // Update client document
                 await db.collection('clients').doc(clientId).update({
