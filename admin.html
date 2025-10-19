@@ -2615,26 +2615,34 @@
             return '📁';
         }
 
-        // Force download file (works with Firebase Storage CORS)
-        window.forceDownloadFile = async function(url, filename) {
+        // Force download file (Firebase Storage workaround)
+        window.forceDownloadFile = function(url, filename) {
             try {
-                // Fetch the file
-                const response = await fetch(url);
-                const blob = await response.blob();
+                // For Firebase Storage URLs, modify the URL to force download
+                // Change alt=media to alt=media&disposition=attachment
+                let downloadUrl = url;
 
-                // Create a temporary URL for the blob
-                const blobUrl = window.URL.createObjectURL(blob);
+                if (url.includes('firebasestorage.googleapis.com')) {
+                    // If URL has alt=media, add response-content-disposition
+                    if (url.includes('alt=media')) {
+                        const separator = url.includes('?') ? '&' : '?';
+                        downloadUrl = url + separator + 'response-content-disposition=attachment';
+
+                        // Add filename if provided
+                        if (filename) {
+                            downloadUrl += `; filename="${encodeURIComponent(filename)}"`;
+                        }
+                    }
+                }
 
                 // Create a temporary anchor element and trigger download
                 const a = document.createElement('a');
-                a.href = blobUrl;
-                a.download = filename || 'download';
+                a.href = downloadUrl;
+                a.download = filename || '';
+                a.target = '_blank';
                 document.body.appendChild(a);
                 a.click();
-
-                // Clean up
                 document.body.removeChild(a);
-                window.URL.revokeObjectURL(blobUrl);
             } catch (error) {
                 console.error('Error downloading file:', error);
                 // Fallback: open in new tab
