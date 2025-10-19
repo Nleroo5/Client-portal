@@ -2270,6 +2270,45 @@
                             <span class="badge badge-${data.active ? 'success' : 'secondary'}">${data.active ? 'Active' : 'Inactive'}</span>
                         </div>
 
+                        ${data.brandLogoUrl || data.brandColors || data.brandPrimaryColor || data.brandSecondaryColor ? `
+                            <div style="background: #E8F5F3; border-radius: 8px; padding: 12px; margin-bottom: 14px; border: 1px solid #05908C;">
+                                <div style="font-size: 0.7rem; color: #012E40; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Brand Assets</div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    ${data.brandLogoUrl ? `
+                                        <img src="${data.brandLogoUrl}" alt="${data.clientName} logo" style="width: 60px; height: 60px; object-fit: contain; border-radius: 6px; background: white; padding: 4px; border: 1px solid #d1d5db;" />
+                                    ` : ''}
+                                    ${(data.brandColors && data.brandColors.length > 0) || data.brandPrimaryColor || data.brandSecondaryColor ? `
+                                        <div style="flex: 1;">
+                                            <div style="font-size: 0.7rem; color: #012E40; margin-bottom: 4px; font-weight: 600;">Brand Colors</div>
+                                            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                                                ${data.brandColors && data.brandColors.length > 0 ?
+                                                    data.brandColors.map(color => `
+                                                        <div style="display: flex; align-items: center; gap: 4px;">
+                                                            <div style="width: 24px; height: 24px; border-radius: 4px; background: ${color}; border: 2px solid #000;"></div>
+                                                            <span style="font-size: 0.75rem; color: #012E40; font-family: monospace;">${color}</span>
+                                                        </div>
+                                                    `).join('')
+                                                :
+                                                    `${data.brandPrimaryColor ? `
+                                                        <div style="display: flex; align-items: center; gap: 4px;">
+                                                            <div style="width: 24px; height: 24px; border-radius: 4px; background: ${data.brandPrimaryColor}; border: 2px solid #000;"></div>
+                                                            <span style="font-size: 0.75rem; color: #012E40; font-family: monospace;">${data.brandPrimaryColor}</span>
+                                                        </div>
+                                                    ` : ''}
+                                                    ${data.brandSecondaryColor ? `
+                                                        <div style="display: flex; align-items: center; gap: 4px;">
+                                                            <div style="width: 24px; height: 24px; border-radius: 4px; background: ${data.brandSecondaryColor}; border: 2px solid #000;"></div>
+                                                            <span style="font-size: 0.75rem; color: #012E40; font-family: monospace;">${data.brandSecondaryColor}</span>
+                                                        </div>
+                                                    ` : ''}`
+                                                }
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+
                         <div style="margin-bottom: 16px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                                 <span style="font-size: 0.75rem; color: #000000; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Onboarding Progress</span>

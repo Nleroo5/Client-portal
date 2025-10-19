@@ -1154,10 +1154,10 @@
         }
     };
 
-    // Sync color picker with hex input
-    window.syncColorFromHex = function(type) {
-        const hexInput = document.getElementById(`${type}Color` + 'Hex');
-        const colorPicker = document.getElementById(`${type}Color`);
+    // Sync color picker with hex input (new multi-color version)
+    window.syncBrandColorFromHex = function(index) {
+        const hexInput = document.getElementById(`brandColor${index}Hex`);
+        const colorPicker = document.getElementById(`brandColor${index}`);
 
         let hexValue = hexInput.value.trim();
 
@@ -1176,20 +1176,83 @@
         }
     };
 
-    // Save brand colors to Firestore
+    // Add brand color
+    window.addBrandColor = function() {
+        const container = document.getElementById('brandColorsContainer');
+        const colorItems = container.querySelectorAll('.brand-color-item');
+        const currentCount = colorItems.length;
+
+        if (currentCount >= 5) {
+            alert('You can add up to 5 brand colors');
+            return;
+        }
+
+        const newIndex = currentCount;
+        const colorDiv = document.createElement('div');
+        colorDiv.className = 'brand-color-item';
+        colorDiv.setAttribute('data-index', newIndex);
+        colorDiv.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <label for="brandColor${newIndex}" style="color: #012E40; font-size: 0.9rem;">Additional Color ${newIndex - 1}</label>
+                <button type="button" onclick="window.removeBrandColor(${newIndex})" style="background: #ef4444; color: white; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">Remove</button>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="color" id="brandColor${newIndex}" class="brand-color-picker" value="#000000" style="width: 60px; height: 60px; border: 2px solid #000000; border-radius: 8px; cursor: pointer;">
+                <input type="text" id="brandColor${newIndex}Hex" class="brand-color-hex" value="#000000" placeholder="#000000" style="flex: 1; padding: 10px; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: monospace;" onchange="window.syncBrandColorFromHex(${newIndex})">
+            </div>
+        `;
+
+        container.appendChild(colorDiv);
+
+        // Add event listeners for the new color picker
+        const colorPicker = document.getElementById(`brandColor${newIndex}`);
+        const colorHex = document.getElementById(`brandColor${newIndex}Hex`);
+
+        colorPicker.addEventListener('change', function() {
+            colorHex.value = this.value;
+            saveBrandColors();
+        });
+
+        // Hide add button if at max
+        if (currentCount + 1 >= 5) {
+            document.getElementById('addColorBtn').style.display = 'none';
+        }
+
+        saveBrandColors();
+    };
+
+    // Remove brand color
+    window.removeBrandColor = function(index) {
+        const item = document.querySelector(`.brand-color-item[data-index="${index}"]`);
+        if (item) {
+            item.remove();
+            document.getElementById('addColorBtn').style.display = 'flex';
+            saveBrandColors();
+        }
+    };
+
+    // Save brand colors to Firestore (updated for multiple colors)
     async function saveBrandColors() {
         const urlParams = new URLSearchParams(window.location.search);
         const clientId = urlParams.get('id') || urlParams.get('c');
 
         if (!clientId) return;
 
-        const primaryColor = document.getElementById('primaryColor').value;
-        const secondaryColor = document.getElementById('secondaryColor').value;
+        const brandColors = [];
+        const colorPickers = document.querySelectorAll('.brand-color-picker');
+
+        colorPickers.forEach(picker => {
+            if (picker.value) {
+                brandColors.push(picker.value);
+            }
+        });
 
         try {
             await db.collection('clients').doc(clientId).update({
-                brandPrimaryColor: primaryColor,
-                brandSecondaryColor: secondaryColor,
+                brandColors: brandColors,
+                // Keep old fields for backwards compatibility
+                brandPrimaryColor: brandColors[0] || null,
+                brandSecondaryColor: brandColors[1] || null,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
             console.log('Brand colors saved');
@@ -1200,24 +1263,17 @@
 
     // Listen for color picker changes
     document.addEventListener('DOMContentLoaded', function() {
-        const primaryColor = document.getElementById('primaryColor');
-        const secondaryColor = document.getElementById('secondaryColor');
-        const primaryHex = document.getElementById('primaryColorHex');
-        const secondaryHex = document.getElementById('secondaryColorHex');
-
-        if (primaryColor) {
-            primaryColor.addEventListener('change', function() {
-                primaryHex.value = this.value;
-                saveBrandColors();
-            });
-        }
-
-        if (secondaryColor) {
-            secondaryColor.addEventListener('change', function() {
-                secondaryHex.value = this.value;
-                saveBrandColors();
-            });
-        }
+        // Add listeners to existing color pickers
+        const colorPickers = document.querySelectorAll('.brand-color-picker');
+        colorPickers.forEach((picker, index) => {
+            const hexInput = document.getElementById(`brandColor${index}Hex`);
+            if (hexInput) {
+                picker.addEventListener('change', function() {
+                    hexInput.value = this.value;
+                    saveBrandColors();
+                });
+            }
+        });
     });
 
     // Toggle advanced brand kit section
