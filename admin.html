@@ -1654,9 +1654,6 @@
             loadDashboardData(); // Load dashboard first since it's the default tab
             loadClients();
 
-            // Start listening for unread messages globally (updates badge on all tabs)
-            startGlobalUnreadListener();
-
             // Initialize notifications
             initializeNotifications();
         });
@@ -3168,39 +3165,8 @@
             }
         }
 
-        // ===== MESSAGING SYSTEM =====
-        let currentChatClientId = null;
-        let messagesListener = null;
-
-        // Global unread messages listener - runs on all tabs to keep badge updated
-        function startGlobalUnreadListener() {
-            firebase.firestore().collection('messages')
-                .onSnapshot(snapshot => {
-                    let totalUnread = 0;
-
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        totalUnread += (data.unreadByAdmin || 0);
-                    });
-
-                    updateUnreadBadge(totalUnread);
-                }, error => {
-                    console.error('Error listening to unread messages:', error);
-                });
-        }
-
-
-
-        // Update unread messages badge
-        function updateUnreadBadge(count) {
-            const badge = document.getElementById('messagesUnreadBadge');
-            if (count > 0) {
-                badge.textContent = count;
-                badge.style.display = 'inline';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
+        // ===== MESSAGING SYSTEM (REMOVED) =====
+        // Messaging functionality has been removed from the admin dashboard
 
         // Format time ago
         function formatTimeAgo(date) {
