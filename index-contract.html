@@ -415,41 +415,43 @@
                 <!-- Temporary access form (hidden by default) -->
                 <div id="tempAccessForm" style="display: none; background: #FBE9D1; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #F2A922;">
                     <h5 style="color: #012E40; margin-bottom: 10px;">Temporary Website Access:</h5>
-                    <div class="form-group">
-                        <label for="websiteUrl">Website URL *</label>
-                        <input type="url" id="websiteUrl" placeholder="https://yourwebsite.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginUrl">Login URL</label>
-                        <input type="url" id="loginUrl" placeholder="https://yourwebsite.com/wp-admin">
-                    </div>
-                    <div class="form-group">
-                        <label for="tempUsername">Admin Username *</label>
-                        <input type="text" id="tempUsername" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tempPassword">Admin Password *</label>
-                        <input type="password" id="tempPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="sitePlatform">Website Platform</label>
-                        <select id="sitePlatform">
-                            <option value="">Select platform</option>
-                            <option value="wordpress">WordPress</option>
-                            <option value="squarespace">Squarespace</option>
-                            <option value="wix">Wix</option>
-                            <option value="shopify">Shopify</option>
-                            <option value="webflow">Webflow</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <input type="text" id="sitePlatformOther" placeholder="Please specify..." style="display: none; margin-top: 10px;">
-                    </div>
-                    <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
-                        <strong>🔒 Secure:</strong> We'll install tracking and remove our access immediately. You can change the password afterward.
-                    </p>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-secondary btn-small" onclick="window.emailAccessDetails()">Send Access Details Securely</button>
-                    </div>
+                    <form id="tempAccessCredentialsForm" autocomplete="on">
+                        <div class="form-group">
+                            <label for="websiteUrl">Website URL *</label>
+                            <input type="url" id="websiteUrl" name="website-url" placeholder="https://yourwebsite.com" required autocomplete="url">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUrl">Login URL</label>
+                            <input type="url" id="loginUrl" name="login-url" placeholder="https://yourwebsite.com/wp-admin" autocomplete="url">
+                        </div>
+                        <div class="form-group">
+                            <label for="tempUsername">Admin Username *</label>
+                            <input type="text" id="tempUsername" name="username" required autocomplete="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="tempPassword">Admin Password *</label>
+                            <input type="password" id="tempPassword" name="password" required autocomplete="current-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="sitePlatform">Website Platform</label>
+                            <select id="sitePlatform" name="platform">
+                                <option value="">Select platform</option>
+                                <option value="wordpress">WordPress</option>
+                                <option value="squarespace">Squarespace</option>
+                                <option value="wix">Wix</option>
+                                <option value="shopify">Shopify</option>
+                                <option value="webflow">Webflow</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <input type="text" id="sitePlatformOther" name="platform-other" placeholder="Please specify..." style="display: none; margin-top: 10px;">
+                        </div>
+                        <p style="font-size: 0.9rem; color: #012E40; margin-top: 10px;">
+                            <strong>🔒 Secure:</strong> We'll install tracking and remove our access immediately. You can change the password afterward.
+                        </p>
+                        <div style="margin-top: 15px;">
+                            <button type="button" class="btn btn-secondary btn-small" onclick="window.emailAccessDetails()">Send Access Details Securely</button>
+                        </div>
+                    </form>
                 </div>
 
                 <div style="margin-top: 25px; background: #F0F9F7; padding: 15px; border-radius: 8px;">

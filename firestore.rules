@@ -24,7 +24,20 @@ service cloud.firestore {
     match /clients/{clientId} {
       allow read: if true;  // Allow unauthenticated read (protected by temp password in portal)
       allow write: if isAdmin();
-      allow update: if true;  // Allow clients to update their own progress steps
+
+      // Allow clients to update only specific progress and data fields (not sensitive fields)
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['step1Complete', 'step2Complete', 'step3Complete',
+                                'step4Complete', 'step5Complete', 'step6Complete',
+                                'brandLogoUrl', 'brandLogoFileName', 'brandColors',
+                                'brandPrimaryColor', 'brandSecondaryColor', 'brandAssets',
+                                'metaBusinessManagerId', 'metaAdAccountId', 'metaPageId',
+                                'metaPixelId', 'metaBusinessManagerUrl', 'metaBusinessManagerEmail',
+                                'ga4PropertyId', 'ga4MeasurementId', 'googleAnalyticsEmail',
+                                'websiteAccessMethod', 'websiteUrl', 'websiteUsername',
+                                'websitePassword', 'hostingProvider', 'hasUnreviewedWebsiteAccess',
+                                'currentStep', 'completedSteps', 'progress',
+                                'lastUpdated', 'updatedAt']);
     }
 
     // Sales Reps - Allow unauthenticated users to list active reps (for login dropdown)

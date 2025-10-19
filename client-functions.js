@@ -31,8 +31,6 @@
         "4": false,
         "5": false,
         "6": false,
-        "creativeLink": null,
-        "googleDriveLink": null,
         "docuSignLinks": {
             "dpa": null,
             "service6": null,
@@ -63,23 +61,25 @@
             }
         };
         
+        const contactEmail = APP_SETTINGS?.support?.email || 'nicolas@driveleadmedia.com';
+
         if (!clientId) {
-            document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Invalid Access</h1><p style="font-size: 1.1rem;">Please use the link provided by Drive Lead Media.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
+            document.body.innerHTML = `<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Invalid Access</h1><p style="font-size: 1.1rem;">Please use the link provided by Drive Lead Media.</p><p style="margin-top: 20px; color: #05908C;">Contact: ${contactEmail}</p></div></div>`;
             return;
         }
-        
+
         try {
             const doc = await db.collection('clients').doc(clientId).get();
-            
+
             if (!doc.exists) {
-                document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Portal Not Found</h1><p style="font-size: 1.1rem;">Please contact Drive Lead Media for assistance.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
+                document.body.innerHTML = `<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Portal Not Found</h1><p style="font-size: 1.1rem;">Please contact Drive Lead Media for assistance.</p><p style="margin-top: 20px; color: #05908C;">Contact: ${contactEmail}</p></div></div>`;
                 return;
             }
-            
+
             const data = doc.data();
-            
+
             if (!data.active) {
-                document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Portal Inactive</h1><p style="font-size: 1.1rem;">This portal is currently inactive. Please contact Drive Lead Media.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
+                document.body.innerHTML = `<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Portal Inactive</h1><p style="font-size: 1.1rem;">This portal is currently inactive. Please contact Drive Lead Media.</p><p style="margin-top: 20px; color: #05908C;">Contact: ${contactEmail}</p></div></div>`;
                 return;
             }
             
@@ -153,7 +153,7 @@
             
         } catch (error) {
             console.error('Error loading:', error);
-            document.body.innerHTML = '<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Loading Error</h1><p style="font-size: 1.1rem;">Please refresh the page or contact support.</p><p style="margin-top: 20px; color: #05908C;">Contact: Nicolas@driveleadmedia.com</p></div></div>';
+            document.body.innerHTML = `<div style="text-align:center; padding:50px; color:#012E40; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;"><div style="background: #EEF4D9; padding: 40px; border-radius: 15px; max-width: 500px;"><h1 style="font-family: Young Serif, serif; margin-bottom: 20px;">Loading Error</h1><p style="font-size: 1.1rem;">Please refresh the page or contact support.</p><p style="margin-top: 20px; color: #05908C;">Contact: ${contactEmail}</p></div></div>`;
         }
     }
 
@@ -1134,13 +1134,17 @@
         const file = input.files[0];
         if (!file) return;
 
+        const previewContainer = document.getElementById('logoPreviewContainer');
+        const previewImg = document.getElementById('logoPreviewImg');
+        const fileName = document.getElementById('logoFileName');
+
         try {
-            // Show preview
+            // Show preview with loading state
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('logoPreviewImg').src = e.target.result;
-                document.getElementById('logoFileName').textContent = file.name;
-                document.getElementById('logoPreviewContainer').style.display = 'block';
+                previewImg.src = e.target.result;
+                fileName.innerHTML = `${file.name} <span style="color: #F2A922; font-size: 0.8rem;">⏳ Uploading...</span>`;
+                previewContainer.style.display = 'block';
             };
             reader.readAsDataURL(file);
 
@@ -1163,10 +1167,16 @@
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
+            // Update UI to show success
+            fileName.innerHTML = `${file.name} <span style="color: #05908C; font-size: 0.8rem;">✓ Uploaded</span>`;
             console.log('Logo uploaded successfully');
 
         } catch (error) {
             console.error('Error uploading logo:', error);
+            // Update UI to show error
+            if (fileName) {
+                fileName.innerHTML = `${file.name} <span style="color: #F2584E; font-size: 0.8rem;">✗ Upload failed</span>`;
+            }
             alert('Error uploading logo. Please try again.');
         }
     };
