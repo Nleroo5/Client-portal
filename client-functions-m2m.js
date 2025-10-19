@@ -503,36 +503,32 @@
         }
 
         const platformText = platform === 'other' ? platformOther : platform;
-        const messageText = `📋 Website Admin Contact Details:\n\n` +
-            `Name: ${adminName || 'Not provided'}\n` +
-            `Email: ${adminEmail}\n` +
-            `Phone: ${adminPhone || 'Not provided'}\n` +
-            `Platform: ${platformText || 'Not specified'}\n\n` +
-            `Please contact them to coordinate tracking installation.`;
 
         try {
-            await db.collection('messages').doc(window.currentClientId).collection('thread').add({
-                message: messageText,
-                sender: 'client',
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                read: false
+            // Save to client document for admin dashboard display
+            await db.collection('clients').doc(window.currentClientId).update({
+                websiteAccessMethod: 'admin-contact',
+                websiteAdminDetails: {
+                    name: adminName || 'Not provided',
+                    email: adminEmail,
+                    phone: adminPhone || 'Not provided',
+                    platform: platformText || 'Not specified',
+                    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pending'
+                },
+                hasUnreviewedWebsiteAccess: true,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            await db.collection('messages').doc(window.currentClientId).set({
-                lastMessage: messageText,
-                lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                unreadCount: firebase.firestore.FieldValue.increment(1)
-            }, { merge: true });
-
-            alert('Admin details sent successfully!');
+            alert('Admin contact details submitted successfully! We will contact them to coordinate tracking installation.');
         } catch (error) {
-            console.error('Error sending message:', error);
+            console.error('Error sending admin details:', error);
             alert('Error sending details. Please try again.');
         }
     }
 
     // Email Access Details
-    function emailAccessDetails() {
+    async function emailAccessDetails() {
         const websiteUrl = document.getElementById('websiteUrl').value;
         const loginUrl = document.getElementById('loginUrl').value;
         const username = document.getElementById('tempUsername').value;
@@ -545,17 +541,35 @@
             return;
         }
 
-        const platformText = platform === 'other' ? platformOther : platform;
-        const subject = 'Temporary Website Access Details - Client Portal';
-        const body = `Temporary Website Access Details:\n\n` +
-            `Website URL: ${websiteUrl}\n` +
-            `Login URL: ${loginUrl || 'Not provided'}\n` +
-            `Username: ${username}\n` +
-            `Password: ${password}\n` +
-            `Platform: ${platformText || 'Not specified'}\n\n` +
-            `Please install tracking and remove access when complete.`;
+        if (!window.currentClientId) {
+            alert('Error: Client ID not found');
+            return;
+        }
 
-        window.open(`mailto:${APP_SETTINGS.support.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+        const platformText = platform === 'other' ? platformOther : platform;
+
+        try {
+            // Save to client document for admin dashboard display
+            await db.collection('clients').doc(window.currentClientId).update({
+                websiteAccessMethod: 'direct-access',
+                websiteDirectAccess: {
+                    websiteUrl: websiteUrl,
+                    loginUrl: loginUrl || 'Not provided',
+                    username: username,
+                    password: password,
+                    platform: platformText || 'Not specified',
+                    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pending'
+                },
+                hasUnreviewedWebsiteAccess: true,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            alert('Website access details submitted successfully! We will install tracking and remove our access immediately.');
+        } catch (error) {
+            console.error('Error sending access details:', error);
+            alert('Error sending details. Please try again.');
+        }
     }
 
     // Fireworks display

@@ -83,34 +83,6 @@
         </div>
     </div>
 
-
-
-
-
-        <!-- Message Input -->
-        <div style="padding: 16px 20px; border-top: 2px solid #000000; background: rgba(255, 255, 255, 0.5);">
-            <form id="clientMessageForm" style="display: flex; gap: 10px;">
-                <input
-                    type="text"
-                    id="clientMessageInput"
-                    placeholder="Type your message..."
-                    required
-                    style="flex: 1; padding: 12px; border: 1px solid #000000; border-radius: 8px; font-size: 0.9rem; background: white;"
-                >
-                <button type="submit" style="
-                    background: linear-gradient(135deg, #05908C 0%, #047a72 100%);
-                    color: #000000;
-                    border: 1px solid #000000;
-                    border-radius: 8px;
-                    padding: 12px 20px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                ">Send</button>
-            </form>
-        </div>
-    </div>
-
     <div class="portal-container">
         <!-- Hero Section -->
         <div class="hero">
@@ -144,12 +116,25 @@
                 <div class="step-number">1</div>
             </div>
             <div class="step-content">
-                <div style="margin-bottom: 20px;">
-                    <a href="#" class="btn" id="serviceAgreementBtn" target="_blank" rel="noopener" style="border: 1px solid #000;">
-                        Sign Service Agreement
-                    </a>
-                    <a href="#" class="btn" id="dpaBtn" target="_blank" rel="noopener" style="border: 1px solid #000;">
+                <div style="background: #E8F5F3; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 2px solid #05908C;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                        <div style="background: #05908C; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem;">1</div>
+                        <h4 style="margin: 0; color: #012E40; font-size: 1.1rem;">Data Processing Agreement (DPA)</h4>
+                    </div>
+                    <p style="color: #012E40; font-size: 0.9rem; margin-bottom: 15px;">First, sign the DPA to protect your data privacy</p>
+                    <a href="#" class="btn" id="dpaBtn" target="_blank" rel="noopener" style="border: 1px solid #000; width: 100%;">
                         Sign DPA (Data Processing Agreement)
+                    </a>
+                </div>
+
+                <div style="background: #FBE9D1; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 2px solid #F2A922;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                        <div style="background: #F2A922; color: #012E40; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem;">2</div>
+                        <h4 style="margin: 0; color: #012E40; font-size: 1.1rem;">Service Agreement</h4>
+                    </div>
+                    <p style="color: #012E40; font-size: 0.9rem; margin-bottom: 15px;">Month-to-month service agreement - no long-term commitment</p>
+                    <a href="#" class="btn" id="serviceAgreementBtn" target="_blank" rel="noopener" style="border: 1px solid #000; width: 100%;">
+                        Sign Service Agreement
                     </a>
                 </div>
             </div>
@@ -512,20 +497,6 @@
                 <span>•</span>
                 <span id="contactPhone">(678) 650-6411</span>
             </div>
-            <button onclick="window.resetClientPortal()" style="
-                margin-top: 20px;
-                padding: 10px 20px;
-                background: transparent;
-                border: 2px solid #F2584E;
-                color: #F2584E;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 0.85rem;
-                font-weight: 600;
-                transition: all 0.3s ease;
-            " onmouseover="this.style.background='#F2584E'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#F2584E';">
-                Reset Portal Data
-            </button>
         </div>
     </div>
 

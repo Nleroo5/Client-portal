@@ -2257,15 +2257,17 @@
                     ].filter(Boolean).length;
                     const progressPercent = (completedSteps / 5) * 100;
 
-                    // Check for pending revision requests
+                    // Check for pending revision requests and website access
                     const hasPendingRevision = data.hasPendingRevision || false;
+                    const hasUnreviewedWebsiteAccess = data.hasUnreviewedWebsiteAccess || false;
+                    const needsAttention = hasPendingRevision || hasUnreviewedWebsiteAccess;
 
                     const card = document.createElement('div');
                     const baseCardStyle = 'background: #FFF8E6; border-radius: 12px; padding: 20px; transition: all 0.2s ease; backdrop-filter: blur(8px);';
-                    const revisionStyle = hasPendingRevision
+                    const attentionStyle = needsAttention
                         ? 'box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), 0 6px 30px rgba(1, 46, 64, 0.3); border: 2px solid rgba(239, 68, 68, 0.8); animation: revisionPulse 2s infinite;'
                         : 'box-shadow: 0 6px 30px rgba(1, 46, 64, 0.3); border: 2px solid rgba(5, 144, 140, 0.3);';
-                    card.style.cssText = baseCardStyle + revisionStyle;
+                    card.style.cssText = baseCardStyle + attentionStyle;
 
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 14px;">
@@ -2274,6 +2276,7 @@
                                     <h3 style="font-size: 1.1rem; font-weight: 700; color: #000000; margin: 0;">${data.clientName}</h3>
                                     <span class="badge badge-${portalType === 'm2m' ? 'warning' : 'success'}" style="font-size: 0.7rem;">${portalType === 'm2m' ? 'M2M' : 'Contract'}</span>
                                     ${hasPendingRevision ? '<span class="badge badge-danger" style="font-size: 0.7rem; background: #ef4444; animation: pulse 2s infinite;">Revision Request</span>' : ''}
+                                    ${hasUnreviewedWebsiteAccess ? '<span class="badge badge-danger" style="font-size: 0.7rem; background: #ef4444; animation: pulse 2s infinite;">Website Access</span>' : ''}
                                 </div>
                                 <p style="color: #000000; font-size: 0.85rem; margin: 0;">${data.clientEmail || 'No email provided'}</p>
                             </div>
@@ -2399,6 +2402,41 @@
                             </button>
                         `}
 
+                        <!-- Website Access Details Section -->
+                        ${data.websiteAccessMethod ? `
+                            <div style="background: ${hasUnreviewedWebsiteAccess ? '#fee2e2' : '#f0fdf4'}; border-radius: 8px; padding: 14px; margin-bottom: 14px; border: 2px solid ${hasUnreviewedWebsiteAccess ? '#ef4444' : '#22c55e'};">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                                    <div style="font-size: 0.7rem; color: #012E40; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+                                        ${data.websiteAccessMethod === 'admin-contact' ? 'Website Admin Contact' : 'Direct Website Access'}
+                                    </div>
+                                    ${hasUnreviewedWebsiteAccess ? `
+                                        <button class="btn btn-small" onclick="markWebsiteAccessReviewed('${docId}')" style="padding: 4px 10px; font-size: 0.7rem; background: #22c55e; color: white; border: none;">Mark Reviewed</button>
+                                    ` : `
+                                        <span style="font-size: 0.7rem; color: #22c55e; font-weight: 600;">✓ Reviewed</span>
+                                    `}
+                                </div>
+
+                                ${data.websiteAccessMethod === 'admin-contact' && data.websiteAdminDetails ? `
+                                    <div style="font-size: 0.85rem; line-height: 1.6; color: #012E40;">
+                                        <div style="margin-bottom: 6px;"><strong>Name:</strong> ${data.websiteAdminDetails.name}</div>
+                                        <div style="margin-bottom: 6px;"><strong>Email:</strong> <a href="mailto:${data.websiteAdminDetails.email}" style="color: #05908C; text-decoration: none;">${data.websiteAdminDetails.email}</a></div>
+                                        <div style="margin-bottom: 6px;"><strong>Phone:</strong> ${data.websiteAdminDetails.phone !== 'Not provided' ? `<a href="tel:${data.websiteAdminDetails.phone}" style="color: #05908C; text-decoration: none;">${data.websiteAdminDetails.phone}</a>` : data.websiteAdminDetails.phone}</div>
+                                        <div><strong>Platform:</strong> ${data.websiteAdminDetails.platform}</div>
+                                    </div>
+                                ` : ''}
+
+                                ${data.websiteAccessMethod === 'direct-access' && data.websiteDirectAccess ? `
+                                    <div style="font-size: 0.85rem; line-height: 1.6; color: #012E40;">
+                                        <div style="margin-bottom: 6px;"><strong>Website:</strong> <a href="${data.websiteDirectAccess.websiteUrl}" target="_blank" style="color: #05908C; text-decoration: none;">${data.websiteDirectAccess.websiteUrl}</a></div>
+                                        <div style="margin-bottom: 6px;"><strong>Login URL:</strong> ${data.websiteDirectAccess.loginUrl}</div>
+                                        <div style="margin-bottom: 6px;"><strong>Username:</strong> <code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">${data.websiteDirectAccess.username}</code></div>
+                                        <div style="margin-bottom: 6px;"><strong>Password:</strong> <code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.8rem;">${data.websiteDirectAccess.password}</code></div>
+                                        <div><strong>Platform:</strong> ${data.websiteDirectAccess.platform}</div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+
                         <div style="display: flex; gap: 8px;">
                             <button class="btn btn-${data.active ? 'secondary' : 'success'} btn-small" onclick="toggleStatus('${docId}', ${!data.active})" style="flex: 1; padding: 10px; font-size: 0.85rem;">
                                 ${data.active ? 'Deactivate' : 'Activate'}
@@ -2450,6 +2488,21 @@
             } catch (error) {
                 console.error('Error updating status:', error);
                 showAlert('Error updating client status', 'error');
+            }
+        }
+
+        // Mark website access as reviewed
+        async function markWebsiteAccessReviewed(clientId) {
+            try {
+                await db.collection('clients').doc(clientId).update({
+                    hasUnreviewedWebsiteAccess: false,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showAlert('Website access marked as reviewed');
+                loadClients();
+            } catch (error) {
+                console.error('Error marking website access as reviewed:', error);
+                showAlert('Error updating status', 'error');
             }
         }
 
