@@ -931,20 +931,6 @@
                 </div>
                 <!-- End Month-to-Month Portal Links -->
 
-                <div class="link-section">
-                    <h3>Other Links</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="googleDriveLink">Google Drive Upload Link</label>
-                            <input type="url" id="googleDriveLink" placeholder="">
-                        </div>
-                        <div class="form-group">
-                            <label for="creativeLink">Creative Preview Link</label>
-                            <input type="url" id="creativeLink" placeholder="Add later when creatives are ready">
-                        </div>
-                    </div>
-                </div>
-                
                 <button type="submit" class="btn btn-primary">Create Client Portal</button>
             </form>
         </div>
@@ -1509,21 +1495,7 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="link-section">
-                    <h3>Other Links</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="editGoogleDriveLink">Google Drive Upload Link</label>
-                            <input type="url" id="editGoogleDriveLink" placeholder="">
-                        </div>
-                        <div class="form-group">
-                            <label for="editCreativeLink">Creative Preview Link</label>
-                            <input type="url" id="editCreativeLink" placeholder="Add when creatives are ready">
-                        </div>
-                    </div>
-                </div>
-                
+
                 <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 2px solid #85C7B3;">
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                     <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
@@ -3065,11 +3037,7 @@
                 document.getElementById('editStripe6Upfront').value = data.stripe6Upfront || '';
                 document.getElementById('editStripe12Monthly').value = data.stripe12Monthly || '';
                 document.getElementById('editStripe12Upfront').value = data.stripe12Upfront || '';
-                
-                // Other links
-                document.getElementById('editGoogleDriveLink').value = data.googleDriveLink || '';
-                document.getElementById('editCreativeLink').value = data.creativeLink || '';
-                
+
                 // Show modal
                 document.getElementById('editModal').style.display = 'flex';
                 
@@ -3445,11 +3413,7 @@
                 stripe6Monthly: document.getElementById('editStripe6Monthly').value || null,
                 stripe6Upfront: document.getElementById('editStripe6Upfront').value || null,
                 stripe12Monthly: document.getElementById('editStripe12Monthly').value || null,
-                stripe12Upfront: document.getElementById('editStripe12Upfront').value || null,
-                
-                // Other links (null if empty)
-                googleDriveLink: document.getElementById('editGoogleDriveLink').value || null,
-                creativeLink: document.getElementById('editCreativeLink').value || null
+                stripe12Upfront: document.getElementById('editStripe12Upfront').value || null
             };
             
             try {
