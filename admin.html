@@ -815,21 +815,6 @@
                 </div>
             </div>
 
-            <!-- Urgent Tasks -->
-            <div class="admin-section">
-                <h2 style="font-family: 'Bitter', serif; color: #000000; margin-bottom: 16px;">Urgent Tasks</h2>
-                <div id="urgentTasksList" style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 16px; border-radius: 8px;">
-                        <div style="font-weight: 600; color: #92400E; margin-bottom: 4px;">Website Forms Pending Review</div>
-                        <div style="color: #78350F; font-size: 0.9rem;"><span id="dashboardQuotesPending">0</span> forms waiting for your response</div>
-                    </div>
-                    <div style="background: #DBEAFE; border-left: 4px solid #3B82F6; padding: 16px; border-radius: 8px;">
-                        <div style="font-weight: 600; color: #1E3A8A; margin-bottom: 4px;">Deals in Proposal Stage</div>
-                        <div style="color: #1E40AF; font-size: 0.9rem;"><span id="dashboardProposalDeals">0</span> deals need follow-up</div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Quick Actions -->
             <div class="admin-section">
                 <h2 style="font-family: 'Bitter', serif; color: #000000; margin-bottom: 16px;">Quick Actions</h2>
@@ -1717,7 +1702,6 @@
                 let totalPipeline = 0;
                 let activeDeals = 0;
                 let monthlyMRR = 0;
-                let proposalDeals = 0;
 
                 const currentMonth = new Date().getMonth();
                 const currentYear = new Date().getFullYear();
@@ -1728,11 +1712,6 @@
                         activeDeals++;
                         const dealValue = parseFloat(deal.value) || 0;
                         totalPipeline += dealValue;
-
-                        // Count deals in Proposal stage
-                        if (deal.stage === 'Proposal') {
-                            proposalDeals++;
-                        }
                     }
 
                     // Calculate MRR for deals won this month
@@ -1748,16 +1727,11 @@
                 document.getElementById('dashboardTotalPipeline').textContent = '$' + totalPipeline.toLocaleString();
                 document.getElementById('dashboardActiveDeals').textContent = activeDeals;
                 document.getElementById('dashboardMonthlyMRR').textContent = '$' + monthlyMRR.toLocaleString();
-                document.getElementById('dashboardProposalDeals').textContent = proposalDeals;
 
                 // Load active clients count
                 const clientsSnapshot = await db.collection('clients').get();
                 const activeClients = clientsSnapshot.docs.filter(doc => doc.data().active !== false).length;
                 document.getElementById('dashboardActiveClients').textContent = activeClients;
-
-                // Load website forms pending
-                const quotesSnapshot = await db.collection('websiteQuotes').where('status', 'in', ['completed', 'incomplete']).get();
-                document.getElementById('dashboardQuotesPending').textContent = quotesSnapshot.size;
 
 
 
