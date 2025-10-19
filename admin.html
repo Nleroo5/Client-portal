@@ -1837,31 +1837,37 @@
                 });
 
                 // Check for completed website forms (from website-quotes collection)
-                const quotesSnapshot = await db.collection('website-quotes')
-                    .where('status', '==', 'completed')
-                    .orderBy('completedAt', 'desc')
-                    .limit(5)
-                    .get();
+                // Wrap in try-catch in case permissions don't allow access
+                try {
+                    const quotesSnapshot = await db.collection('website-quotes')
+                        .where('status', '==', 'completed')
+                        .orderBy('completedAt', 'desc')
+                        .limit(5)
+                        .get();
 
-                quotesSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    const completedDate = data.completedAt?.toDate();
-                    const now = new Date();
-                    const hoursSinceCompletion = completedDate ? (now - completedDate) / (1000 * 60 * 60) : 999;
+                    quotesSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        const completedDate = data.completedAt?.toDate();
+                        const now = new Date();
+                        const hoursSinceCompletion = completedDate ? (now - completedDate) / (1000 * 60 * 60) : 999;
 
-                    // Only show if completed in last 24 hours
-                    if (hoursSinceCompletion < 24) {
-                        notifications.push({
-                            type: 'website-form',
-                            icon: '📝',
-                            title: `${data.companyName || 'Company'} completed website form`,
-                            message: `Form completed ${Math.round(hoursSinceCompletion)} hours ago`,
-                            quoteId: doc.id,
-                            timestamp: completedDate || new Date(),
-                            priority: 'low'
-                        });
-                    }
-                });
+                        // Only show if completed in last 24 hours
+                        if (hoursSinceCompletion < 24) {
+                            notifications.push({
+                                type: 'website-form',
+                                icon: '📝',
+                                title: `${data.companyName || 'Company'} completed website form`,
+                                message: `Form completed ${Math.round(hoursSinceCompletion)} hours ago`,
+                                quoteId: doc.id,
+                                timestamp: completedDate || new Date(),
+                                priority: 'low'
+                            });
+                        }
+                    });
+                } catch (quotesError) {
+                    console.warn('Could not load website forms notifications (permissions may not be set):', quotesError.message);
+                    // Continue without website form notifications
+                }
 
                 // Sort by priority and timestamp
                 const priorityOrder = { high: 1, medium: 2, low: 3 };
@@ -1877,6 +1883,8 @@
 
             } catch (error) {
                 console.error('Error loading dashboard notifications:', error);
+                // Still render empty state even if there's an error
+                renderDashboardNotifications([]);
             }
         }
 
