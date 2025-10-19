@@ -842,11 +842,22 @@ body {
 @media (max-width: 1024px) {
     .floating-progress-sidebar {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
     }
 
     .portal-container {
         max-width: 100%;
         padding: 20px 15px;
+    }
+}
+
+/* Show floating sidebar only on large screens (1025px+) */
+@media (min-width: 1025px) {
+    .floating-progress-sidebar {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 }
 

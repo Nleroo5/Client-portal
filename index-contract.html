@@ -966,8 +966,8 @@ onclick="toggleHelpPanel()">
 <div id="helpPanel" style="
     position: fixed;
     bottom: 0;
-    right: -400px;
-    width: 380px;
+    right: -100%;
+    width: min(380px, calc(100vw - 20px));
     height: auto;
     max-height: 400px;
     background: white;
@@ -1019,10 +1019,10 @@ onclick="toggleHelpPanel()">
 function toggleHelpPanel() {
     const panel = document.getElementById('helpPanel');
     const btn = document.getElementById('needHelpBtn');
-    
+
     if (panel.style.right === '0px') {
         // Close panel
-        panel.style.right = '-400px';
+        panel.style.right = '-100%';
         btn.style.display = 'flex';
     } else {
         // Open panel
