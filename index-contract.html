@@ -83,61 +83,9 @@
         </div>
     </div>
 
-    <!-- Message Admin Button (Floating) -->
-    <button id="messageAdminBtn" style="
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background: linear-gradient(135deg, #F2A922 0%, #e09819 100%);
-        color: #000000;
-        border: 2px solid #000000;
-        border-radius: 50px;
-        padding: 16px 28px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(242, 169, 34, 0.4);
-        transition: all 0.2s ease;
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    "
-    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(242, 169, 34, 0.5)'"
-    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(242, 169, 34, 0.4)'"
-    onclick="toggleChatPanel()">
-        💬 Message Admin
-        <span id="clientUnreadBadge" style="display: none; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.75rem; display: none; align-items: center; justify-content: center;"></span>
-    </button>
 
-    <!-- Chat Panel (Sliding) -->
-    <div id="chatPanel" style="
-        position: fixed;
-        bottom: 0;
-        right: -400px;
-        width: 400px;
-        height: 600px;
-        background: #E8F5F3;
-        border: 2px solid #000000;
-        border-radius: 12px 0 0 0;
-        box-shadow: -4px 0 12px rgba(0, 0, 0, 0.2);
-        transition: right 0.3s ease;
-        z-index: 10000;
-        display: flex;
-        flex-direction: column;
-    ">
-        <!-- Chat Header -->
-        <div style="background: rgba(5, 144, 140, 0.7); padding: 16px 20px; border-bottom: 2px solid #000000; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 0 0 0;">
-            <h3 style="margin: 0; color: #000000; font-size: 1.1rem; font-weight: 600;">Message Admin</h3>
-            <button onclick="toggleChatPanel()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #000000; padding: 0; line-height: 1;">&times;</button>
-        </div>
 
-        <!-- Messages Area -->
-        <div id="clientChatMessages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
-            <div style="text-align: center; padding: 40px 20px; color: #64748B;">
-                Loading messages...
-            </div>
-        </div>
+
 
         <!-- Message Input -->
         <div style="padding: 16px 20px; border-top: 2px solid #000000; background: rgba(255, 255, 255, 0.5);">
@@ -197,24 +145,31 @@
             </div>
             <div class="step-content">
                 <!-- Educational Context -->
-                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C;">
-                    <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">📋 Why This Matters</h4>
-                    <p style="color: #012E40; margin-bottom: 15px; line-height: 1.6;">
-                        These agreements protect both of us and ensure we're on the same page about how we'll work together and handle your data.
-                    </p>
-                    <div style="display: grid; gap: 10px;">
-                        <div style="display: flex; gap: 10px; align-items: start;">
-                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✓</span>
-                            <div>
-                                <strong style="color: #012E40;">What We'll Do:</strong>
-                                <span style="color: #012E40;"> Send agreements via DocuSign for easy electronic signing (takes ~5 minutes)</span>
-                            </div>
-                        </div>
-                        <div style="display: flex; gap: 10px; align-items: start;">
-                            <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✗</span>
-                            <div>
-                                <strong style="color: #012E40;">What We Won't Do:</strong>
-                                <span style="color: #012E40;"> We never share your data with third parties or use it for anything beyond your campaigns</span>
+                <div class="why-matters-box" style="background: #E8F5F3; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C; overflow: hidden;">
+                    <div class="why-matters-header" onclick="toggleWhyMatters(this)" style="padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                        <h4 style="color: #012E40; margin: 0; font-size: 1rem;">📋 Why This Matters</h4>
+                        <span class="why-matters-toggle" style="color: #05908C; font-size: 1.2rem; transition: transform 0.3s ease;">▼</span>
+                    </div>
+                    <div class="why-matters-content" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+                        <div style="padding: 0 20px 20px 20px;">
+                            <p style="color: #012E40; margin-bottom: 15px; line-height: 1.6;">
+                                These agreements protect both of us and ensure we're on the same page about how we'll work together and handle your data.
+                            </p>
+                            <div style="display: grid; gap: 10px;">
+                                <div style="display: flex; gap: 10px; align-items: start;">
+                                    <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✓</span>
+                                    <div>
+                                        <strong style="color: #012E40;">What We'll Do:</strong>
+                                        <span style="color: #012E40;"> Send agreements via DocuSign for easy electronic signing (takes ~5 minutes)</span>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 10px; align-items: start;">
+                                    <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✗</span>
+                                    <div>
+                                        <strong style="color: #012E40;">What We Won't Do:</strong>
+                                        <span style="color: #012E40;"> We never share your data with third parties or use it for anything beyond your campaigns</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -255,8 +210,13 @@
             </div>
             <div class="step-content">
                 <!-- Educational Context -->
-                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C;">
-                    <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">💳 Why This Matters</h4>
+                <div class="why-matters-box" style="background: #E8F5F3; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C; overflow: hidden;">
+                    <div class="why-matters-header" onclick="toggleWhyMatters(this)" style="padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                        <h4 style="color: #012E40; margin: 0; font-size: 1rem;">💳 Why This Matters</h4>
+                        <span class="why-matters-toggle" style="color: #05908C; font-size: 1.2rem; transition: transform 0.3s ease;">▼</span>
+                    </div>
+                    <div class="why-matters-content" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+                        <div style="padding: 0 20px 20px 20px;">
                     <p style="color: #012E40; margin-bottom: 15px; line-height: 1.6;">
                         Setting up payment now means we can start your campaign immediately once onboarding is complete. No delays waiting for invoices!
                     </p>
@@ -267,6 +227,8 @@
                                 <strong style="color: #012E40;">What We'll Do:</strong>
                                 <span style="color: #012E40;"> Use Stripe's secure payment system (same as Amazon, Google). Your payment info is encrypted and never stored on our servers.</span>
                             </div>
+                    </div>
+                </div>
                         </div>
                         <div style="display: flex; gap: 10px; align-items: start;">
                             <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✗</span>
@@ -404,8 +366,13 @@
                     </div>
                 </div>
 
-                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #05908C;">
-                    <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">🎨 Why This Matters</h4>
+                <div class="why-matters-box" style="background: #E8F5F3; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C; overflow: hidden;">
+                    <div class="why-matters-header" onclick="toggleWhyMatters(this)" style="padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                        <h4 style="color: #012E40; margin: 0; font-size: 1rem;">🎨 Why This Matters</h4>
+                        <span class="why-matters-toggle" style="color: #05908C; font-size: 1.2rem; transition: transform 0.3s ease;">▼</span>
+                    </div>
+                    <div class="why-matters-content" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+                        <div style="padding: 0 20px 20px 20px;">
                     <p style="color: #012E40; margin-bottom: 15px; line-height: 1.6;">
                         Your logo and colors help us create ads that feel authentic to your brand and catch your ideal customers' attention.
                     </p>
@@ -416,6 +383,8 @@
                                 <strong style="color: #012E40;">What We'll Do:</strong>
                                 <span style="color: #012E40;"> Design ad creatives that match your brand perfectly and get them approved by you before running anything</span>
                             </div>
+                    </div>
+                </div>
                         </div>
                         <div style="display: flex; gap: 10px; align-items: start;">
                             <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✗</span>
@@ -443,8 +412,13 @@
             </div>
             <div class="step-content">
                 <!-- Educational Context -->
-                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C;">
-                    <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">📱 Why This Matters</h4>
+                <div class="why-matters-box" style="background: #E8F5F3; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C; overflow: hidden;">
+                    <div class="why-matters-header" onclick="toggleWhyMatters(this)" style="padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                        <h4 style="color: #012E40; margin: 0; font-size: 1rem;">📱 Why This Matters</h4>
+                        <span class="why-matters-toggle" style="color: #05908C; font-size: 1.2rem; transition: transform 0.3s ease;">▼</span>
+                    </div>
+                    <div class="why-matters-content" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+                        <div style="padding: 0 20px 20px 20px;">
                     <p style="color: #012E40; margin-bottom: 15px; line-height: 1.6;">
                         This connects your Facebook and Instagram accounts so we can run ads on your behalf. It's the technical setup that makes everything work!
                     </p>
@@ -455,6 +429,8 @@
                                 <strong style="color: #012E40;">What We'll Do:</strong>
                                 <span style="color: #012E40;"> Walk you through the setup on a quick call (~10-15 minutes). We'll handle all the technical parts.</span>
                             </div>
+                    </div>
+                </div>
                         </div>
                         <div style="display: flex; gap: 10px; align-items: start;">
                             <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✗</span>
@@ -509,8 +485,13 @@
             </div>
             <div class="step-content">
                 <!-- Educational Context -->
-                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C;">
-                    <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">📊 Why This Matters</h4>
+                <div class="why-matters-box" style="background: #E8F5F3; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #05908C; overflow: hidden;">
+                    <div class="why-matters-header" onclick="toggleWhyMatters(this)" style="padding: 15px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                        <h4 style="color: #012E40; margin: 0; font-size: 1rem;">📊 Why This Matters</h4>
+                        <span class="why-matters-toggle" style="color: #05908C; font-size: 1.2rem; transition: transform 0.3s ease;">▼</span>
+                    </div>
+                    <div class="why-matters-content" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+                        <div style="padding: 0 20px 20px 20px;">
                     <p style="color: #012E40; margin-bottom: 15px; line-height: 1.6;">
                         Tracking pixels let us see which ads are working and which aren't. This is how we optimize your campaigns to get better results over time!
                     </p>
@@ -521,6 +502,8 @@
                                 <strong style="color: #012E40;">What We'll Do:</strong>
                                 <span style="color: #012E40;"> Install Google Analytics 4 and Meta Pixel to track form submissions, calls, and key actions on your website</span>
                             </div>
+                    </div>
+                </div>
                         </div>
                         <div style="display: flex; gap: 10px; align-items: start;">
                             <span style="color: #05908C; font-weight: 700; font-size: 1.2rem;">✗</span>
@@ -681,23 +664,14 @@
                 
                 <div style="margin: 20px 0;">
                     <button class="btn btn-secondary" onclick="window.approveCreatives()">
-                        🚀 Approve to Launch
+                        Approve to Launch
                     </button>
-                    <button class="btn btn-outline" onclick="window.requestRevisions()">
+                    <button class="btn btn-outline" onclick="window.openRevisionModal()">
                         Request Revisions
                     </button>
                 </div>
                 
-                <!-- Revision Form (hidden) -->
-                <div id="revisionForm" style="display: none; background: #DFF5F3; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #85C7B3;">
-                    <h4 style="color: #012E40;">Request Revisions</h4>
-                    <div class="form-group">
-                        <label for="revisionNotes">Revision Notes</label>
-                        <textarea id="revisionNotes" rows="4" placeholder="Please describe the changes..."></textarea>
-                    </div>
-                    <button class="btn" onclick="window.submitRevisions()">Submit Revisions</button>
                 </div>
-            </div>
             <div class="step-actions">
                 <button class="btn btn-complete" onclick="window.markStepComplete(6)">Mark Step 6 Complete</button>
             </div>
@@ -727,5 +701,422 @@
 
     <!-- Main Functions -->
     <script src="client-functions.js"></script>
+
 </body>
+
+<!-- Revision Request Modal -->
+<div id="revisionModal" style="
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(1, 46, 64, 0.9);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 20px;
+">
+    <div style="
+        background: white;
+        border-radius: 16px;
+        max-width: 700px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    ">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #012E40 0%, #05908C 100%); padding: 24px; border-radius: 16px 16px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; color: white; font-size: 1.4rem; font-weight: 700;">
+                Request Creative Revisions
+            </h3>
+            <button onclick="closeRevisionModal()" style="background: none; border: none; font-size: 2rem; cursor: pointer; color: white; padding: 0; line-height: 1;">&times;</button>
+        </div>
+
+        <!-- Content -->
+        <div style="padding: 30px;">
+            <p style="color: #6b7280; margin-bottom: 24px; font-size: 1rem;">
+                Select the changes you need and provide details. We'll review and get back to you within 2-3 business days.
+            </p>
+
+            <form id="revisionRequestForm" onsubmit="submitRevisionRequest(event)">
+                <!-- Quick Picks -->
+                <div style="margin-bottom: 24px;">
+                    <h4 style="color: #012E40; margin-bottom: 16px; font-size: 1.1rem;">What needs to change? (Select all that apply)</h4>
+                    
+                    <!-- Headlines & Copy -->
+                    <div style="background: #E8F5F3; padding: 16px; border-radius: 10px; margin-bottom: 16px;">
+                        <h5 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">Headlines & Copy</h5>
+                        <div style="display: grid; gap: 10px;">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="headline-wording" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Change headline wording</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="headline-shorter" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Make it shorter/punchier</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="headline-longer" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Make it more descriptive</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="cta-button" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Change call-to-action button</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="spelling-grammar" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Fix spelling/grammar</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Images & Photos -->
+                    <div style="background: #FEF3C7; padding: 16px; border-radius: 10px; margin-bottom: 16px;">
+                        <h5 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">Images & Photos</h5>
+                        <div style="display: grid; gap: 10px;">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="different-image" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Try a different image</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="image-doesnt-represent" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Image doesn't represent my business</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="use-my-photos" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Use my own photos instead</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="show-people" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Show people/lifestyle vs product</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Colors & Branding -->
+                    <div style="background: #FCE7F3; padding: 16px; border-radius: 10px; margin-bottom: 16px;">
+                        <h5 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">Colors & Branding</h5>
+                        <div style="display: grid; gap: 10px;">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="exact-brand-colors" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Use my exact brand colors</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="logo-adjustment" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Logo needs adjustment</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="colors-dont-pop" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Colors don't pop enough</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Overall Design -->
+                    <div style="background: #DFF5F3; padding: 16px; border-radius: 10px;">
+                        <h5 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">Overall Design</h5>
+                        <div style="display: grid; gap: 10px;">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="too-busy" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Too busy - simplify it</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="too-plain" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Too plain - add more interest</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="doesnt-feel-like-brand" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Doesn't feel like my brand</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" name="change" value="not-eye-catching" style="width: 18px; height: 18px;">
+                                <span style="color: #012E40;">Not eye-catching enough</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Notes -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; color: #012E40; font-weight: 600; margin-bottom: 8px;">
+                        Additional notes:
+                    </label>
+                    <textarea id="revisionNotes" rows="5" style="
+                        width: 100%;
+                        padding: 12px;
+                        border: 2px solid #d1d5db;
+                        border-radius: 8px;
+                        font-family: inherit;
+                        font-size: 1rem;
+                        resize: vertical;
+                    " placeholder="Add any specific details here... (e.g., 'Make headline more action-oriented like Get Your Free Quote Today')"></textarea>
+                    <small style="color: #6b7280; margin-top: 6px; display: block;">
+                        Tip: Be specific! "Make headline more action-oriented" is better than "change the text"
+                    </small>
+                </div>
+
+                <!-- File Upload -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; color: #012E40; font-weight: 600; margin-bottom: 8px;">
+                        Upload reference images (optional):
+                    </label>
+                    <div style="
+                        border: 2px dashed #d1d5db;
+                        border-radius: 8px;
+                        padding: 30px;
+                        text-align: center;
+                        background: #f9fafb;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    " id="dropZone">
+                        <input type="file" id="revisionFiles" multiple accept="image/*,.pdf" style="display: none;" onchange="handleFileSelect(this)">
+                        <div style="color: #6b7280;">
+                            <div style="font-size: 2rem; margin-bottom: 8px;">File Upload</div>
+                            <p style="margin-bottom: 4px; font-weight: 600;">Click to upload or drag & drop</p>
+                            <small>Images (JPG, PNG) or PDF • Max 10MB per file • Up to 5 files</small>
+                        </div>
+                    </div>
+                    <div id="fileList" style="margin-top: 12px;"></div>
+                </div>
+
+                <!-- Timeline -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; color: #012E40; font-weight: 600; margin-bottom: 8px;">
+                        Timeline:
+                    </label>
+                    <div style="display: grid; gap: 10px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="radio" name="timeline" value="standard" checked style="width: 18px; height: 18px;">
+                            <span style="color: #012E40;">Standard (2-3 business days) Recommended</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="radio" name="timeline" value="rush" style="width: 18px; height: 18px;">
+                            <span style="color: #012E40;">Rush - let's discuss</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="radio" name="timeline" value="no-rush" style="width: 18px; height: 18px;">
+                            <span style="color: #012E40;">No rush</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div style="display: flex; gap: 12px; margin-top: 30px;">
+                    <button type="button" onclick="closeRevisionModal()" style="
+                        flex: 1;
+                        padding: 14px 24px;
+                        background: white;
+                        border: 2px solid #d1d5db;
+                        border-radius: 10px;
+                        font-weight: 600;
+                        font-size: 1rem;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    ">Cancel</button>
+                    <button type="submit" style="
+                        flex: 1;
+                        padding: 14px 24px;
+                        background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 10px;
+                        font-weight: 600;
+                        font-size: 1rem;
+                        cursor: pointer;
+                        box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3);
+                        transition: all 0.2s ease;
+                    ">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Open revision modal
+function openRevisionModal() {
+    document.getElementById('revisionModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
+}
+
+// Close revision modal
+function closeRevisionModal() {
+    document.getElementById('revisionModal').style.display = 'none';
+    document.body.style.overflow = 'auto'; // Restore scroll
+}
+
+// Handle file selection
+let selectedFiles = [];
+function handleFileSelect(input) {
+    const files = Array.from(input.files);
+    const fileList = document.getElementById('fileList');
+    
+    selectedFiles = [...selectedFiles, ...files].slice(0, 5); // Max 5 files
+    
+    fileList.innerHTML = '';
+    selectedFiles.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.style.cssText = 'display: flex; align-items: center; gap: 10px; padding: 10px; background: #E8F5F3; border-radius: 6px; margin-bottom: 8px;';
+        fileItem.innerHTML = `
+            <span style="flex: 1; color: #012E40; font-size: 0.9rem;">${file.name}</span>
+            <button onclick="removeFile(${index})" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1.2rem;" type="button">×</button>
+        `;
+        fileList.appendChild(fileItem);
+    });
+}
+
+function removeFile(index) {
+    selectedFiles.splice(index, 1);
+    const fileInput = document.getElementById('revisionFiles');
+    const dt = new DataTransfer();
+    selectedFiles.forEach(file => dt.items.add(file));
+    fileInput.files = dt.files;
+    handleFileSelect(fileInput);
+}
+
+// Drop zone functionality
+const dropZone = document.getElementById('dropZone');
+dropZone.onclick = () => document.getElementById('revisionFiles').click();
+
+dropZone.ondragover = (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = '#05908C';
+    dropZone.style.background = '#E8F5F3';
+};
+
+dropZone.ondragleave = () => {
+    dropZone.style.borderColor = '#d1d5db';
+    dropZone.style.background = '#f9fafb';
+};
+
+dropZone.ondrop = (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = '#d1d5db';
+    dropZone.style.background = '#f9fafb';
+    const fileInput = document.getElementById('revisionFiles');
+    fileInput.files = e.dataTransfer.files;
+    handleFileSelect(fileInput);
+};
+
+// Form submission will be handled by client-functions.js
+</script>
 </html>
+
+<!-- Toggle Why This Matters Script -->
+<script>
+function toggleWhyMatters(header) {
+    const content = header.nextElementSibling;
+    const toggle = header.querySelector('.why-matters-toggle');
+    
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+        // Collapse
+        content.style.maxHeight = '0';
+        toggle.style.transform = 'rotate(0deg)';
+    } else {
+        // Expand
+        content.style.maxHeight = content.scrollHeight + 'px';
+        toggle.style.transform = 'rotate(180deg)';
+    }
+}
+</script>
+
+<!-- Need Help? Floating Button -->
+<button id="needHelpBtn" style="
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 24px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(5, 144, 140, 0.4);
+    z-index: 9998;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+"
+onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(5, 144, 140, 0.5)'"
+onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(5, 144, 140, 0.4)'"
+onclick="toggleHelpPanel()">
+    <span style="font-size: 1.2rem;">🆘</span>
+    Need Help?
+</button>
+
+<!-- Help Panel (Sliding) -->
+<div id="helpPanel" style="
+    position: fixed;
+    bottom: 0;
+    right: -400px;
+    width: 380px;
+    height: auto;
+    max-height: 400px;
+    background: white;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    transition: right 0.3s ease;
+    border-radius: 12px 0 0 0;
+    display: flex;
+    flex-direction: column;
+">
+    <!-- Help Header -->
+    <div style="background: linear-gradient(135deg, #012E40 0%, #05908C 100%); padding: 20px; border-radius: 12px 0 0 0; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; color: white; font-size: 1.2rem; font-weight: 600;">
+            <span style="font-size: 1.5rem; margin-right: 8px;">🆘</span>
+            Need Help?
+        </h3>
+        <button onclick="toggleHelpPanel()" style="background: none; border: none; font-size: 1.8rem; cursor: pointer; color: white; padding: 0; line-height: 1;">&times;</button>
+    </div>
+
+    <!-- Help Content -->
+    <div style="padding: 30px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: linear-gradient(135deg, #E8F5F3 0%, #ffffff 100%);">
+        <div style="font-size: 3rem; margin-bottom: 20px;">📞</div>
+        <h4 style="color: #012E40; font-size: 1.3rem; margin-bottom: 12px; font-weight: 700;">
+            Call Nicolas for Assistance
+        </h4>
+        <a href="tel:678-650-6411" style="
+            color: #05908C;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            margin-bottom: 16px;
+            padding: 12px 24px;
+            border: 2px solid #05908C;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            display: inline-block;
+        "
+        onmouseover="this.style.background='#05908C'; this.style.color='white'"
+        onmouseout="this.style.background='transparent'; this.style.color='#05908C'">
+            678-650-6411
+        </a>
+        <p style="color: #6b7280; font-size: 0.9rem; line-height: 1.6; margin-top: 12px;">
+            Available to help you through the onboarding process
+        </p>
+    </div>
+</div>
+
+<script>
+function toggleHelpPanel() {
+    const panel = document.getElementById('helpPanel');
+    const btn = document.getElementById('needHelpBtn');
+    
+    if (panel.style.right === '0px') {
+        // Close panel
+        panel.style.right = '-400px';
+        btn.style.display = 'flex';
+    } else {
+        // Open panel
+        panel.style.right = '0px';
+        btn.style.display = 'none';
+    }
+}
+</script>

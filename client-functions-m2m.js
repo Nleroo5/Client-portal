@@ -251,7 +251,7 @@
 
                 const btn = step.querySelector('.btn-complete');
                 if (btn) {
-                    btn.textContent = isCompleted ? `✓ Step ${i} Completed` : `Mark Step ${i} Complete`;
+                    btn.textContent = isCompleted ? `Step ${i} Completed` : `Mark Step ${i} Complete`;
                     if (isCompleted) btn.setAttribute('disabled', 'true');
                     else btn.removeAttribute('disabled');
                 }
@@ -282,21 +282,154 @@
                 step.style.boxShadow = '0 0 50px rgba(34, 197, 94, 0.8)';
                 setTimeout(() => {
                     updateStepStates();
+
+                    // Scroll to next step (or top if step 6)
+                    if (stepNum < 6) {
+                        const nextStep = document.getElementById(`step${stepNum + 1}`);
+                        if (nextStep) {
+                            nextStep.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    } else {
+                        // Step 6 - scroll to top for celebration
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    }
                 }, 200);
             }, 10);
         } else {
             updateStepStates();
+
+            // Scroll to next step (or top if step 6)
+            if (stepNum < 6) {
+                const nextStep = document.getElementById(`step${stepNum + 1}`);
+                if (nextStep) {
+                    nextStep.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            } else {
+                // Step 6 - scroll to top for celebration
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
         }
 
-        // Check if all complete
+        // Check if all complete (especially step 6)
         const allComplete = [1,2,3,4,5,6].every(n => portalState[n.toString()]);
-        if (allComplete) {
-            const successMsg = document.getElementById('successMessage');
-            if (successMsg) {
-                setTimeout(() => {
-                    successMsg.style.display = 'block';
-                }, 1000);
-            }
+        if (stepNum === 6 || allComplete) {
+            // Show celebration for final step completion
+            setTimeout(() => {
+                showFinalCelebration();
+            }, 1000);
+        }
+    }
+
+    // Final celebration when step 6 is completed
+    function showFinalCelebration() {
+        // Create full-screen celebration overlay
+        const celebrationDiv = document.createElement('div');
+        celebrationDiv.id = 'finalCelebration';
+        celebrationDiv.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(1, 46, 64, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        `;
+
+        celebrationDiv.innerHTML = `
+            <div style="text-align: center; color: white; max-width: 600px; padding: 40px;">
+                <div style="font-size: 6rem; margin-bottom: 20px; animation: bounce 1s infinite;">🎉</div>
+                <h1 style="font-family: 'Young Serif', serif; font-size: 3rem; margin-bottom: 20px; color: #F2A922;">
+                    Congratulations!
+                </h1>
+                <p style="font-size: 1.5rem; margin-bottom: 30px; color: #85C7B3;">
+                    You're all set and ready to launch!
+                </p>
+                <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px; color: #EEF4D9;">
+                    We'll review everything and start your campaign within 24-48 hours.
+                    You'll receive an email as soon as we're live!
+                </p>
+                <button onclick="document.getElementById('finalCelebration').remove()"
+                        style="background: linear-gradient(135deg, #F2A922 0%, #05908C 100%);
+                               color: white;
+                               border: none;
+                               padding: 15px 40px;
+                               font-size: 1.1rem;
+                               font-weight: 600;
+                               border-radius: 10px;
+                               cursor: pointer;
+                               box-shadow: 0 4px 15px rgba(242, 169, 34, 0.4);
+                               transition: transform 0.2s;">
+                    Continue to Portal
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(celebrationDiv);
+
+        // Fade in
+        setTimeout(() => {
+            celebrationDiv.style.opacity = '1';
+        }, 10);
+
+        // Trigger confetti burst
+        triggerCelebrationConfetti();
+
+        // Scroll to top
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+        // Show success message too
+        const successMsg = document.getElementById('successMessage');
+        if (successMsg) {
+            setTimeout(() => {
+                successMsg.style.display = 'block';
+            }, 3000);
+        }
+    }
+
+    // Trigger multiple confetti bursts for celebration
+    function triggerCelebrationConfetti() {
+        const colors = ['#F2A922', '#85C7B3', '#05908C', '#EEF4D9'];
+
+        // Create 5 bursts with slight delays
+        for (let burst = 0; burst < 5; burst++) {
+            setTimeout(() => {
+                for (let i = 0; i < 30; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti-particle';
+                    confetti.style.position = 'fixed';
+                    confetti.style.left = '50%';
+                    confetti.style.top = '30%';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.pointerEvents = 'none';
+                    confetti.style.zIndex = '9999';
+
+                    const angle = (Math.PI * 2 * i) / 30;
+                    const velocity = 100 + Math.random() * 100;
+                    confetti.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
+                    confetti.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
+
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 2000);
+                }
+            }, burst * 200);
         }
     }
 
@@ -507,6 +640,134 @@
         window.open(`mailto:${APP_SETTINGS.support.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(notes)}`);
     }
 
+    // Submit Revision Request from Modal
+    window.submitRevisionRequest = async function(event) {
+        event.preventDefault();
+
+        if (!window.currentClientId) {
+            alert('Error: Client ID not found');
+            return;
+        }
+
+        // Collect selected changes
+        const selectedChanges = [];
+        document.querySelectorAll('input[name="change"]:checked').forEach(checkbox => {
+            selectedChanges.push(checkbox.value);
+        });
+
+        // Get additional notes
+        const notes = document.getElementById('revisionNotes').value.trim();
+
+        // Get timeline
+        const timeline = document.querySelector('input[name="timeline"]:checked')?.value || 'standard';
+
+        // Validate: must have at least one change selected or notes
+        if (selectedChanges.length === 0 && !notes) {
+            alert('Please select at least one change or add notes about what you\'d like revised.');
+            return;
+        }
+
+        try {
+            // Show loading state on submit button
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            // Upload files to Firebase Storage
+            const uploadedFileUrls = [];
+            const fileInput = document.getElementById('revisionFiles');
+
+            if (fileInput && fileInput.files.length > 0) {
+                const storageRef = firebase.storage().ref();
+
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    const file = fileInput.files[i];
+                    const fileName = `${Date.now()}-${file.name}`;
+                    const fileRef = storageRef.child(`revisions/${window.currentClientId}/${fileName}`);
+
+                    await fileRef.put(file);
+                    const fileUrl = await fileRef.getDownloadURL();
+
+                    uploadedFileUrls.push({
+                        name: file.name,
+                        url: fileUrl,
+                        size: file.size,
+                        type: file.type
+                    });
+                }
+            }
+
+            // Get client data for notification
+            const clientDoc = await db.collection('clients').doc(window.currentClientId).get();
+            const clientData = clientDoc.data();
+            const clientName = clientData.clientName || 'Client';
+
+            // Save revision request to Firestore
+            await db.collection('revisionRequests').add({
+                clientId: window.currentClientId,
+                clientName: clientName,
+                selectedChanges: selectedChanges,
+                notes: notes,
+                timeline: timeline,
+                attachments: uploadedFileUrls,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                resolvedAt: null
+            });
+
+            // Update client document to indicate pending revision
+            await db.collection('clients').doc(window.currentClientId).update({
+                hasPendingRevision: true,
+                lastRevisionRequestAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // Create notification for admin
+            if (window.createNotification) {
+                await window.createNotification({
+                    type: 'REVISION_REQUEST',
+                    recipientId: 'admin',
+                    recipientType: 'admin',
+                    message: `${clientName} requested creative revisions`,
+                    actionUrl: `admin.html?tab=clients`,
+                    relatedId: window.currentClientId,
+                    metadata: {
+                        clientName: clientName,
+                        changeCount: selectedChanges.length,
+                        hasNotes: !!notes,
+                        hasAttachments: uploadedFileUrls.length > 0,
+                        timeline: timeline
+                    }
+                });
+                console.log('Admin notification created for revision request');
+            }
+
+            // Close modal and show success
+            closeRevisionModal();
+
+            // Show success message
+            alert('Revision request submitted successfully! We\'ll review your feedback and get back to you within 2-3 business days.');
+
+            // Reset form
+            document.getElementById('revisionRequestForm').reset();
+            selectedFiles = [];
+            document.getElementById('fileList').innerHTML = '';
+
+            // Restore button
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+
+        } catch (error) {
+            console.error('Error submitting revision request:', error);
+            alert('Error submitting revision request. Please try again or contact support.');
+
+            // Restore button
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Request 🚀';
+        }
+    };
+
     // Initialize on DOM ready
     document.addEventListener('DOMContentLoaded', async function() {
         await loadSettings(); // Load settings from Firestore first
@@ -567,7 +828,7 @@
             }
         });
 
-        console.log('✓ Month-to-Month Portal initialized successfully with Firebase');
+        console.log('Month-to-Month Portal initialized successfully with Firebase');
     });
 
     // ===== CLIENT MESSAGING SYSTEM =====
