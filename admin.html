@@ -4432,14 +4432,22 @@
             });
 
             // Load client data for all linked deals
-            loadClientDataForDeals(deals);
+            await loadClientDataForDeals(deals);
         }
 
-        // Load client data for deals with linked portals
+        // Load client data for deals with linked portals - OPTIMIZED FOR PARALLEL LOADING
         async function loadClientDataForDeals(deals) {
             const dealsWithClients = deals.filter(d => d.clientPortalId);
 
-            for (const deal of dealsWithClients) {
+            if (dealsWithClients.length === 0) {
+                console.log('📊 No deals with linked clients to load');
+                return;
+            }
+
+            console.log(`📊 Loading client data for ${dealsWithClients.length} deals...`);
+
+            // Load all clients in parallel instead of sequentially
+            const clientPromises = dealsWithClients.map(async (deal) => {
                 try {
                     const clientDoc = await db.collection('clients').doc(deal.clientPortalId).get();
 
@@ -4498,8 +4506,27 @@
                         if (virtualInfo) virtualInfo.innerHTML = errorHTML;
                     }
                 } catch (error) {
-                    console.error('Error loading client data for deal:', error);
+                    console.error(`❌ Error loading client data for deal ${deal.id}:`, error);
+
+                    // Show error in UI
+                    const compressedInfo = document.querySelector(`#client-info-compressed-${deal.id} .client-portal-data`);
+                    const fullInfo = document.querySelector(`#client-info-full-${deal.id} .client-portal-data`);
+                    const virtualInfo = document.querySelector(`#client-info-virtual-${deal.id} .client-portal-data`);
+
+                    const errorHTML = '<div style="color: #991b1b; font-size: 0.7rem;">⚠️ Error loading</div>';
+                    if (compressedInfo) compressedInfo.innerHTML = errorHTML;
+                    if (fullInfo) fullInfo.innerHTML = errorHTML;
+                    if (virtualInfo) virtualInfo.innerHTML = errorHTML;
                 }
+            });
+
+            // Wait for all client data to load in parallel
+            try {
+                await Promise.all(clientPromises);
+                console.log(`✅ Successfully loaded client data for ${dealsWithClients.length} deals`);
+            } catch (error) {
+                console.error('❌ Error loading some client data:', error);
+                // Individual errors are already handled above, this is just for logging
             }
         }
 
