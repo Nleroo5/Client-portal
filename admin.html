@@ -1709,7 +1709,7 @@
                 if (document.getElementById('archivedDealsSection').style.display !== 'none') {
                     loadAdminArchivedDeals();
                 }
-
+            }
         }
 
         // Load Dashboard Data
@@ -2995,7 +2995,7 @@
             document.getElementById('avgDealSize').textContent = `$${Math.round(avgDeal).toLocaleString()}`;
         }
 
-        // Load CRM and Website Forms when switching tabs
+        // Load CRM, Website Forms, and CMS Clients when switching tabs
         const originalSwitchAdminTab = switchAdminTab;
         switchAdminTab = function(tabName) {
             originalSwitchAdminTab(tabName);
@@ -3003,6 +3003,8 @@
                 loadCRMPipeline();
             } else if (tabName === 'website-forms') {
                 loadWebsiteQuotes();
+            } else if (tabName === 'cms-clients') {
+                loadCMSClients();
             }
         };
 
@@ -4658,15 +4660,6 @@ Start with Phase 1 and work through systematically. Show your progress after eac
                 document.getElementById('cmsClientsList').innerHTML = '<p style="color: #dc2626;">Error loading clients</p>';
             }
         }
-
-        // Load CMS clients when tab is opened
-        const originalSwitchTab = switchAdminTab;
-        switchAdminTab = function(tab) {
-            originalSwitchTab(tab);
-            if (tab === 'cms-clients') {
-                loadCMSClients();
-            }
-        };
 
     </script>
 
