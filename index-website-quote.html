@@ -879,8 +879,17 @@
                 <p class="section-description">Share examples of websites you admire</p>
 
                 <div class="form-group">
-                    <label for="favoriteWebsiteUrl">Your Favorite Website (Reference Website) *</label>
-                    <input type="url" id="favoriteWebsiteUrl" required placeholder="https://www.example.com">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label>Reference Websites *</label>
+                        <button type="button" onclick="addReferenceWebsite()" style="background: linear-gradient(135deg, #05908C 0%, #47a5a3 100%); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(5, 144, 140, 0.3); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">+</button>
+                    </div>
+                    <div id="referenceWebsitesContainer">
+                        <div class="reference-website-entry" data-index="0">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="url" class="favoriteWebsiteUrl" data-index="0" required placeholder="https://www.example.com" style="flex: 1;">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -1095,7 +1104,7 @@
                 <div class="form-group">
                     <label for="logoFile">Your Logo File * (PNG preferred)</label>
                     <input type="file" id="logoFile" accept="image/png,image/jpeg,image/svg+xml" style="padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; width: 100%;">
-                    <span class="helper-text">Upload your logo file (PNG, JPG, or SVG)</span>
+                    <span class="helper-text">PNG with transparent background works best (recommended: 500x500px or larger)</span>
                     <div id="logoPreview" style="margin-top: 15px; display: none;">
                         <img id="logoPreviewImg" style="max-width: 200px; max-height: 100px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px;">
                         <p id="logoFileName" style="margin-top: 8px; font-size: 0.9rem; color: #6b7280;"></p>
@@ -1804,47 +1813,21 @@
             <!-- Completion Screen -->
             <div class="completion-screen" id="completionScreen">
                 <div class="completion-icon">✓</div>
-                <h2>Thank You!</h2>
-                <p style="margin-bottom: 30px;">We've received your discovery form. Our team will review your information and be in touch shortly with a detailed quote.</p>
+                <h2 id="completionClientName">Thank You!</h2>
+                <p style="margin-bottom: 30px; font-size: 1.1rem; line-height: 1.8; color: #012E40;">
+                    Your website discovery form has been submitted successfully.
+                </p>
+                <p style="margin-bottom: 40px; font-size: 1.05rem; line-height: 1.8; color: #374151;">
+                    Nicolas and the Drive Lead Media team will review your project details and reach out shortly to discuss your vision.
+                </p>
 
-                <!-- Ballpark Quote Estimate -->
-                <div id="ballparkQuote" style="background: linear-gradient(135deg, #E8F5F3 0%, #DFF5F3 100%); border: 2px solid #05908C; border-radius: 16px; padding: 30px; margin: 30px 0; box-shadow: 0 4px 16px rgba(5, 144, 140, 0.2);">
-                    <h3 style="color: #012E40; margin-bottom: 15px; font-size: 1.3rem;">📊 Estimated Project Range</h3>
-                    <p style="color: #000000; margin-bottom: 20px; line-height: 1.6;">Based on your answers, here's a ballpark estimate for your website project:</p>
-
-                    <div style="background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; text-align: center; border: 2px solid #05908C;">
-                        <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Estimated Cost</div>
-                        <div id="estimatedCost" style="font-size: 2.5rem; font-weight: 700; color: #012E40; margin-bottom: 10px;">$5,000 - $8,000</div>
-                        <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Timeline</div>
-                        <div id="estimatedTimeline" style="font-size: 1.5rem; font-weight: 600; color: #05908C;">3-4 weeks</div>
-                    </div>
-
-                    <div style="background: rgba(242, 169, 34, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #F2A922; margin-bottom: 15px;">
-                        <p style="color: #000000; margin: 0; font-size: 0.9rem; line-height: 1.6;">
-                            <strong>Please note:</strong> This is a rough estimate based on typical projects with similar requirements. Your actual quote may vary based on specific customizations and complexity.
-                        </p>
-                    </div>
-
-                    <div id="estimateBreakdown" style="background: white; border-radius: 8px; padding: 20px; margin-top: 15px;">
-                        <h4 style="color: #012E40; margin-bottom: 12px; font-size: 1rem;">What's Included:</h4>
-                        <div id="breakdownList" style="color: #000000; line-height: 2;">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </div>
+                <div style="background: linear-gradient(135deg, #E8F5F3 0%, #DFF5F3 100%); border: 2px solid #05908C; border-radius: 16px; padding: 30px; margin: 30px auto; max-width: 500px; box-shadow: 0 4px 16px rgba(5, 144, 140, 0.2);">
+                    <h4 style="color: #012E40; margin-bottom: 15px; font-size: 1.1rem;">Questions in the meantime?</h4>
+                    <p style="color: #05908C; font-weight: 600; font-size: 1.05rem; margin-bottom: 5px;">Nicolas Leroo</p>
+                    <p style="color: #374151; margin-bottom: 0;">
+                        <a href="mailto:nicolas@driveleadmedia.com" style="color: #05908C; text-decoration: none; font-weight: 500;">nicolas@driveleadmedia.com</a>
+                    </p>
                 </div>
-
-                <div style="background: #E8F5F3; padding: 20px; border-radius: 10px; border-left: 4px solid #05908C; margin-top: 20px;">
-                    <h4 style="color: #012E40; margin-bottom: 10px;">🎯 Next Steps</h4>
-                    <ol style="color: #000000; margin-left: 20px; line-height: 1.8;">
-                        <li>We'll review your full discovery form</li>
-                        <li>Prepare a detailed, itemized proposal</li>
-                        <li>Schedule a call to walk through everything</li>
-                        <li>Answer any questions you have</li>
-                    </ol>
-                    <p style="color: #05908C; font-weight: 600; margin-top: 15px; margin-bottom: 0;">Expect to hear from us within 48 hours!</p>
-                </div>
-
-                <p style="color: #05908C; font-weight: 600; margin-top: 25px;">Check your email for confirmation.</p>
             </div>
         </div>
     </div>
