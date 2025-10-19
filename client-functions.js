@@ -492,10 +492,10 @@
         if (service12 && serviceBtn) {
             if (service12.checked) {
                 serviceBtn.textContent = 'Sign Service Agreement (12-month)';
-                serviceBtn.href = portalState.docuSignLinks?.service12 || APP_SETTINGS.docuSign.service12;
+                serviceBtn.href = portalState.docuSignLinks?.service12 || APP_SETTINGS?.docuSign?.service12 || '#';
             } else {
                 serviceBtn.textContent = 'Sign Service Agreement (6-month)';
-                serviceBtn.href = portalState.docuSignLinks?.service6 || APP_SETTINGS.docuSign.service6;
+                serviceBtn.href = portalState.docuSignLinks?.service6 || APP_SETTINGS?.docuSign?.service6 || '#';
             }
             updatePaymentOptions();
         }
@@ -526,7 +526,7 @@
             if (portalState.stripeLinks?.[serviceTerm]?.[paymentType]) {
                 paymentLink = portalState.stripeLinks[serviceTerm][paymentType];
             } else {
-                paymentLink = APP_SETTINGS.stripeLinks[serviceTerm][paymentType];
+                paymentLink = APP_SETTINGS?.stripeLinks?.[serviceTerm]?.[paymentType] || '#';
             }
             stripeBtn.href = paymentLink;
         }
@@ -750,7 +750,8 @@
             return;
         }
         const subject = 'Creative Revision Request';
-        window.open(`mailto:${APP_SETTINGS.support.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(notes)}`);
+        const supportEmail = APP_SETTINGS?.support?.email || 'nicolas@driveleadmedia.com';
+        window.open(`mailto:${supportEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(notes)}`);
     }
 
     // Submit Revision Request from Modal
@@ -889,8 +890,10 @@
         
         // Set default DocuSign DPA link if no custom link
         const dpaBtn = document.getElementById('dpaBtn');
-        if (dpaBtn && !portalState.docuSignLinks?.dpa) {
-            dpaBtn.href = APP_SETTINGS.docuSign.dpa;
+        if (dpaBtn && portalState.docuSignLinks && !portalState.docuSignLinks.dpa) {
+            if (APP_SETTINGS?.docuSign?.dpa) {
+                dpaBtn.href = APP_SETTINGS.docuSign.dpa;
+            }
         }
         
         // Initialize Service Agreement
@@ -899,8 +902,8 @@
         // Set contact info
         const contactEmail = document.getElementById('contactEmail');
         const contactPhone = document.getElementById('contactPhone');
-        if (contactEmail) contactEmail.textContent = APP_SETTINGS.support.email;
-        if (contactPhone) contactPhone.textContent = APP_SETTINGS.support.phone;
+        if (contactEmail) contactEmail.textContent = APP_SETTINGS?.support?.email || 'nicolas@driveleadmedia.com';
+        if (contactPhone) contactPhone.textContent = APP_SETTINGS?.support?.phone || '(555) 123-4567';
         
         // Event listeners
         document.querySelectorAll('input[name="serviceTerm"]').forEach(radio => {
