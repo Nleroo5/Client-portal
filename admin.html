@@ -2615,9 +2615,50 @@
             return '📁';
         }
 
-        // Download file - opens in new tab (user can right-click to save)
-        window.downloadFile = function(url, filename) {
-            window.open(url, '_blank');
+        // Download file using Firebase Storage with proper headers
+        window.downloadFile = async function(url, filename) {
+            try {
+                // Get storage reference from URL
+                const storageRef = firebase.storage().refFromURL(url);
+
+                // Get metadata to determine content type
+                const metadata = await storageRef.getMetadata();
+
+                // Fetch the file as blob with proper CORS
+                const xhr = new XMLHttpRequest();
+                xhr.responseType = 'blob';
+
+                xhr.onload = function() {
+                    // Create blob URL
+                    const blob = xhr.response;
+                    const blobUrl = window.URL.createObjectURL(blob);
+
+                    // Create download link
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = filename || metadata.name || 'download';
+                    document.body.appendChild(a);
+                    a.click();
+
+                    // Cleanup
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(blobUrl);
+                    }, 100);
+                };
+
+                xhr.onerror = function() {
+                    console.error('Download failed, opening in new tab');
+                    window.open(url, '_blank');
+                };
+
+                xhr.open('GET', url);
+                xhr.send();
+
+            } catch (error) {
+                console.error('Error downloading:', error);
+                window.open(url, '_blank');
+            }
         };
 
         // Load existing clients
@@ -2704,9 +2745,9 @@
                                                 <a href="${data.brandLogoUrl}" target="_blank" style="padding: 3px 8px; background: #e8f5f3; color: #05908C; border-radius: 4px; font-size: 0.65rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border: 1px solid #05908C; white-space: nowrap;" onmouseover="this.style.background='#d1fae5'" onmouseout="this.style.background='#e8f5f3'">
                                                     👁️ Preview
                                                 </a>
-                                                <a href="${data.brandLogoUrl}" download="${data.clientName}-logo" target="_blank" style="padding: 3px 8px; background: #05908C; color: white; border-radius: 4px; font-size: 0.65rem; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s ease; white-space: nowrap;" onmouseover="this.style.background='#047a77'" onmouseout="this.style.background='#05908C'">
+                                                <button onclick="downloadFile('${data.brandLogoUrl}', '${data.clientName}-logo')" style="padding: 3px 8px; background: #05908C; color: white; border-radius: 4px; font-size: 0.65rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s ease; white-space: nowrap;" onmouseover="this.style.background='#047a77'" onmouseout="this.style.background='#05908C'">
                                                     📥 Download
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                     ` : ''}
@@ -2752,9 +2793,9 @@
                                                     <a href="${file.url}" target="_blank" style="padding: 4px 10px; background: #e8f5f3; color: #05908C; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; border: 1px solid #05908C;" onmouseover="this.style.background='#d1fae5'" onmouseout="this.style.background='#e8f5f3'">
                                                         👁️ Preview
                                                     </a>
-                                                    <a href="${file.url}" download="${file.name}" target="_blank" style="padding: 4px 10px; background: #05908C; color: white; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s ease;" onmouseover="this.style.background='#047a77'" onmouseout="this.style.background='#05908C'">
+                                                    <button onclick="downloadFile('${file.url}', '${file.name}')" style="padding: 4px 10px; background: #05908C; color: white; border-radius: 4px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s ease;" onmouseover="this.style.background='#047a77'" onmouseout="this.style.background='#05908C'">
                                                         📥 Download
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             `).join('')}
                                         </div>
@@ -2815,9 +2856,9 @@
                                                 <a href="${creative.url}" target="_blank" style="flex: 1; padding: 3px 6px; background: #fef3c7; color: #92400e; border-radius: 4px; font-size: 0.6rem; font-weight: 600; text-decoration: none; text-align: center; transition: all 0.2s ease; border: 1px solid #F2A922; white-space: nowrap;" onmouseover="this.style.background='#fde68a'" onmouseout="this.style.background='#fef3c7'">
                                                     👁️
                                                 </a>
-                                                <a href="${creative.url}" download="${creative.name}" target="_blank" style="flex: 1; padding: 3px 6px; background: #F2A922; color: #012E40; border-radius: 4px; font-size: 0.6rem; font-weight: 600; text-decoration: none; display: block; text-align: center; transition: all 0.2s ease; white-space: nowrap;" onmouseover="this.style.background='#f59e0b'" onmouseout="this.style.background='#F2A922'">
+                                                <button onclick="downloadFile('${creative.url}', '${creative.name}')" style="flex: 1; padding: 3px 6px; background: #F2A922; color: #012E40; border-radius: 4px; font-size: 0.6rem; font-weight: 600; text-align: center; transition: all 0.2s ease; white-space: nowrap; border: 1px solid #F2A922; cursor: pointer;" onmouseover="this.style.background='#f59e0b'" onmouseout="this.style.background='#F2A922'">
                                                     📥
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                     `).join('')}
