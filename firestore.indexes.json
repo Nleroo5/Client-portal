@@ -15,6 +15,20 @@
       ]
     },
     {
+      "collectionGroup": "website-quotes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "completedAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "revisionRequests",
       "queryScope": "COLLECTION",
       "fields": [
