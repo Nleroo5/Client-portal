@@ -4022,7 +4022,8 @@
                                           clientData.step2Complete ||
                                           clientData.step3Complete ||
                                           clientData.step4Complete ||
-                                          clientData.step5Complete;
+                                          clientData.step5Complete ||
+                                          clientData.step6Complete;
 
                         if (hasProgress) {
                             // Create a virtual deal for this client
@@ -4205,9 +4206,10 @@
                             clientData.step2Complete,
                             clientData.step3Complete,
                             clientData.step4Complete,
-                            clientData.step5Complete
+                            clientData.step5Complete,
+                            clientData.step6Complete
                         ].filter(Boolean).length;
-                        const progressPercent = Math.round((completedSteps / 5) * 100);
+                        const progressPercent = Math.round((completedSteps / 6) * 100);
 
                         // Update virtual deal cards
                         if (deal.isVirtualDeal) {
@@ -4218,7 +4220,7 @@
                                     <div style="background: #d1d5db; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 6px;">
                                         <div style="background: #05908C; height: 100%; width: ${progressPercent}%;"></div>
                                     </div>
-                                    <div style="text-align: center; margin-top: 4px; font-weight: 600;">${progressPercent}% Complete (${completedSteps}/5)</div>
+                                    <div style="text-align: center; margin-top: 4px; font-weight: 600;">${progressPercent}% Complete (${completedSteps}/6)</div>
                                 `;
                             }
                         } else {
@@ -4232,7 +4234,7 @@
                                 <div style="background: #d1d5db; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 6px;">
                                     <div style="background: #05908C; height: 100%; width: ${progressPercent}%;"></div>
                                 </div>
-                                <div style="text-align: center; margin-top: 4px; font-weight: 600;">${progressPercent}% Complete</div>
+                                <div style="text-align: center; margin-top: 4px; font-weight: 600;">${progressPercent}% Complete (${completedSteps}/6)</div>
                             `;
 
                             if (compressedInfo) compressedInfo.innerHTML = infoHTML;
