@@ -732,32 +732,6 @@
     <div class="admin-header">
         <h1 style="flex: 1; text-align: center;">Admin Dashboard</h1>
 
-        <!-- Notifications Bell -->
-        <div style="position: relative; margin-right: 20px;">
-            <button onclick="toggleNotifications()" style="background: transparent; border: none; cursor: pointer; position: relative; padding: 8px;">
-                <span style="font-size: 1.5rem;">🔔</span>
-                <span id="notificationBadge" style="display: none; position: absolute; top: 4px; right: 4px; background: #ef4444; color: white; border-radius: 10px; padding: 2px 6px; font-size: 0.7rem; font-weight: 600; min-width: 18px; text-align: center;"></span>
-            </button>
-
-            <!-- Notifications Dropdown -->
-            <div id="notificationsDropdown" style="display: none; position: absolute; right: 0; top: 45px; background: white; border: 2px solid #05908C; border-radius: 12px; width: 400px; max-height: 500px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 1000;">
-                <div style="padding: 15px; border-bottom: 2px solid #E8F5F3; background: linear-gradient(135deg, #012E40 0%, #05908C 100%); border-radius: 10px 10px 0 0;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 style="margin: 0; color: #EEF4D9; font-size: 1.1rem;">Notifications</h3>
-                        <button onclick="markAllNotificationsRead()" style="background: transparent; border: 1px solid #EEF4D9; color: #EEF4D9; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                            Mark All Read
-                        </button>
-                    </div>
-                </div>
-                <div id="notificationsList" style="padding: 10px;">
-                    <div style="text-align: center; padding: 40px 20px; color: #6b7280;">
-                        <div style="font-size: 2rem; margin-bottom: 10px;">🔔</div>
-                        <div>No new notifications</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <button class="btn-logout" onclick="logoutAdmin()">Logout</button>
     </div>
 
