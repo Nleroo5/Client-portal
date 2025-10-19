@@ -232,6 +232,9 @@
             <form class="login-form active" id="admin-form">
                 <div class="error-message" id="admin-error"></div>
 
+                <!-- Hidden email field for accessibility/password managers -->
+                <input type="email" id="admin-email-hidden" name="username" autocomplete="username" style="display: none;" tabindex="-1" aria-hidden="true">
+
                 <div class="form-group">
                     <label for="admin-name">Select Admin</label>
                     <select id="admin-name" required>
@@ -244,7 +247,7 @@
 
                 <div class="form-group">
                     <label for="admin-password">Password</label>
-                    <input type="password" id="admin-password" placeholder="Enter your password" required autocomplete="current-password">
+                    <input type="password" id="admin-password" name="password" placeholder="Enter your password" required autocomplete="current-password">
                 </div>
 
                 <button type="submit" class="btn-login">Login to Admin Dashboard</button>
@@ -253,6 +256,9 @@
             <!-- Sales Rep Login Form -->
             <form class="login-form" id="sales-rep-form">
                 <div class="error-message" id="rep-error"></div>
+
+                <!-- Hidden email field for accessibility/password managers -->
+                <input type="email" id="rep-email-hidden" name="username" autocomplete="username" style="display: none;" tabindex="-1" aria-hidden="true">
 
                 <div class="form-group">
                     <label for="rep-name">Select Your Name</label>
@@ -263,7 +269,7 @@
 
                 <div class="form-group">
                     <label for="rep-password">Password</label>
-                    <input type="password" id="rep-password" placeholder="Enter your password" required autocomplete="current-password">
+                    <input type="password" id="rep-password" name="password" placeholder="Enter your password" required autocomplete="current-password">
                 </div>
 
                 <button type="submit" class="btn-login">Login to Sales Dashboard</button>
@@ -450,6 +456,25 @@
                 errorDiv.style.display = 'none';
             }, 5000);
         }
+
+        // Update hidden email fields when user selects their name (for password managers)
+        document.getElementById('admin-name').addEventListener('change', (e) => {
+            document.getElementById('admin-email-hidden').value = e.target.value;
+        });
+
+        document.getElementById('rep-name').addEventListener('change', async (e) => {
+            const repId = e.target.value;
+            if (repId) {
+                try {
+                    const doc = await db.collection('salesReps').doc(repId).get();
+                    if (doc.exists) {
+                        document.getElementById('rep-email-hidden').value = doc.data().email || '';
+                    }
+                } catch (error) {
+                    console.error('Error fetching rep email:', error);
+                }
+            }
+        });
 
         // Auto-focus admin name dropdown on page load
         document.addEventListener('DOMContentLoaded', () => {
