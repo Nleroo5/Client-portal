@@ -1763,7 +1763,7 @@
         }
 
         // Switch between admin tabs
-        function switchAdminTab(tabName) {
+        window.switchAdminTab = function(tabName) {
             // Update active tab button
             document.querySelectorAll('.admin-tab').forEach(tab => {
                 tab.classList.remove('active');
@@ -4256,7 +4256,7 @@
                 });
 
                 // Render pipeline board
-                renderPipelineBoard(deals);
+                await renderPipelineBoard(deals);
 
                 // Update metrics
                 updateMetrics(deals);
@@ -4395,7 +4395,7 @@
         }
 
         // Render pipeline board
-        function renderPipelineBoard(deals) {
+        async function renderPipelineBoard(deals) {
             // Render to Sales Pipeline tab only
             const board = document.getElementById('crmPipelineBoard');
             if (!board) return;
