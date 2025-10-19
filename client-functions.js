@@ -1489,12 +1489,22 @@
         if (gallery) gallery.style.display = 'block';
 
         if (grid) {
-            grid.innerHTML = creatives.map((creative, index) => `
+            grid.innerHTML = creatives.map((creative, index) => {
+                const isVideo = creative.type && creative.type.startsWith('video/');
+
+                return `
                 <div style="background: white; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.06); transition: all 0.3s ease;">
-                    <img src="${creative.url}" alt="${creative.name}" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block;">
+                    ${isVideo ? `
+                        <div style="position: relative; width: 100%; aspect-ratio: 1/1; background: #000;">
+                            <video src="${creative.url}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></video>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.5rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); pointer-events: none;">▶️</div>
+                        </div>
+                    ` : `
+                        <img src="${creative.url}" alt="${creative.name}" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block;">
+                    `}
                     <div style="padding: 4px;">
-                        <div style="color: #012E40; font-weight: 600; font-size: 0.6rem; margin-bottom: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${creative.name || `Creative ${index + 1}`}</div>
-                        <div style="color: #6b7280; font-size: 0.55rem; margin-bottom: 4px;">${creative.type || 'Image'}</div>
+                        <div style="color: #012E40; font-weight: 600; font-size: 0.6rem; margin-bottom: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${isVideo ? '🎬 ' : ''}${creative.name || `Creative ${index + 1}`}</div>
+                        <div style="color: #6b7280; font-size: 0.55rem; margin-bottom: 4px;">${isVideo ? 'Video' : (creative.type || 'Image')}</div>
                         <div style="display: flex; gap: 2px;">
                             <button onclick="window.openLightbox(${index})" style="flex: 1; padding: 3px 4px; background: #E8F5F3; color: #05908C; border: 1px solid #05908C; border-radius: 2px; font-size: 0.6rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='#D1F2EB'" onmouseout="this.style.background='#E8F5F3'">
                                 👁️
@@ -1505,7 +1515,8 @@
                         </div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Store creatives globally for lightbox
@@ -1516,6 +1527,9 @@
     window.openLightbox = function(index) {
         const creatives = window.currentCreatives;
         if (!creatives || !creatives[index]) return;
+
+        const creative = creatives[index];
+        const isVideo = creative.type && creative.type.startsWith('video/');
 
         const lightbox = document.createElement('div');
         lightbox.id = 'creativeLightbox';
@@ -1536,9 +1550,15 @@
         lightbox.innerHTML = `
             <div style="position: relative; max-width: 90vw; max-height: 90vh;">
                 <button onclick="window.closeLightbox()" style="position: absolute; top: -40px; right: 0; background: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">&times;</button>
-                <img src="${creatives[index].url}" alt="${creatives[index].name}" style="max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                ${isVideo ? `
+                    <video src="${creative.url}" controls autoplay style="max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                        Your browser does not support the video tag.
+                    </video>
+                ` : `
+                    <img src="${creative.url}" alt="${creative.name}" style="max-width: 100%; max-height: 90vh; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                `}
                 <div style="text-align: center; margin-top: 15px; color: white;">
-                    <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 5px;">${creatives[index].name || `Creative ${index + 1}`}</div>
+                    <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 5px;">${isVideo ? '🎬 ' : ''}${creative.name || `Creative ${index + 1}`}</div>
                     <div style="font-size: 0.9rem; opacity: 0.8;">${index + 1} of ${creatives.length}</div>
                 </div>
             </div>
