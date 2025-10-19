@@ -2416,14 +2416,14 @@
 
             const form = e.target;
             const submitBtn = form.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.textContent;
+            const originalBtnText = submitBtn?.textContent;
             const editingRepId = form.dataset.editingRepId;
 
-            const name = document.getElementById('repName').value;
-            const email = document.getElementById('repEmail').value;
-            const phone = document.getElementById('repPhone').value;
-            const password = document.getElementById('repPassword').value;
-            const role = document.getElementById('repRole').value;
+            const name = document.getElementById('repName')?.value;
+            const email = document.getElementById('repEmail')?.value;
+            const phone = document.getElementById('repPhone')?.value;
+            const password = document.getElementById('repPassword')?.value;
+            const role = document.getElementById('repRole')?.value;
 
             // Validate email is provided
             if (!email || !email.includes('@')) {
@@ -2446,8 +2446,10 @@
             };
 
             // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.textContent = editingRepId ? 'Updating...' : 'Creating...';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = editingRepId ? 'Updating...' : 'Creating...';
+            }
 
             try {
                 if (editingRepId) {
@@ -2458,15 +2460,15 @@
 
                     // Reset form to add mode
                     delete form.dataset.editingRepId;
-                    submitBtn.textContent = 'Create Sales Rep';
+                    if (submitBtn) submitBtn.textContent = 'Create Sales Rep';
                 } else {
                     // Create new rep with Firebase Authentication
-                    submitBtn.textContent = 'Creating Firebase Auth user...';
+                    if (submitBtn) submitBtn.textContent = 'Creating Firebase Auth user...';
 
                     // Step 1: Create Firebase Auth user
                     const uid = await createFirebaseAuthUser(email, password, name);
 
-                    submitBtn.textContent = 'Saving to database...';
+                    if (submitBtn) submitBtn.textContent = 'Saving to database...';
 
                     // Step 2: Create Firestore document with UID as document ID
                     repData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
@@ -2495,8 +2497,10 @@
 
                 showAlert(errorMessage, 'error');
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalBtnText;
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                }
             }
         });
         
