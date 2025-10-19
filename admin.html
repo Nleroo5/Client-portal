@@ -2552,13 +2552,13 @@
             }
 
             const clientId = generateClientId();
-            const portalType = document.getElementById('portalType').value;
+            const portalType = document.getElementById('portalType')?.value;
 
             // Base client data (common to both portal types)
             const clientData = {
                 clientId: clientId,
-                clientName: document.getElementById('clientName').value,
-                clientEmail: document.getElementById('clientEmail').value || null,
+                clientName: document.getElementById('clientName')?.value,
+                clientEmail: document.getElementById('clientEmail')?.value || null,
                 portalType: portalType, // NEW: Store portal type
                 active: true,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -2572,25 +2572,25 @@
                 step5Complete: false,
 
                 // Shared links
-                googleDriveLink: document.getElementById('googleDriveLink').value || null,
-                creativeLink: document.getElementById('creativeLink').value || null
+                googleDriveLink: document.getElementById('googleDriveLink')?.value || null,
+                creativeLink: document.getElementById('creativeLink')?.value || null
             };
 
             // Add portal-specific links
             if (portalType === 'contract') {
                 // Contract portal (6/12 month) links
-                clientData.dpaLink = document.getElementById('dpaLink').value || null;
-                clientData.service6Link = document.getElementById('service6Link').value || null;
-                clientData.service12Link = document.getElementById('service12Link').value || null;
-                clientData.stripe6Monthly = document.getElementById('stripe6Monthly').value || null;
-                clientData.stripe6Upfront = document.getElementById('stripe6Upfront').value || null;
-                clientData.stripe12Monthly = document.getElementById('stripe12Monthly').value || null;
-                clientData.stripe12Upfront = document.getElementById('stripe12Upfront').value || null;
+                clientData.dpaLink = document.getElementById('dpaLink')?.value || null;
+                clientData.service6Link = document.getElementById('service6Link')?.value || null;
+                clientData.service12Link = document.getElementById('service12Link')?.value || null;
+                clientData.stripe6Monthly = document.getElementById('stripe6Monthly')?.value || null;
+                clientData.stripe6Upfront = document.getElementById('stripe6Upfront')?.value || null;
+                clientData.stripe12Monthly = document.getElementById('stripe12Monthly')?.value || null;
+                clientData.stripe12Upfront = document.getElementById('stripe12Upfront')?.value || null;
             } else if (portalType === 'm2m') {
                 // Month-to-month portal links
-                clientData.serviceAgreementLink = document.getElementById('m2mServiceAgreementLink').value || null;
-                clientData.dpaLink = document.getElementById('m2mDpaLink').value || null;
-                clientData.invoiceLink = document.getElementById('m2mInvoiceLink').value || null;
+                clientData.serviceAgreementLink = document.getElementById('m2mServiceAgreementLink')?.value || null;
+                clientData.dpaLink = document.getElementById('m2mDpaLink')?.value || null;
+                clientData.invoiceLink = document.getElementById('m2mInvoiceLink')?.value || null;
             }
 
             try {
