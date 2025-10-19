@@ -2330,8 +2330,8 @@
             }
         }
 
-        // Edit sales rep
-        async function editRep(repId) {
+        // Edit sales rep - MUST be window.editRep for onclick to work
+        window.editRep = async function(repId) {
             try {
                 const doc = await db.collection('salesReps').doc(repId).get();
                 if (!doc.exists) {
@@ -2364,10 +2364,10 @@
                 console.error('Error loading rep for edit:', error);
                 showAlert('Error loading sales rep: ' + error.message, 'error');
             }
-        }
+        };
 
-        // Delete sales rep
-        async function deleteRep(repId, repName) {
+        // Delete sales rep - MUST be window.deleteRep for onclick to work
+        window.deleteRep = async function(repId, repName) {
             // CRITICAL: Prevent admin from deleting themselves
             const currentUser = firebase.auth().currentUser;
             if (currentUser && currentUser.uid === repId) {
@@ -2432,7 +2432,7 @@
                 console.error('Error details:', error);
                 showAlert('Error deleting sales rep: ' + error.message, 'error');
             }
-        }
+        };
 
         // Helper function to create Firebase Auth user
         async function createFirebaseAuthUser(email, password, displayName) {
