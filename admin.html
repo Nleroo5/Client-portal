@@ -4167,8 +4167,16 @@
         let repsMap = {};
 
         // Load and render CRM pipeline
-        async function loadCRMPipeline() {
+        async function loadCRMPipeline(retryCount = 0) {
+            const MAX_RETRIES = 3;
+            const board = document.getElementById('crmPipelineBoard');
+
             try {
+                // Show loading indicator
+                if (board) {
+                    board.innerHTML = '<div style="text-align: center; padding: 40px; color: #012E40;"><div style="font-size: 2rem; margin-bottom: 12px;">⏳</div><div>Loading sales pipeline...</div></div>';
+                }
+
                 // Verify admin is authenticated
                 const currentUser = firebase.auth().currentUser;
                 if (!currentUser) {
@@ -4177,14 +4185,21 @@
                 console.log('Loading CRM pipeline for user:', currentUser.uid, currentUser.email);
 
                 // Load all sales reps first to map names
+                console.log('📊 Loading sales reps...');
                 const repsSnapshot = await db.collection('salesReps').get();
                 repsMap = {};
                 repsSnapshot.forEach(doc => {
                     repsMap[doc.id] = doc.data()?.name || 'Unknown Rep';
                 });
+                console.log(`✅ Loaded ${repsSnapshot.size} sales reps`);
 
-                // Fetch all deals
-                const snapshot = await db.collection('deals').get();
+                // Fetch all deals with timeout protection
+                console.log('📊 Loading deals...');
+                const snapshot = await Promise.race([
+                    db.collection('deals').get(),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout loading deals')), 15000))
+                ]);
+
                 const deals = [];
                 const archivedDeals = { completed: [], 'closed-lost': [] };
 
@@ -4198,6 +4213,7 @@
                         deals.push(deal);
                     }
                 });
+                console.log(`✅ Loaded ${deals.length} active deals, ${archivedDeals.completed.length + archivedDeals['closed-lost'].length} archived`);
 
                 // Fetch all active clients without linked deals and create virtual deals
                 const clientsSnapshot = await db.collection('clients').get();
@@ -4246,11 +4262,49 @@
                 updateMetrics(deals);
 
             } catch (error) {
-                console.error('Error loading CRM pipeline:', error);
+                console.error('❌ Error loading CRM pipeline:', error);
                 console.error('Error code:', error.code);
                 console.error('Error details:', error);
 
-                // Check if user document exists
+                // Implement retry logic for transient errors
+                if (retryCount < MAX_RETRIES && (
+                    error.code === 'unavailable' ||
+                    error.code === 'deadline-exceeded' ||
+                    error.message?.includes('Timeout') ||
+                    error.message?.includes('network')
+                )) {
+                    console.log(`🔄 Retrying... (attempt ${retryCount + 1}/${MAX_RETRIES})`);
+
+                    // Show retry message
+                    if (board) {
+                        board.innerHTML = `
+                            <div style="text-align: center; padding: 40px; color: #012E40;">
+                                <div style="font-size: 2rem; margin-bottom: 12px;">🔄</div>
+                                <div>Connection issue. Retrying... (${retryCount + 1}/${MAX_RETRIES})</div>
+                            </div>
+                        `;
+                    }
+
+                    // Wait before retrying (exponential backoff)
+                    await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount)));
+                    return loadCRMPipeline(retryCount + 1);
+                }
+
+                // Show error message to user
+                if (board) {
+                    board.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #dc2626;">
+                            <div style="font-size: 2rem; margin-bottom: 12px;">⚠️</div>
+                            <div style="font-weight: 600; margin-bottom: 8px;">Failed to load sales pipeline</div>
+                            <div style="font-size: 0.9rem; color: #6b7280; margin-bottom: 16px;">${error.message}</div>
+                            <button onclick="loadCRMPipeline()" style="padding: 10px 20px; background: #05908C; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                🔄 Try Again
+                            </button>
+                        </div>
+                    `;
+                }
+
+                // Check if user document exists for debugging
                 try {
                     const currentUser = firebase.auth().currentUser;
                     if (currentUser) {
