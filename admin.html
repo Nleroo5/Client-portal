@@ -3275,6 +3275,14 @@
         function renderDealCard(deal) {
             const repName = repsMap[deal.assignedTo] || 'Unassigned';
 
+            // Calculate deal value (MRR × Contract Length or just MRR)
+            const dealValue = deal.mrr && deal.contractLength
+                ? deal.mrr * deal.contractLength
+                : (deal.mrr || 0);
+            const formattedValue = dealValue > 0
+                ? `$${dealValue.toLocaleString()}`
+                : '$0';
+
             return `
                 <div class="deal-card"
                     draggable="true"
@@ -3296,6 +3304,12 @@
                     onmouseout="this.style.transform=''; this.style.boxShadow=''">
                     <div style="font-weight: 700; color: #000000; margin-bottom: 4px; font-size: 0.95rem;">${deal.companyName}</div>
                     <div style="font-size: 0.85rem; color: #000000; margin-bottom: 8px;">${deal.contactName || 'No contact'}</div>
+
+                    <!-- Deal Value -->
+                    <div style="background: linear-gradient(135deg, #F2A922 0%, #FCD34D 100%); color: #000000; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; text-align: center; font-weight: 700; font-size: 1rem; border: 1px solid #F59E0B;">
+                        ${formattedValue}
+                    </div>
+
                     <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
                         <span style="color: #000000; font-weight: 600;">👤 ${repName}</span>
                     </div>
