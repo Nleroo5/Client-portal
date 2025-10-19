@@ -1377,7 +1377,7 @@
 
             // Save file metadata to Firestore
             const clientDoc = await db.collection('clients').doc(clientId).get();
-            const existingAssets = clientDoc.data().brandAssets || [];
+            const existingAssets = clientDoc.data()?.brandAssets || [];
 
             await db.collection('clients').doc(clientId).update({
                 brandAssets: [...existingAssets, ...uploadedFiles],

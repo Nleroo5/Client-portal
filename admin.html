@@ -3850,10 +3850,10 @@
 
             snapshot.forEach(doc => {
                 const data = doc.data();
-                if (data.role === 'admin') {
-                    admins.push({ id: doc.id, name: data.name });
+                if (data?.role === 'admin') {
+                    admins.push({ id: doc.id, name: data?.name || 'Unknown Admin' });
                 } else {
-                    reps.push({ id: doc.id, name: data.name });
+                    reps.push({ id: doc.id, name: data?.name || 'Unknown Rep' });
                 }
             });
 
@@ -3906,7 +3906,7 @@
                 const repsSnapshot = await db.collection('salesReps').get();
                 repsMap = {};
                 repsSnapshot.forEach(doc => {
-                    repsMap[doc.id] = doc.data().name;
+                    repsMap[doc.id] = doc.data()?.name || 'Unknown Rep';
                 });
 
                 // Fetch all deals
