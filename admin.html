@@ -1658,7 +1658,7 @@
             isAuthChecked = true;
 
             // Now that we're authenticated and verified, load the initial data
-            loadDashboardData(); // Load dashboard first since it's the default tab
+            restoreLastTab(); // Restore last active tab (or default to dashboard)
             loadClients();
 
             // Old notification bell system removed - notifications now loaded via loadDashboardNotifications() in loadDashboardData()
@@ -1702,6 +1702,12 @@
             });
             document.getElementById(`tab-${tabName}`).classList.add('active');
 
+            // Save current tab to URL and localStorage
+            const url = new URL(window.location);
+            url.searchParams.set('tab', tabName);
+            window.history.pushState({}, '', url);
+            localStorage.setItem('adminLastTab', tabName);
+
             // Load data for specific tabs
             if (tabName === 'dashboard') {
                 loadDashboardData();
@@ -1712,6 +1718,26 @@
                 if (document.getElementById('archivedDealsSection').style.display !== 'none') {
                     loadAdminArchivedDeals();
                 }
+            }
+        }
+
+        // Restore last active tab on page load
+        function restoreLastTab() {
+            // Check URL parameter first
+            const urlParams = new URLSearchParams(window.location.search);
+            let tabToLoad = urlParams.get('tab');
+
+            // If no URL parameter, check localStorage
+            if (!tabToLoad) {
+                tabToLoad = localStorage.getItem('adminLastTab');
+            }
+
+            // If we have a saved tab, switch to it
+            if (tabToLoad && document.querySelector(`[data-tab="${tabToLoad}"]`)) {
+                switchAdminTab(tabToLoad);
+            } else {
+                // Default to dashboard
+                switchAdminTab('dashboard');
             }
         }
 
