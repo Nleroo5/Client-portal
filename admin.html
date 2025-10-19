@@ -2732,18 +2732,13 @@
                                     <div style="border-top: 1px solid #05908C; padding-top: 12px;">
                                         <div style="font-size: 0.7rem; color: #012E40; margin-bottom: 8px; font-weight: 600;">${data.brandAssets.length} Additional File${data.brandAssets.length > 1 ? 's' : ''}</div>
                                         <div style="display: flex; flex-direction: column; gap: 6px;">
-                                            ${data.brandAssets.slice(0, 3).map(file => `
-                                                <a href="${file.url}" target="_blank" style="display: flex; align-items: center; gap: 8px; padding: 6px; background: white; border-radius: 6px; text-decoration: none; transition: all 0.2s ease;">
+                                            ${data.brandAssets.map(file => `
+                                                <a href="${file.url}" target="_blank" download style="display: flex; align-items: center; gap: 8px; padding: 6px; background: white; border-radius: 6px; text-decoration: none; transition: all 0.2s ease; border: 1px solid #d1d5db;" onmouseover="this.style.background='#f9fafb'; this.style.borderColor='#05908C'" onmouseout="this.style.background='white'; this.style.borderColor='#d1d5db'">
                                                     <span style="font-size: 1rem;">${getFileIcon(file.type || file.name)}</span>
-                                                    <span style="flex: 1; color: #012E40; font-size: 0.75rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>
-                                                    <span style="color: #05908C; font-size: 0.7rem; font-weight: 600;">Download</span>
+                                                    <span style="flex: 1; color: #012E40; font-size: 0.75rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${file.name}">${file.name}</span>
+                                                    <span style="color: #05908C; font-size: 0.7rem; font-weight: 600;">📥 Download</span>
                                                 </a>
                                             `).join('')}
-                                            ${data.brandAssets.length > 3 ? `
-                                                <div style="text-align: center; padding: 4px; color: #6b7280; font-size: 0.7rem;">
-                                                    +${data.brandAssets.length - 3} more file${data.brandAssets.length - 3 > 1 ? 's' : ''}
-                                                </div>
-                                            ` : ''}
                                         </div>
                                     </div>
                                 ` : ''}

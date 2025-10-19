@@ -1371,7 +1371,7 @@
                     url: fileUrl,
                     size: file.size,
                     type: file.type,
-                    uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    uploadedAt: new Date().toISOString()
                 });
             }
 
