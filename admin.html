@@ -3800,7 +3800,7 @@
                 admins.forEach(admin => {
                     const option = document.createElement('option');
                     option.value = admin.id;
-                    option.textContent = admin.name;
+                    option.textContent = `${admin.name} (Admin)`;
                     adminGroup.appendChild(option);
                 });
                 select.appendChild(adminGroup);
@@ -3813,7 +3813,7 @@
                 reps.forEach(rep => {
                     const option = document.createElement('option');
                     option.value = rep.id;
-                    option.textContent = rep.name;
+                    option.textContent = `${rep.name} (Sales Rep)`;
                     repsGroup.appendChild(option);
                 });
                 select.appendChild(repsGroup);
