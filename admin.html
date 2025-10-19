@@ -1217,97 +1217,6 @@
                     </div>
                 </div>
 
-                <!-- DocuSign Integration -->
-                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-                    <h3 style="color: #012E40; font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                        📝 DocuSign Integration
-                    </h3>
-
-                    <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-                        <p style="color: #92400E; font-size: 0.9rem; font-weight: 600; margin-bottom: 4px;">💡 How to get DocuSign template links:</p>
-                        <ol style="color: #78350F; font-size: 0.85rem; margin-left: 20px; margin-top: 8px; line-height: 1.6;">
-                            <li>Login to DocuSign</li>
-                            <li>Create/open your template</li>
-                            <li>Click "Use" → "Get Link"</li>
-                            <li>Copy the signing URL</li>
-                            <li>Paste below</li>
-                        </ol>
-                    </div>
-
-                    <div style="display: grid; gap: 20px;">
-                        <div>
-                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">DPA (Data Processing Agreement)</label>
-                            <input type="url" id="settingsDocuSignDPA" placeholder="https://na4.docusign.net/Member/PowerFormSigning.aspx?..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
-                        </div>
-                        <div>
-                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">6-Month Service Agreement</label>
-                            <input type="url" id="settingsDocuSign6Month" placeholder="https://na4.docusign.net/Member/PowerFormSigning.aspx?..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
-                        </div>
-                        <div>
-                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">12-Month Service Agreement</label>
-                            <input type="url" id="settingsDocuSign12Month" placeholder="https://na4.docusign.net/Member/PowerFormSigning.aspx?..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
-                        </div>
-                        <div>
-                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Month-to-Month Service Agreement</label>
-                            <input type="url" id="settingsDocuSignM2M" placeholder="https://na4.docusign.net/Member/PowerFormSigning.aspx?..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stripe Payment Links -->
-                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-                    <h3 style="color: #012E40; font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                        💳 Stripe Payment Links
-                    </h3>
-
-                    <div style="background: #DBEAFE; border-left: 4px solid #3B82F6; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-                        <p style="color: #1E3A8A; font-size: 0.9rem; font-weight: 600; margin-bottom: 4px;">💡 How to get Stripe payment links:</p>
-                        <ol style="color: #1E40AF; font-size: 0.85rem; margin-left: 20px; margin-top: 8px; line-height: 1.6;">
-                            <li>Login to Stripe Dashboard</li>
-                            <li>Go to "Products" → "Payment Links"</li>
-                            <li>Create or open payment link</li>
-                            <li>Copy the link URL</li>
-                            <li>Paste below</li>
-                        </ol>
-                    </div>
-
-                    <div style="margin-bottom: 28px;">
-                        <h4 style="color: #05908C; font-weight: 700; margin-bottom: 16px; font-size: 1.1rem;">6-Month Contract</h4>
-                        <div style="display: grid; gap: 16px;">
-                            <div>
-                                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Monthly Payment Plan</label>
-                                <input type="url" id="settingsStripe6MonthMonthly" placeholder="https://buy.stripe.com/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
-                            </div>
-                            <div>
-                                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Pay Upfront (Discount)</label>
-                                <input type="url" id="settingsStripe6MonthUpfront" placeholder="https://buy.stripe.com/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 28px;">
-                        <h4 style="color: #05908C; font-weight: 700; margin-bottom: 16px; font-size: 1.1rem;">12-Month Contract</h4>
-                        <div style="display: grid; gap: 16px;">
-                            <div>
-                                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Monthly Payment Plan</label>
-                                <input type="url" id="settingsStripe12MonthMonthly" placeholder="https://buy.stripe.com/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
-                            </div>
-                            <div>
-                                <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Pay Upfront (Discount)</label>
-                                <input type="url" id="settingsStripe12MonthUpfront" placeholder="https://buy.stripe.com/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h4 style="color: #05908C; font-weight: 700; margin-bottom: 16px; font-size: 1.1rem;">Month-to-Month</h4>
-                        <div>
-                            <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 8px;">Invoice Payment Link</label>
-                            <input type="url" id="settingsStripeM2MInvoice" placeholder="https://buy.stripe.com/..." style="width: 100%; padding: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; transition: all 0.2s ease;" onfocus="this.style.borderColor='#05908C'" onblur="this.style.borderColor='#d1d5db'">
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Notification Settings -->
                 <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
                     <h3 style="color: #012E40; font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
@@ -5389,33 +5298,17 @@ Start with Phase 1 and work through systematically. Show your progress after eac
                     // Company Information
                     document.getElementById('settingsSupportEmail').value = settings.support?.email || '';
                     document.getElementById('settingsSupportPhone').value = settings.support?.phone || '';
-                    document.getElementById('settingsGoogleDriveLink').value = settings.googleDrive?.defaultUploadLink || '';
-
-                    // DocuSign
-                    document.getElementById('settingsDocuSignDPA').value = settings.docuSign?.dpa || '';
-                    document.getElementById('settingsDocuSign6Month').value = settings.docuSign?.service6 || '';
-                    document.getElementById('settingsDocuSign12Month').value = settings.docuSign?.service12 || '';
-                    document.getElementById('settingsDocuSignM2M').value = settings.docuSign?.serviceAgreement || '';
-
-                    // Stripe
-                    document.getElementById('settingsStripe6MonthMonthly').value = settings.stripeLinks?.service6?.monthly || '';
-                    document.getElementById('settingsStripe6MonthUpfront').value = settings.stripeLinks?.service6?.upfront || '';
-                    document.getElementById('settingsStripe12MonthMonthly').value = settings.stripeLinks?.service12?.monthly || '';
-                    document.getElementById('settingsStripe12MonthUpfront').value = settings.stripeLinks?.service12?.upfront || '';
-                    document.getElementById('settingsStripeM2MInvoice').value = settings.stripeLinks?.invoiceLink || '';
 
                     // Notifications
                     document.getElementById('settingsNotifyNewQuotes').checked = settings.notifications?.newQuotes || false;
-
                     document.getElementById('settingsNotifyDealChanges').checked = settings.notifications?.dealChanges || false;
                     document.getElementById('settingsNotifyNewClients').checked = settings.notifications?.newClients || false;
 
                     showAlert('Settings loaded successfully', 'success');
                 } else {
                     // No settings exist yet, load from config.js defaults
-                    document.getElementById('settingsSupportEmail').value = DLM_CONFIG.support.opsEmail;
-                    document.getElementById('settingsSupportPhone').value = DLM_CONFIG.support.opsPhone;
-                    document.getElementById('settingsGoogleDriveLink').value = DLM_CONFIG.googleDrive.defaultUploadLink;
+                    document.getElementById('settingsSupportEmail').value = DLM_CONFIG.support?.email || '';
+                    document.getElementById('settingsSupportPhone').value = DLM_CONFIG.support?.phone || '';
 
                     showAlert('Loaded default settings. Click "Save All Changes" to persist them.', 'info');
                 }
@@ -5433,29 +5326,8 @@ Start with Phase 1 and work through systematically. Show your progress after eac
                         email: document.getElementById('settingsSupportEmail').value,
                         phone: document.getElementById('settingsSupportPhone').value
                     },
-                    googleDrive: {
-                        defaultUploadLink: document.getElementById('settingsGoogleDriveLink').value
-                    },
-                    docuSign: {
-                        dpa: document.getElementById('settingsDocuSignDPA').value,
-                        service6: document.getElementById('settingsDocuSign6Month').value,
-                        service12: document.getElementById('settingsDocuSign12Month').value,
-                        serviceAgreement: document.getElementById('settingsDocuSignM2M').value
-                    },
-                    stripeLinks: {
-                        service6: {
-                            monthly: document.getElementById('settingsStripe6MonthMonthly').value,
-                            upfront: document.getElementById('settingsStripe6MonthUpfront').value
-                        },
-                        service12: {
-                            monthly: document.getElementById('settingsStripe12MonthMonthly').value,
-                            upfront: document.getElementById('settingsStripe12MonthUpfront').value
-                        },
-                        invoiceLink: document.getElementById('settingsStripeM2MInvoice').value
-                    },
                     notifications: {
                         newQuotes: document.getElementById('settingsNotifyNewQuotes').checked,
-
                         dealChanges: document.getElementById('settingsNotifyDealChanges').checked,
                         newClients: document.getElementById('settingsNotifyNewClients').checked
                     },
