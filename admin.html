@@ -2842,6 +2842,24 @@
                             </div>
                         ` : ''}
 
+                        <!-- Deal Stage Info (if linked to deal) -->
+                        <div id="deal-info-${docId}" style="margin-bottom: 14px;">
+                            ${data.linkedDealId ? `
+                                <div style="background: linear-gradient(135deg, #FBE9D1 0%, #FFF8E6 100%); border-radius: 8px; padding: 12px; border: 2px solid #F2A922;">
+                                    <div style="font-size: 0.75rem; color: #F2A922; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">💼 Active Deal</div>
+                                    <div class="deal-stage-data" style="font-size: 0.75rem; color: #012E40; margin-bottom: 8px;">Loading deal data...</div>
+                                    <button onclick="viewLinkedDeal('${data.linkedDealId}'); event.stopPropagation();"
+                                            style="padding: 8px 16px; background: #F2A922; color: #012E40; border: none;
+                                                   border-radius: 6px; font-size: 0.8rem; cursor: pointer;
+                                                   font-weight: 600; width: 100%; transition: all 0.2s ease;"
+                                            onmouseover="this.style.background='#f59e0b'"
+                                            onmouseout="this.style.background='#F2A922'">
+                                        View Deal →
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+
                         <div style="display: flex; gap: 8px;">
                             <button class="btn btn-${data.active ? 'secondary' : 'success'} btn-small" onclick="toggleStatus('${docId}', ${!data.active})" style="flex: 1; padding: 10px; font-size: 0.85rem;">
                                 ${data.active ? 'Deactivate' : 'Activate'}
@@ -2867,12 +2885,92 @@
 
                     grid.appendChild(card);
                 });
+
+                // Load deal data for clients with linked deals
+                await loadDealDataForClients(snapshot.docs);
             } catch (error) {
                 console.error('Error loading clients:', error);
                 showAlert('Error loading clients', 'error');
             }
         }
-        
+
+        // Load deal data for clients with linked deals
+        async function loadDealDataForClients(clientDocs) {
+            const clientsWithDeals = clientDocs.filter(doc => doc.data().linkedDealId);
+
+            for (const clientDoc of clientsWithDeals) {
+                const clientData = clientDoc.data();
+                const docId = clientDoc.id;
+
+                try {
+                    const dealDoc = await db.collection('deals').doc(clientData.linkedDealId).get();
+
+                    if (dealDoc.exists) {
+                        const dealData = dealDoc.data();
+
+                        // Find the stage name
+                        const stage = PIPELINE_STAGES.find(s => s.id === dealData.stage);
+                        const stageName = stage ? stage.name : dealData.stage;
+                        const stageColor = stage ? stage.color : '#05908C';
+
+                        // Calculate deal value
+                        const dealValue = dealData.mrr && dealData.contractLength
+                            ? dealData.mrr * dealData.contractLength
+                            : (dealData.mrr || 0);
+                        const formattedValue = dealValue > 0
+                            ? `$${dealValue.toLocaleString()}`
+                            : '$0';
+
+                        // Update the deal info section
+                        const dealInfoElement = document.querySelector(`#deal-info-${docId} .deal-stage-data`);
+
+                        if (dealInfoElement) {
+                            dealInfoElement.innerHTML = `
+                                <div style="margin-bottom: 4px;"><strong>${dealData.companyName}</strong></div>
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                    <span style="background: ${stageColor}; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">${stageName}</span>
+                                </div>
+                                <div style="font-weight: 600; color: #F2A922; font-size: 0.9rem;">${formattedValue}</div>
+                            `;
+                        }
+                    } else {
+                        // Deal not found
+                        const dealInfoElement = document.querySelector(`#deal-info-${docId} .deal-stage-data`);
+                        if (dealInfoElement) {
+                            dealInfoElement.innerHTML = '<div style="color: #991b1b;">⚠️ Deal not found</div>';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading deal data for client:', error);
+                }
+            }
+        }
+
+        // Cross-tab navigation: View linked deal from client
+        window.viewLinkedDeal = function(dealId) {
+            // Switch to Sales Pipeline tab
+            switchAdminTab('sales-pipeline');
+
+            // Scroll to and highlight the deal card
+            setTimeout(() => {
+                const dealCard = document.getElementById(`deal-${dealId}`);
+                if (dealCard) {
+                    dealCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    // Add highlight animation
+                    dealCard.style.transition = 'all 0.3s ease';
+                    dealCard.style.boxShadow = '0 0 30px rgba(242, 169, 34, 0.8), 0 6px 30px rgba(1, 46, 64, 0.3)';
+                    dealCard.style.transform = 'scale(1.05)';
+
+                    // Remove highlight after 2 seconds
+                    setTimeout(() => {
+                        dealCard.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)';
+                        dealCard.style.transform = 'scale(1)';
+                    }, 2000);
+                }
+            }, 300);
+        };
+
         // Copy portal link
         function copyLink(clientId) {
             const input = document.getElementById(`link-${clientId}`);
@@ -2912,7 +3010,19 @@
         }
 
         // Open reset portal confirmation modal
-        function resetClientData(clientId, clientName) {
+        async function resetClientData(clientId, clientName) {
+            // Check if client has linked deal
+            const clientDoc = await db.collection('clients').doc(clientId).get();
+            const clientData = clientDoc.data();
+
+            if (clientData.linkedDealId) {
+                const confirmReset = confirm(`Warning: "${clientName}" is linked to an active deal.\n\nResetting this portal will unlink it from the deal and clear all onboarding data.\n\nDo you want to continue?`);
+
+                if (!confirmReset) {
+                    return;
+                }
+            }
+
             // Store client info in hidden fields
             document.getElementById('resetClientId').value = clientId;
             document.getElementById('resetClientName').value = clientName;
@@ -2976,6 +3086,18 @@
                 const clientDoc = await db.collection('clients').doc(clientId).get();
                 const currentData = clientDoc.data();
 
+                // Remove link from deal if exists
+                if (currentData.linkedDealId) {
+                    try {
+                        await db.collection('deals').doc(currentData.linkedDealId).update({
+                            clientPortalId: null
+                        });
+                        console.log('✓ Removed client link from deal');
+                    } catch (err) {
+                        console.error('Error removing deal link:', err);
+                    }
+                }
+
                 // Reset all progress and form data
                 await db.collection('clients').doc(clientId).update({
                     // Step completion flags
@@ -3028,6 +3150,10 @@
                     // Contract/payment info (reset to null)
                     contractType: currentData?.contractType || null,
                     paymentPlan: null,
+
+                    // Remove deal link
+                    linkedDealId: null,
+                    dealStage: null,
 
                     // Timestamp
                     lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
@@ -3522,6 +3648,48 @@
             { id: 'follow-up-resell', name: 'Follow-Up & Resell', color: '#1A6361' }
         ];
 
+        // Load clients for deal form dropdown
+        async function loadClientsForDealForm() {
+            try {
+                const snapshot = await db.collection('clients').orderBy('createdAt', 'desc').get();
+                const select = document.getElementById('dealClientPortalId');
+
+                // Clear existing options except the first one
+                select.innerHTML = '<option value="">No client portal linked</option>';
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const docId = doc.id;
+
+                    // Calculate progress
+                    const completedSteps = [
+                        data.step1Complete,
+                        data.step2Complete,
+                        data.step3Complete,
+                        data.step4Complete,
+                        data.step5Complete
+                    ].filter(Boolean).length;
+                    const progressPercent = Math.round((completedSteps / 5) * 100);
+
+                    // Create option with detailed info
+                    const option = document.createElement('option');
+                    option.value = docId;
+                    option.textContent = `${data.clientName} • ${data.portalType === 'm2m' ? 'M2M' : 'Contract'} • ${progressPercent}% Complete • ${data.active ? 'Active' : 'Inactive'}`;
+
+                    // Check if already linked to another deal (we'll validate this)
+                    if (data.linkedDealId) {
+                        option.textContent += ' (Already Linked)';
+                        option.disabled = true;
+                        option.style.color = '#9ca3af';
+                    }
+
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading clients for deal form:', error);
+            }
+        }
+
         // Open deal modal
         async function openDealModal(dealId = null) {
             const modal = document.getElementById('dealModal');
@@ -3530,6 +3698,9 @@
 
             // Load reps for dropdown
             await loadRepsForDealForm();
+
+            // Load clients for dropdown
+            await loadClientsForDealForm();
 
             if (dealId) {
                 // Edit mode
@@ -3819,7 +3990,86 @@
 
                 board.appendChild(column);
             });
+
+            // Load client data for all linked deals
+            loadClientDataForDeals(deals);
         }
+
+        // Load client data for deals with linked portals
+        async function loadClientDataForDeals(deals) {
+            const dealsWithClients = deals.filter(d => d.clientPortalId);
+
+            for (const deal of dealsWithClients) {
+                try {
+                    const clientDoc = await db.collection('clients').doc(deal.clientPortalId).get();
+
+                    if (clientDoc.exists) {
+                        const clientData = clientDoc.data();
+
+                        // Calculate progress
+                        const completedSteps = [
+                            clientData.step1Complete,
+                            clientData.step2Complete,
+                            clientData.step3Complete,
+                            clientData.step4Complete,
+                            clientData.step5Complete
+                        ].filter(Boolean).length;
+                        const progressPercent = Math.round((completedSteps / 5) * 100);
+
+                        // Update both compressed and full views
+                        const compressedInfo = document.querySelector(`#client-info-compressed-${deal.id} .client-portal-data`);
+                        const fullInfo = document.querySelector(`#client-info-full-${deal.id} .client-portal-data`);
+
+                        const infoHTML = `
+                            <div style="margin-bottom: 4px;"><strong>${clientData.clientName}</strong></div>
+                            <div style="margin-bottom: 4px;">${clientData.portalType === 'm2m' ? 'M2M' : 'Contract'} Portal • ${clientData.active ? 'Active' : 'Inactive'}</div>
+                            <div style="background: #d1d5db; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 6px;">
+                                <div style="background: #05908C; height: 100%; width: ${progressPercent}%;"></div>
+                            </div>
+                            <div style="text-align: center; margin-top: 4px; font-weight: 600;">${progressPercent}% Complete</div>
+                        `;
+
+                        if (compressedInfo) compressedInfo.innerHTML = infoHTML;
+                        if (fullInfo) fullInfo.innerHTML = infoHTML;
+                    } else {
+                        // Client not found
+                        const compressedInfo = document.querySelector(`#client-info-compressed-${deal.id} .client-portal-data`);
+                        const fullInfo = document.querySelector(`#client-info-full-${deal.id} .client-portal-data`);
+
+                        const errorHTML = '<div style="color: #991b1b;">⚠️ Client not found</div>';
+                        if (compressedInfo) compressedInfo.innerHTML = errorHTML;
+                        if (fullInfo) fullInfo.innerHTML = errorHTML;
+                    }
+                } catch (error) {
+                    console.error('Error loading client data for deal:', error);
+                }
+            }
+        }
+
+        // Cross-tab navigation: View linked client from deal
+        window.viewLinkedClient = function(clientId) {
+            // Switch to Clients tab
+            switchAdminTab('clients');
+
+            // Scroll to and highlight the client card
+            setTimeout(() => {
+                const clientCard = document.querySelector(`[data-client-id="${clientId}"]`);
+                if (clientCard) {
+                    clientCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    // Add highlight animation
+                    clientCard.style.transition = 'all 0.3s ease';
+                    clientCard.style.boxShadow = '0 0 30px rgba(242, 169, 34, 0.8), 0 6px 30px rgba(1, 46, 64, 0.3)';
+                    clientCard.style.transform = 'scale(1.02)';
+
+                    // Remove highlight after 2 seconds
+                    setTimeout(() => {
+                        clientCard.style.boxShadow = '0 6px 30px rgba(1, 46, 64, 0.3)';
+                        clientCard.style.transform = 'scale(1)';
+                    }, 2000);
+                }
+            }, 300);
+        };
 
         // Render deal card with compressed/full view
         function renderDealCard(deal, stageCount) {
@@ -3920,7 +4170,18 @@
                             <div style="font-size: 0.85rem; color: #000000; margin-bottom: 6px;">
                                 👤 <strong>${repName}</strong>
                             </div>
-                            ${deal.clientPortalId ? '<div style="font-size: 0.75rem; color: #05908C; margin-bottom: 4px;">🔗 Portal Linked</div>' : ''}
+                            ${deal.clientPortalId ? `
+                                <div id="client-info-compressed-${deal.id}" style="background: #E8F5F3; border-radius: 6px; padding: 8px; margin-bottom: 8px; border: 1px solid #05908C;">
+                                    <div style="font-size: 0.75rem; color: #05908C; font-weight: 600; margin-bottom: 4px;">🔗 Client Portal Linked</div>
+                                    <div class="client-portal-data" style="font-size: 0.7rem; color: #012E40;">Loading...</div>
+                                    <button onclick="viewLinkedClient('${deal.clientPortalId}'); event.stopPropagation();"
+                                            style="padding: 4px 10px; background: #05908C; color: white; border: none;
+                                                   border-radius: 4px; font-size: 0.7rem; cursor: pointer; margin-top: 6px;
+                                                   font-weight: 600; width: 100%;">
+                                        View Portal →
+                                    </button>
+                                </div>
+                            ` : ''}
                             ${deal.websiteQuoteId ? '<div style="font-size: 0.75rem; color: #F59E0B; font-weight: 600; margin-bottom: 4px;">📝 From Website Form</div>' : ''}
                         </div>
                     </div>
@@ -3995,7 +4256,20 @@
                         <div style="font-size: 0.9rem; color: #000000; margin-bottom: 6px;">
                             👤 <strong>${repName}</strong>
                         </div>
-                        ${deal.clientPortalId ? '<div style="font-size: 0.8rem; color: #05908C; margin-bottom: 4px;">🔗 Portal Linked</div>' : ''}
+                        ${deal.clientPortalId ? `
+                            <div id="client-info-full-${deal.id}" style="background: #E8F5F3; border-radius: 8px; padding: 12px; margin-bottom: 10px; border: 2px solid #05908C;">
+                                <div style="font-size: 0.8rem; color: #05908C; font-weight: 600; margin-bottom: 6px;">🔗 Client Portal Linked</div>
+                                <div class="client-portal-data" style="font-size: 0.75rem; color: #012E40; margin-bottom: 8px;">Loading client data...</div>
+                                <button onclick="viewLinkedClient('${deal.clientPortalId}'); event.stopPropagation();"
+                                        style="padding: 8px 16px; background: #05908C; color: white; border: none;
+                                               border-radius: 6px; font-size: 0.8rem; cursor: pointer;
+                                               font-weight: 600; width: 100%; transition: all 0.2s ease;"
+                                        onmouseover="this.style.background='#047a77'"
+                                        onmouseout="this.style.background='#05908C'">
+                                    View Portal →
+                                </button>
+                            </div>
+                        ` : ''}
                         ${deal.websiteQuoteId ? '<div style="font-size: 0.8rem; color: #F59E0B; font-weight: 600;">📝 From Website Form</div>' : ''}
                     </div>
                 `;
@@ -4026,14 +4300,33 @@
 
         // Confirm and delete deal (archives it)
         async function confirmDeleteDeal(dealId) {
-            if (!confirm('Are you sure you want to delete this deal? This will archive it.')) {
+            // Get deal data first to check for client link
+            const dealDoc = await db.collection('deals').doc(dealId).get();
+            const dealData = dealDoc.data();
+
+            let confirmMessage = 'Are you sure you want to delete this deal? This will archive it.';
+
+            if (dealData.clientPortalId) {
+                confirmMessage = `This deal is linked to a client portal.\n\nWhat would you like to do?\n\nOK = Archive deal and unlink from client\nCancel = Keep everything`;
+            }
+
+            if (!confirm(confirmMessage)) {
                 return;
             }
 
             try {
-                // Get current deal data before archiving
-                const dealDoc = await db.collection('deals').doc(dealId).get();
-                const dealData = dealDoc.data();
+                // Remove link from client if exists
+                if (dealData.clientPortalId) {
+                    try {
+                        await db.collection('clients').doc(dealData.clientPortalId).update({
+                            linkedDealId: null,
+                            dealStage: null
+                        });
+                        console.log('✓ Removed client link from deal');
+                    } catch (err) {
+                        console.error('Error removing client link:', err);
+                    }
+                }
 
                 // Archive the deal instead of deleting
                 await db.collection('deals').doc(dealId).update({
@@ -4041,6 +4334,7 @@
                     archivedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     stage: 'closed-lost',
                     stageWhenLost: dealData.stage,
+                    clientPortalId: null, // Remove the link
                     lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
@@ -4120,6 +4414,7 @@
                         let oldDealData = null;
                         let wasAssignmentChange = false;
                         let wasStageChange = false;
+                        let oldClientPortalId = null;
 
                         if (dealId) {
                             // Get old data to detect changes
@@ -4127,6 +4422,7 @@
                             oldDealData = oldDoc.data();
                             wasAssignmentChange = oldDealData.assignedTo !== dealData.assignedTo;
                             wasStageChange = oldDealData.stage !== dealData.stage;
+                            oldClientPortalId = oldDealData.clientPortalId;
 
                             // Update existing deal
                             await db.collection('deals').doc(dealId).update(dealData);
@@ -4137,6 +4433,48 @@
                             const newDealRef = await db.collection('deals').add(dealData);
                             dealId = newDealRef.id;
                             showAlert('Deal created successfully!');
+                        }
+
+                        // Handle bidirectional linking with client portal
+                        const newClientPortalId = dealData.clientPortalId;
+
+                        // If client link changed, update both old and new clients
+                        if (oldClientPortalId !== newClientPortalId) {
+                            // Remove link from old client (if exists)
+                            if (oldClientPortalId) {
+                                try {
+                                    await db.collection('clients').doc(oldClientPortalId).update({
+                                        linkedDealId: null,
+                                        dealStage: null
+                                    });
+                                    console.log('✓ Removed deal link from old client');
+                                } catch (err) {
+                                    console.error('Error removing old client link:', err);
+                                }
+                            }
+
+                            // Add link to new client (if selected)
+                            if (newClientPortalId) {
+                                try {
+                                    await db.collection('clients').doc(newClientPortalId).update({
+                                        linkedDealId: dealId,
+                                        dealStage: dealData.stage
+                                    });
+                                    console.log('✓ Added deal link to new client');
+                                } catch (err) {
+                                    console.error('Error adding new client link:', err);
+                                }
+                            }
+                        } else if (newClientPortalId && wasStageChange) {
+                            // If client link didn't change but stage did, update client's stage
+                            try {
+                                await db.collection('clients').doc(newClientPortalId).update({
+                                    dealStage: dealData.stage
+                                });
+                                console.log('✓ Updated client deal stage');
+                            } catch (err) {
+                                console.error('Error updating client deal stage:', err);
+                            }
                         }
 
                         // Create notifications based on what changed
@@ -5736,9 +6074,11 @@ Start with Phase 1 and work through systematically. Show your progress after eac
                 </div>
 
                 <div class="form-group">
-                    <label for="dealClientPortalId">Linked Client Portal ID</label>
-                    <input type="text" id="dealClientPortalId" placeholder="Leave empty until Onboarding Portal stage">
-                    <small style="color: #666; font-size: 0.85rem;">Link this deal to an existing client portal (optional)</small>
+                    <label for="dealClientPortalId">Link to Client Portal (Optional)</label>
+                    <select id="dealClientPortalId" style="width: 100%; padding: 10px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; background: white;">
+                        <option value="">No client portal linked</option>
+                    </select>
+                    <small style="color: #666; font-size: 0.85rem;">Select an existing client portal to link to this deal</small>
                 </div>
 
                 <!-- Website Quote Link (Read-only, auto-filled) -->
