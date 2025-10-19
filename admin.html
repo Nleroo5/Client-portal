@@ -1223,23 +1223,136 @@
                         🔔 Notification Preferences
                     </h3>
 
-                    <div style="background: #F3F4F6; padding: 20px; border-radius: 10px;">
-                        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 16px;">
-                            <input type="checkbox" id="settingsNotifyNewQuotes" style="width: 20px; height: 20px; cursor: pointer;">
-                            <span style="color: #374151; font-weight: 600;">Notify me when new website forms are submitted</span>
-                        </label>
+                    <div style="background: #F3F4F6; padding: 24px; border-radius: 10px;">
+                        <!-- Client Portal Activity -->
+                        <div style="margin-bottom: 24px;">
+                            <h4 style="color: #012E40; font-size: 1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">👤</span> Client Portal Activity
+                            </h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px; padding-left: 32px;">
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyClientStepComplete" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Client completes a step (Steps 1-6)</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyLogoUpload" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Client uploads brand logo</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyBrandColorsSubmit" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Client submits brand colors</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyWebsiteAccess" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Client provides website access credentials</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyCreativeApproval" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Client approves creatives to launch</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyRevisionRequest" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Client requests creative revisions</span>
+                                </label>
+                            </div>
+                        </div>
 
+                        <!-- Website Discovery Forms -->
+                        <div style="margin-bottom: 24px;">
+                            <h4 style="color: #012E40; font-size: 1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">📝</span> Website Discovery Forms
+                            </h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px; padding-left: 32px;">
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyNewQuotes" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">New website form submitted</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyQuoteCompleted" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Client completes entire discovery form</span>
+                                </label>
+                            </div>
+                        </div>
 
+                        <!-- Sales Pipeline -->
+                        <div style="margin-bottom: 24px;">
+                            <h4 style="color: #012E40; font-size: 1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">📊</span> Sales Pipeline
+                            </h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px; padding-left: 32px;">
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyDealCreated" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">New deal created</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyDealAssigned" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Deal assigned to sales rep</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyDealChanges" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Deal stage changes</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyDealWon" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Deal marked as won</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyDealLost" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Deal marked as lost</span>
+                                </label>
+                            </div>
+                        </div>
 
-                        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 16px;">
-                            <input type="checkbox" id="settingsNotifyDealChanges" style="width: 20px; height: 20px; cursor: pointer;">
-                            <span style="color: #374151; font-weight: 600;">Notify me when deal stages change</span>
-                        </label>
+                        <!-- Client Management -->
+                        <div style="margin-bottom: 24px;">
+                            <h4 style="color: #012E40; font-size: 1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">🏢</span> Client Management
+                            </h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px; padding-left: 32px;">
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyNewClients" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">New client added to system</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyClientActivated" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Client portal activated</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyClientDeactivated" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Client portal deactivated</span>
+                                </label>
+                            </div>
+                        </div>
 
-                        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-                            <input type="checkbox" id="settingsNotifyNewClients" style="width: 20px; height: 20px; cursor: pointer;">
-                            <span style="color: #374151; font-weight: 600;">Notify me when new clients are added</span>
-                        </label>
+                        <!-- Messages -->
+                        <div style="margin-bottom: 24px;">
+                            <h4 style="color: #012E40; font-size: 1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">💬</span> Messages
+                            </h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px; padding-left: 32px;">
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyNewMessages" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">Client sends a new message</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Team & System -->
+                        <div>
+                            <h4 style="color: #012E40; font-size: 1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.2rem;">⚙️</span> Team & System
+                            </h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px; padding-left: 32px;">
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifyNewTeamMember" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">New team member added</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <input type="checkbox" id="settingsNotifySystemErrors" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="color: #374151; font-weight: 600;">System errors or critical issues</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -5299,10 +5412,36 @@ Start with Phase 1 and work through systematically. Show your progress after eac
                     document.getElementById('settingsSupportEmail').value = settings.support?.email || '';
                     document.getElementById('settingsSupportPhone').value = settings.support?.phone || '';
 
-                    // Notifications
+                    // Notifications - Client Portal Activity
+                    document.getElementById('settingsNotifyClientStepComplete').checked = settings.notifications?.clientStepComplete || false;
+                    document.getElementById('settingsNotifyLogoUpload').checked = settings.notifications?.logoUpload || false;
+                    document.getElementById('settingsNotifyBrandColorsSubmit').checked = settings.notifications?.brandColorsSubmit || false;
+                    document.getElementById('settingsNotifyWebsiteAccess').checked = settings.notifications?.websiteAccess || false;
+                    document.getElementById('settingsNotifyCreativeApproval').checked = settings.notifications?.creativeApproval || false;
+                    document.getElementById('settingsNotifyRevisionRequest').checked = settings.notifications?.revisionRequest || false;
+
+                    // Notifications - Website Discovery Forms
                     document.getElementById('settingsNotifyNewQuotes').checked = settings.notifications?.newQuotes || false;
+                    document.getElementById('settingsNotifyQuoteCompleted').checked = settings.notifications?.quoteCompleted || false;
+
+                    // Notifications - Sales Pipeline
+                    document.getElementById('settingsNotifyDealCreated').checked = settings.notifications?.dealCreated || false;
+                    document.getElementById('settingsNotifyDealAssigned').checked = settings.notifications?.dealAssigned || false;
                     document.getElementById('settingsNotifyDealChanges').checked = settings.notifications?.dealChanges || false;
+                    document.getElementById('settingsNotifyDealWon').checked = settings.notifications?.dealWon || false;
+                    document.getElementById('settingsNotifyDealLost').checked = settings.notifications?.dealLost || false;
+
+                    // Notifications - Client Management
                     document.getElementById('settingsNotifyNewClients').checked = settings.notifications?.newClients || false;
+                    document.getElementById('settingsNotifyClientActivated').checked = settings.notifications?.clientActivated || false;
+                    document.getElementById('settingsNotifyClientDeactivated').checked = settings.notifications?.clientDeactivated || false;
+
+                    // Notifications - Messages
+                    document.getElementById('settingsNotifyNewMessages').checked = settings.notifications?.newMessages || false;
+
+                    // Notifications - Team & System
+                    document.getElementById('settingsNotifyNewTeamMember').checked = settings.notifications?.newTeamMember || false;
+                    document.getElementById('settingsNotifySystemErrors').checked = settings.notifications?.systemErrors || false;
 
                     showAlert('Settings loaded successfully', 'success');
                 } else {
@@ -5327,9 +5466,36 @@ Start with Phase 1 and work through systematically. Show your progress after eac
                         phone: document.getElementById('settingsSupportPhone').value
                     },
                     notifications: {
+                        // Client Portal Activity
+                        clientStepComplete: document.getElementById('settingsNotifyClientStepComplete').checked,
+                        logoUpload: document.getElementById('settingsNotifyLogoUpload').checked,
+                        brandColorsSubmit: document.getElementById('settingsNotifyBrandColorsSubmit').checked,
+                        websiteAccess: document.getElementById('settingsNotifyWebsiteAccess').checked,
+                        creativeApproval: document.getElementById('settingsNotifyCreativeApproval').checked,
+                        revisionRequest: document.getElementById('settingsNotifyRevisionRequest').checked,
+
+                        // Website Discovery Forms
                         newQuotes: document.getElementById('settingsNotifyNewQuotes').checked,
+                        quoteCompleted: document.getElementById('settingsNotifyQuoteCompleted').checked,
+
+                        // Sales Pipeline
+                        dealCreated: document.getElementById('settingsNotifyDealCreated').checked,
+                        dealAssigned: document.getElementById('settingsNotifyDealAssigned').checked,
                         dealChanges: document.getElementById('settingsNotifyDealChanges').checked,
-                        newClients: document.getElementById('settingsNotifyNewClients').checked
+                        dealWon: document.getElementById('settingsNotifyDealWon').checked,
+                        dealLost: document.getElementById('settingsNotifyDealLost').checked,
+
+                        // Client Management
+                        newClients: document.getElementById('settingsNotifyNewClients').checked,
+                        clientActivated: document.getElementById('settingsNotifyClientActivated').checked,
+                        clientDeactivated: document.getElementById('settingsNotifyClientDeactivated').checked,
+
+                        // Messages
+                        newMessages: document.getElementById('settingsNotifyNewMessages').checked,
+
+                        // Team & System
+                        newTeamMember: document.getElementById('settingsNotifyNewTeamMember').checked,
+                        systemErrors: document.getElementById('settingsNotifySystemErrors').checked
                     },
                     lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
                     updatedBy: firebase.auth().currentUser?.email || 'unknown'
