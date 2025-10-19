@@ -540,8 +540,9 @@ body {
 }
 
 .btn:hover {
-    background: #012E40;
+    background: linear-gradient(135deg, #047a77 0%, #05908C 100%);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3);
 }
 
 .btn-complete {
