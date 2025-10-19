@@ -3461,26 +3461,57 @@
             }
         };
 
-        // Load reps for deal form dropdown
+        // Load reps and admins for deal form dropdown
         async function loadRepsForDealForm() {
             const select = document.getElementById('dealAssignedTo');
             const currentValue = select.value; // Preserve selection
 
             // Clear existing options except first
-            select.innerHTML = '<option value="">Select Rep...</option>';
+            select.innerHTML = '<option value="">Select Person...</option>';
 
             const snapshot = await db.collection('salesReps')
                 .where('active', '==', true)
                 .orderBy('name')
                 .get();
 
+            // Separate admins and reps
+            const admins = [];
+            const reps = [];
+
             snapshot.forEach(doc => {
                 const data = doc.data();
-                const option = document.createElement('option');
-                option.value = doc.id;
-                option.textContent = data.name;
-                select.appendChild(option);
+                if (data.role === 'admin') {
+                    admins.push({ id: doc.id, name: data.name });
+                } else {
+                    reps.push({ id: doc.id, name: data.name });
+                }
             });
+
+            // Add admins group
+            if (admins.length > 0) {
+                const adminGroup = document.createElement('optgroup');
+                adminGroup.label = 'Admins';
+                admins.forEach(admin => {
+                    const option = document.createElement('option');
+                    option.value = admin.id;
+                    option.textContent = admin.name;
+                    adminGroup.appendChild(option);
+                });
+                select.appendChild(adminGroup);
+            }
+
+            // Add sales reps group
+            if (reps.length > 0) {
+                const repsGroup = document.createElement('optgroup');
+                repsGroup.label = 'Sales Reps';
+                reps.forEach(rep => {
+                    const option = document.createElement('option');
+                    option.value = rep.id;
+                    option.textContent = rep.name;
+                    repsGroup.appendChild(option);
+                });
+                select.appendChild(repsGroup);
+            }
 
             // Restore selection
             if (currentValue) {
@@ -5585,7 +5616,7 @@ Start with Phase 1 and work through systematically. Show your progress after eac
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="dealAssignedTo">Assigned To *</label>
+                        <label for="dealAssignedTo">Assigned To (Admin or Sales Rep) *</label>
                         <select id="dealAssignedTo" required>
                             <option value="">Select Rep...</option>
                         </select>
