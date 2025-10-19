@@ -819,6 +819,28 @@
                 </div>
             </div>
 
+            <!-- Notifications & Alerts Section -->
+            <div class="admin-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <h2 style="font-family: 'Bitter', serif; color: #000000; margin: 0;">🔔 Notifications & Alerts</h2>
+                        <span id="dashboardNotificationCount" style="display: none; background: #ef4444; color: white; border-radius: 12px; padding: 4px 10px; font-size: 0.8rem; font-weight: 700;"></span>
+                    </div>
+                    <button onclick="markAllDashboardNotificationsRead()" id="markAllReadBtn" style="display: none; background: transparent; border: 1px solid #05908C; color: #05908C; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s ease;" onmouseover="this.style.background='#05908C'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='#05908C'">
+                        Mark All Read
+                    </button>
+                </div>
+
+                <div id="dashboardNotificationsList" style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Notifications will be rendered here -->
+                    <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px; border: 2px solid #22c55e;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
+                        <div style="font-size: 1.1rem; font-weight: 600; color: #166534; margin-bottom: 4px;">All Caught Up!</div>
+                        <div style="color: #15803d; font-size: 0.9rem;">No pending notifications at this time</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Quick Actions -->
             <div class="admin-section">
                 <h2 style="font-family: 'Bitter', serif; color: #000000; margin-bottom: 16px;">Quick Actions</h2>
@@ -1761,9 +1783,231 @@
                 // Load sales pipeline board on dashboard
                 loadCRMPipeline();
 
+                // Load dashboard notifications
+                loadDashboardNotifications();
+
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
             }
+        }
+
+        // Load Dashboard Notifications
+        async function loadDashboardNotifications() {
+            try {
+                const clientsSnapshot = await db.collection('clients').get();
+                const notifications = [];
+
+                clientsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const clientId = doc.id;
+
+                    // Check for revision requests
+                    if (data.revisionRequests && data.revisionRequests.length > 0) {
+                        const pendingRevisions = data.revisionRequests.filter(r => r.status === 'pending');
+                        if (pendingRevisions.length > 0) {
+                            pendingRevisions.forEach(revision => {
+                                notifications.push({
+                                    type: 'revision',
+                                    icon: '⚠️',
+                                    title: `${data.clientName || 'Client'} requested revision`,
+                                    message: revision.message || 'No details provided',
+                                    clientId: clientId,
+                                    clientName: data.clientName,
+                                    timestamp: revision.timestamp?.toDate() || new Date(),
+                                    priority: 'high'
+                                });
+                            });
+                        }
+                    }
+
+                    // Check for website access submissions
+                    if (data.hasUnreviewedWebsiteAccess && data.websiteAccessMethod) {
+                        const accessType = data.websiteAccessMethod === 'admin-contact' ? 'Admin Contact' : 'Direct Access';
+                        notifications.push({
+                            type: 'website-access',
+                            icon: '🌐',
+                            title: `${data.clientName || 'Client'} submitted website access`,
+                            message: `${accessType} information provided`,
+                            clientId: clientId,
+                            clientName: data.clientName,
+                            timestamp: data.websiteAdminDetails?.submittedAt?.toDate() || data.websiteDirectAccess?.submittedAt?.toDate() || new Date(),
+                            priority: 'medium'
+                        });
+                    }
+                });
+
+                // Check for completed website forms (from website-quotes collection)
+                const quotesSnapshot = await db.collection('website-quotes')
+                    .where('status', '==', 'completed')
+                    .orderBy('completedAt', 'desc')
+                    .limit(5)
+                    .get();
+
+                quotesSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const completedDate = data.completedAt?.toDate();
+                    const now = new Date();
+                    const hoursSinceCompletion = completedDate ? (now - completedDate) / (1000 * 60 * 60) : 999;
+
+                    // Only show if completed in last 24 hours
+                    if (hoursSinceCompletion < 24) {
+                        notifications.push({
+                            type: 'website-form',
+                            icon: '📝',
+                            title: `${data.companyName || 'Company'} completed website form`,
+                            message: `Form completed ${Math.round(hoursSinceCompletion)} hours ago`,
+                            quoteId: doc.id,
+                            timestamp: completedDate || new Date(),
+                            priority: 'low'
+                        });
+                    }
+                });
+
+                // Sort by priority and timestamp
+                const priorityOrder = { high: 1, medium: 2, low: 3 };
+                notifications.sort((a, b) => {
+                    if (a.priority !== b.priority) {
+                        return priorityOrder[a.priority] - priorityOrder[b.priority];
+                    }
+                    return b.timestamp - a.timestamp;
+                });
+
+                // Render notifications
+                renderDashboardNotifications(notifications);
+
+            } catch (error) {
+                console.error('Error loading dashboard notifications:', error);
+            }
+        }
+
+        // Render Dashboard Notifications
+        function renderDashboardNotifications(notifications) {
+            const container = document.getElementById('dashboardNotificationsList');
+            const countBadge = document.getElementById('dashboardNotificationCount');
+            const markAllBtn = document.getElementById('markAllReadBtn');
+
+            if (notifications.length === 0) {
+                // Show "All Caught Up" message
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px; border: 2px solid #22c55e;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
+                        <div style="font-size: 1.1rem; font-weight: 600; color: #166534; margin-bottom: 4px;">All Caught Up!</div>
+                        <div style="color: #15803d; font-size: 0.9rem;">No pending notifications at this time</div>
+                    </div>
+                `;
+                countBadge.style.display = 'none';
+                markAllBtn.style.display = 'none';
+                return;
+            }
+
+            // Show notification count and Mark All Read button
+            countBadge.textContent = notifications.length;
+            countBadge.style.display = 'inline-block';
+            markAllBtn.style.display = 'inline-block';
+
+            // Render each notification
+            container.innerHTML = notifications.map(notification => {
+                const timeAgo = getTimeAgo(notification.timestamp);
+                const bgColor = notification.priority === 'high' ? '#fee2e2' :
+                               notification.priority === 'medium' ? '#fff7ed' : '#f0f9ff';
+                const borderColor = notification.priority === 'high' ? '#ef4444' :
+                                   notification.priority === 'medium' ? '#f97316' : '#3b82f6';
+
+                return `
+                    <div style="background: ${bgColor}; border-left: 4px solid ${borderColor}; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease;"
+                         onclick="handleNotificationClick('${notification.type}', '${notification.clientId || notification.quoteId}')"
+                         onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'"
+                         onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 1.5rem;">${notification.icon}</span>
+                                <div style="font-weight: 700; color: #000000; font-size: 0.95rem;">${notification.title}</div>
+                            </div>
+                            <span style="font-size: 0.75rem; color: #6b7280; white-space: nowrap;">${timeAgo}</span>
+                        </div>
+                        <div style="margin-left: 40px; color: #374151; font-size: 0.9rem; line-height: 1.5;">${notification.message}</div>
+                        <div style="margin-left: 40px; margin-top: 8px;">
+                            <button style="background: ${borderColor}; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Handle notification click
+        function handleNotificationClick(type, id) {
+            if (type === 'revision' || type === 'website-access') {
+                // Navigate to Clients tab and scroll to client
+                switchAdminTab('clients');
+                setTimeout(() => {
+                    const clientCard = document.querySelector(`[data-client-id="${id}"]`);
+                    if (clientCard) {
+                        clientCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        clientCard.style.animation = 'pulse 1s ease 2';
+                    }
+                }, 300);
+            } else if (type === 'website-form') {
+                // Navigate to Website Forms tab
+                switchAdminTab('website-forms');
+            }
+        }
+
+        // Mark all dashboard notifications as read
+        async function markAllDashboardNotificationsRead() {
+            try {
+                const clientsSnapshot = await db.collection('clients').get();
+                const batch = db.batch();
+
+                clientsSnapshot.forEach(doc => {
+                    const data = doc.data();
+
+                    // Mark revision requests as reviewed
+                    if (data.revisionRequests && data.revisionRequests.length > 0) {
+                        const updatedRevisions = data.revisionRequests.map(r => ({
+                            ...r,
+                            status: 'reviewed'
+                        }));
+                        batch.update(doc.ref, { revisionRequests: updatedRevisions });
+                    }
+
+                    // Mark website access as reviewed
+                    if (data.hasUnreviewedWebsiteAccess) {
+                        batch.update(doc.ref, { hasUnreviewedWebsiteAccess: false });
+                    }
+                });
+
+                await batch.commit();
+                loadDashboardNotifications(); // Reload to show "All Caught Up"
+                showToast('All notifications marked as read', 'success');
+            } catch (error) {
+                console.error('Error marking notifications as read:', error);
+                showToast('Error marking notifications as read', 'error');
+            }
+        }
+
+        // Helper function to get time ago
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+
+            const intervals = {
+                year: 31536000,
+                month: 2592000,
+                week: 604800,
+                day: 86400,
+                hour: 3600,
+                minute: 60
+            };
+
+            for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+                const interval = Math.floor(seconds / secondsInUnit);
+                if (interval >= 1) {
+                    return interval === 1 ? `1 ${unit} ago` : `${interval} ${unit}s ago`;
+                }
+            }
+
+            return 'Just now';
         }
 
         // Toggle Archived Deals visibility
@@ -2263,6 +2507,7 @@
                     const needsAttention = hasPendingRevision || hasUnreviewedWebsiteAccess;
 
                     const card = document.createElement('div');
+                    card.setAttribute('data-client-id', docId); // Add data attribute for notification navigation
                     const baseCardStyle = 'background: #FFF8E6; border-radius: 12px; padding: 20px; transition: all 0.2s ease; backdrop-filter: blur(8px);';
                     const attentionStyle = needsAttention
                         ? 'box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), 0 6px 30px rgba(1, 46, 64, 0.3); border: 2px solid rgba(239, 68, 68, 0.8); animation: revisionPulse 2s infinite;'
