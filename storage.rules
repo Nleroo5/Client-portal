@@ -51,6 +51,18 @@ service firebase.storage {
       allow read: if true;
     }
 
+    // Client Portal uploads - Brand assets, logos, etc.
+    match /clients/{clientId}/{allPaths=**} {
+      // Admins can read/write all client files
+      allow read, write: if isAdmin();
+
+      // Allow unauthenticated uploads for client portals (clients access via URL parameter)
+      allow write: if true;
+
+      // Allow public read for displaying logos and assets in admin dashboard
+      allow read: if true;
+    }
+
     // Deny all other access
     match /{allPaths=**} {
       allow read, write: if false;
