@@ -1435,6 +1435,44 @@
         return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     }
 
+    // Download file function
+    window.downloadFile = async function(url, filename) {
+        try {
+            const storageRef = firebase.storage().refFromURL(url);
+            const metadata = await storageRef.getMetadata();
+
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = 'blob';
+
+            xhr.onload = function() {
+                const blob = xhr.response;
+                const blobUrl = window.URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename || metadata.name || 'download';
+                document.body.appendChild(a);
+                a.click();
+
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 100);
+            };
+
+            xhr.onerror = function() {
+                console.error('Download failed, opening in new tab');
+                window.open(url, '_blank');
+            };
+
+            xhr.open('GET', url);
+            xhr.send();
+        } catch (error) {
+            console.error('Error downloading:', error);
+            window.open(url, '_blank');
+        }
+    };
+
     // Display creatives gallery
     function displayCreativesGallery(creatives) {
         const placeholder = document.getElementById('galleryPlaceholder');
@@ -1452,11 +1490,19 @@
 
         if (grid) {
             grid.innerHTML = creatives.map((creative, index) => `
-                <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer;" onclick="window.openLightbox(${index})">
+                <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease;">
                     <img src="${creative.url}" alt="${creative.name}" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block;">
-                    <div style="padding: 12px;">
+                    <div style="padding: 15px;">
                         <div style="color: #012E40; font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">${creative.name || `Creative ${index + 1}`}</div>
-                        <div style="color: #6b7280; font-size: 0.75rem;">${creative.type || 'Image'}</div>
+                        <div style="color: #6b7280; font-size: 0.75rem; margin-bottom: 12px;">${creative.type || 'Image'}</div>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="window.openLightbox(${index})" style="flex: 1; padding: 8px 16px; background: #E8F5F3; color: #05908C; border: 1px solid #05908C; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='#D1F2EB'" onmouseout="this.style.background='#E8F5F3'">
+                                👁️ Preview
+                            </button>
+                            <button onclick="downloadFile('${creative.url}', '${creative.name || `creative-${index + 1}`}')" style="flex: 1; padding: 8px 16px; background: #05908C; color: white; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='#047a77'" onmouseout="this.style.background='#05908C'">
+                                📥 Download
+                            </button>
+                        </div>
                     </div>
                 </div>
             `).join('');
