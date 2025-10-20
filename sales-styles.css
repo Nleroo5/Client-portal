@@ -265,6 +265,7 @@ body {
     border-radius: 8px;
     border: 1px solid var(--border);
     overflow: hidden;
+    min-width: 0; /* Allow column to shrink below content size */
 }
 
 .column-header {
@@ -274,6 +275,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px; /* Add gap between title and count */
 }
 
 .column-header h3 {
@@ -283,6 +285,11 @@ body {
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    flex: 1; /* Allow title to take available space */
+    min-width: 0; /* Allow flex item to shrink */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .deal-count {
@@ -292,6 +299,8 @@ body {
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
+    white-space: nowrap; /* Prevent count from wrapping */
+    flex-shrink: 0; /* Don't shrink count badge */
 }
 
 .column-body {
@@ -299,6 +308,26 @@ body {
     min-height: 100px;
     max-height: 70vh;
     overflow-y: auto;
+    overflow-x: hidden; /* Prevent horizontal overflow */
+}
+
+/* Custom scrollbar for column body */
+.column-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.column-body::-webkit-scrollbar-track {
+    background: var(--bg-main);
+    border-radius: 10px;
+}
+
+.column-body::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.column-body::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
 }
 
 .no-deals {
@@ -318,6 +347,8 @@ body {
     cursor: pointer;
     transition: all 0.15s ease-out;
     margin-bottom: 12px;
+    overflow: hidden; /* Prevent content overflow */
+    word-wrap: break-word; /* Prevent long text from breaking layout */
 }
 
 .deal-card:hover {
@@ -330,16 +361,23 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
+    gap: 8px; /* Add gap to prevent badge from touching company name */
 }
 
 .deal-card-header strong {
     color: var(--text-primary);
     font-size: 1rem;
     font-weight: 600;
+    flex: 1; /* Allow company name to take available space */
+    min-width: 0; /* Allow flex item to shrink below content size */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .deal-card-body {
     font-size: 0.875rem;
+    overflow: hidden; /* Prevent body content overflow */
 }
 
 /* Days Badge */
@@ -350,6 +388,8 @@ body {
     border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 600;
+    white-space: nowrap; /* Prevent wrapping */
+    flex-shrink: 0; /* Don't shrink badge */
 }
 
 /* Sales Card (Pre-Onboarding Stages) */
@@ -367,12 +407,16 @@ body {
     font-size: 0.875rem;
     margin: 6px 0;
     color: #012E40;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .sales-card .deal-value-section {
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid #EEF4D9;
+    overflow: hidden; /* Prevent overflow from value section */
 }
 
 .sales-card .deal-mrr {
@@ -380,12 +424,18 @@ body {
     font-weight: 600;
     font-size: 1rem;
     margin: 4px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .sales-card .deal-total {
     color: #666;
     font-size: 0.875rem;
     margin: 2px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Client Card (Onboarding+ Stages) */
@@ -400,10 +450,11 @@ body {
 /* Portal Status Section */
 .portal-status {
     margin: 12px 0;
+    overflow: hidden; /* Prevent overflow */
 }
 
 .portal-link-badge {
-    display: inline-block;
+    display: block; /* Changed from inline-block for better width control */
     background: linear-gradient(135deg, #85C7B3 0%, #05908C 100%);
     color: white;
     padding: 10px 16px;
@@ -414,6 +465,10 @@ body {
     transition: all 0.15s ease-out;
     width: 100%;
     text-align: center;
+    box-sizing: border-box; /* Include padding in width calculation */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .portal-link-badge:hover {
@@ -435,6 +490,9 @@ body {
     font-weight: 600;
     margin-bottom: 8px;
     border: 1px solid #F59E0B;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .create-portal-btn {
@@ -449,6 +507,8 @@ body {
     width: 100%;
     transition: all 0.15s ease-out;
     font-family: 'Inter', sans-serif;
+    box-sizing: border-box; /* Include padding in width calculation */
+    white-space: nowrap; /* Prevent button text wrapping */
 }
 
 .create-portal-btn:hover {
@@ -467,6 +527,9 @@ body {
     font-size: 0.8125rem;
     color: #666;
     margin: 6px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Onboarding Progress Checklist */
@@ -474,6 +537,7 @@ body {
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid #EEF4D9;
+    overflow: hidden; /* Prevent overflow */
 }
 
 .progress-item {
@@ -481,6 +545,9 @@ body {
     margin: 6px 0;
     color: #012E40;
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .progress-item.completed {
@@ -622,6 +689,11 @@ p {
 
     .pipeline-board {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+    }
+
+    .column-body {
+        max-height: 60vh; /* Shorter columns on tablets */
     }
 }
 
@@ -655,8 +727,22 @@ p {
     }
 
     .pipeline-board {
-        grid-template-columns: 1fr;
-        gap: 16px;
+        grid-template-columns: 1fr; /* Single column on mobile */
+        gap: 12px;
+    }
+
+    .column-body {
+        max-height: 50vh; /* Even shorter on mobile */
+    }
+
+    .deal-card {
+        padding: 12px; /* Slightly less padding on mobile */
+    }
+
+    .portal-link-badge,
+    .create-portal-btn {
+        font-size: 0.8125rem; /* Slightly smaller buttons on mobile */
+        padding: 8px 12px;
     }
 
     .btn {
