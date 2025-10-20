@@ -5272,7 +5272,7 @@
                 dealForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
 
-                    const dealId = document.getElementById('dealId').value;
+                    let dealId = document.getElementById('dealId').value;  // Changed from const to let
                     const websiteQuoteId = document.getElementById('dealWebsiteQuoteId').value || null;
 
                     const dealData = {
