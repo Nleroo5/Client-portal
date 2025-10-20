@@ -4038,8 +4038,60 @@
             }
         }
 
+        // Create Portal for Deal (Admin function)
+        async function createPortalForDealAdmin(dealId) {
+            if (!confirm('Create a new client portal for this deal?')) return;
+
+            try {
+                // Get deal data
+                const dealDoc = await db.collection('deals').doc(dealId).get();
+                if (!dealDoc.exists) {
+                    alert('Deal not found');
+                    return;
+                }
+
+                const dealData = dealDoc.data();
+
+                // Create new client portal
+                const portalData = {
+                    clientName: dealData.companyName,
+                    contactName: dealData.contactName || '',
+                    clientEmail: dealData.email || '',
+                    phone: dealData.phone || '',
+                    active: true,
+                    portalType: 'contract',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    linkedDealId: dealId,
+                    // Onboarding progress
+                    step1Complete: false,
+                    step2Complete: false,
+                    step3Complete: false,
+                    step4Complete: false,
+                    step5Complete: false,
+                    step6Complete: false
+                };
+
+                const portalRef = await db.collection('clients').add(portalData);
+
+                // Link portal to deal
+                await db.collection('deals').doc(dealId).update({
+                    clientPortalId: portalRef.id,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert('Client portal created successfully!');
+
+                // Reload pipeline to show updated card
+                loadCRMPipeline();
+
+            } catch (error) {
+                console.error('Error creating portal:', error);
+                alert('Error creating portal. Please try again.');
+            }
+        }
+
         // Open deal modal
-        async function openDealModal(dealId = null) {
+        async function openDealModal(dealId = null, linkedPortalId = null) {
             const modal = document.getElementById('dealModal');
             const form = document.getElementById('dealForm');
             const title = document.getElementById('dealModalTitle');
@@ -4078,10 +4130,29 @@
                 }
             } else {
                 // Create mode
-                title.textContent = 'Add New Deal';
+                title.textContent = linkedPortalId ? 'Create Deal for Portal' : 'Add New Deal';
                 form.reset();
                 document.getElementById('dealId').value = '';
                 document.getElementById('websiteQuoteSection').style.display = 'none';
+
+                // If creating deal for existing portal, pre-fill the portal ID
+                if (linkedPortalId) {
+                    document.getElementById('dealClientPortalId').value = linkedPortalId;
+
+                    // Try to load portal data to pre-fill company/contact info
+                    try {
+                        const portalDoc = await db.collection('clients').doc(linkedPortalId).get();
+                        if (portalDoc.exists) {
+                            const portalData = portalDoc.data();
+                            document.getElementById('dealCompanyName').value = portalData.clientName || '';
+                            document.getElementById('dealContactName').value = portalData.contactName || '';
+                            document.getElementById('dealEmail').value = portalData.clientEmail || '';
+                            document.getElementById('dealPhone').value = portalData.phone || '';
+                        }
+                    } catch (error) {
+                        console.error('Error loading portal data:', error);
+                    }
+                }
             }
 
             modal.style.display = 'flex';
@@ -4506,58 +4577,35 @@
                         ].filter(Boolean).length;
                         const progressPercent = Math.round((completedSteps / 6) * 100);
 
-                        // Update virtual deal cards
-                        if (deal.isVirtualDeal) {
-                            const virtualInfo = document.querySelector(`#client-info-virtual-${deal.id} .client-portal-data`);
-                            if (virtualInfo) {
-                                virtualInfo.innerHTML = `
-                                    <div style="margin-bottom: 4px;">${clientData.portalType === 'm2m' ? 'M2M' : 'Contract'} Portal</div>
-                                    <div style="background: #d1d5db; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 6px;">
-                                        <div style="background: #05908C; height: 100%; width: ${progressPercent}%;"></div>
+                        // Update new unified card format
+                        const clientInfo = document.querySelector(`#client-info-${deal.id} .client-portal-data`);
+                        if (clientInfo) {
+                            clientInfo.innerHTML = `
+                                <div style="margin-bottom: 4px;">
+                                    <div style="background: #d1d5db; height: 6px; border-radius: 3px; overflow: hidden;">
+                                        <div style="background: #05908C; height: 100%; width: ${progressPercent}%; transition: width 0.3s ease;"></div>
                                     </div>
-                                    <div style="text-align: center; margin-top: 4px; font-weight: 600;">${progressPercent}% Complete (${completedSteps}/6)</div>
-                                `;
-                            }
-                        } else {
-                            // Update regular deal cards (compressed and full views)
-                            const compressedInfo = document.querySelector(`#client-info-compressed-${deal.id} .client-portal-data`);
-                            const fullInfo = document.querySelector(`#client-info-full-${deal.id} .client-portal-data`);
-
-                            const infoHTML = `
-                                <div style="margin-bottom: 4px;"><strong>${clientData.clientName}</strong></div>
-                                <div style="margin-bottom: 4px;">${clientData.portalType === 'm2m' ? 'M2M' : 'Contract'} Portal • ${clientData.active ? 'Active' : 'Inactive'}</div>
-                                <div style="background: #d1d5db; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 6px;">
-                                    <div style="background: #05908C; height: 100%; width: ${progressPercent}%;"></div>
                                 </div>
-                                <div style="text-align: center; margin-top: 4px; font-weight: 600;">${progressPercent}% Complete (${completedSteps}/6)</div>
+                                <div style="text-align: center; font-weight: 600; font-size: 0.75rem;">
+                                    ${progressPercent}% Complete (${completedSteps}/6)
+                                </div>
                             `;
-
-                            if (compressedInfo) compressedInfo.innerHTML = infoHTML;
-                            if (fullInfo) fullInfo.innerHTML = infoHTML;
                         }
                     } else {
                         // Client not found
-                        const compressedInfo = document.querySelector(`#client-info-compressed-${deal.id} .client-portal-data`);
-                        const fullInfo = document.querySelector(`#client-info-full-${deal.id} .client-portal-data`);
-                        const virtualInfo = document.querySelector(`#client-info-virtual-${deal.id} .client-portal-data`);
-
-                        const errorHTML = '<div style="color: #991b1b;">⚠️ Client not found</div>';
-                        if (compressedInfo) compressedInfo.innerHTML = errorHTML;
-                        if (fullInfo) fullInfo.innerHTML = errorHTML;
-                        if (virtualInfo) virtualInfo.innerHTML = errorHTML;
+                        const clientInfo = document.querySelector(`#client-info-${deal.id} .client-portal-data`);
+                        if (clientInfo) {
+                            clientInfo.innerHTML = '<div style="color: #991b1b; font-size: 0.75rem;">⚠️ Portal not found</div>';
+                        }
                     }
                 } catch (error) {
                     console.error(`❌ Error loading client data for deal ${deal.id}:`, error);
 
                     // Show error in UI
-                    const compressedInfo = document.querySelector(`#client-info-compressed-${deal.id} .client-portal-data`);
-                    const fullInfo = document.querySelector(`#client-info-full-${deal.id} .client-portal-data`);
-                    const virtualInfo = document.querySelector(`#client-info-virtual-${deal.id} .client-portal-data`);
-
-                    const errorHTML = '<div style="color: #991b1b; font-size: 0.7rem;">⚠️ Error loading</div>';
-                    if (compressedInfo) compressedInfo.innerHTML = errorHTML;
-                    if (fullInfo) fullInfo.innerHTML = errorHTML;
-                    if (virtualInfo) virtualInfo.innerHTML = errorHTML;
+                    const clientInfo = document.querySelector(`#client-info-${deal.id} .client-portal-data`);
+                    if (clientInfo) {
+                        clientInfo.innerHTML = '<div style="color: #991b1b; font-size: 0.75rem;">⚠️ Error loading</div>';
+                    }
                 }
             });
 
@@ -4598,6 +4646,221 @@
 
         // Render deal card with compressed/full view
         function renderDealCard(deal, stageCount) {
+            // UNIFIED STAGE-BASED RENDERING
+            // Pre-onboarding stages: qualified → discovery-completed
+            // Onboarding+ stages: onboarding-portal → follow-up-resell
+
+            const preOnboardingStages = ['qualified', 'cold-outreach', 'follow-up', 'discovery-scheduled', 'discovery-completed'];
+            const isPreOnboarding = preOnboardingStages.includes(deal.stage);
+
+            // Common calculations
+            const daysInStage = deal.lastUpdated
+                ? Math.floor((new Date() - (deal.lastUpdated.toDate ? deal.lastUpdated.toDate() : new Date(deal.lastUpdated))) / (1000 * 60 * 60 * 24))
+                : 0;
+            const mrr = deal.mrr ? `$${deal.mrr.toLocaleString()}/mo` : '';
+            const hasPortal = !!deal.clientPortalId;
+            const isDeal = !deal.isVirtualDeal;
+
+            // Status color based on days
+            let statusBg, statusColor;
+            if (daysInStage <= 3) {
+                statusBg = '#d1fae5'; statusColor = '#065f46';
+            } else if (daysInStage <= 7) {
+                statusBg = '#fef3c7'; statusColor = '#92400e';
+            } else {
+                statusBg = '#fee2e2'; statusColor = '#991b1b';
+            }
+
+            if (isPreOnboarding) {
+                return renderPreOnboardingCard(deal, daysInStage, statusBg, statusColor, mrr, hasPortal, isDeal);
+            } else {
+                return renderOnboardingCard(deal, daysInStage, statusBg, statusColor, mrr, hasPortal, isDeal);
+            }
+        }
+
+        // Pre-Onboarding Card (Qualified → Discovery Completed)
+        function renderPreOnboardingCard(deal, daysInStage, statusBg, statusColor, mrr, hasPortal, isDeal) {
+            return `
+                <div class="deal-card"
+                     id="deal-${deal.id}"
+                     draggable="${isDeal ? 'true' : 'false'}"
+                     data-deal-id="${deal.id}"
+                     data-deal-stage="${deal.stage}"
+                     ${isDeal ? 'ondragstart="handleDealDragStart(event)" ondragend="handleDealDragEnd(event)"' : ''}
+                     style="background: linear-gradient(135deg, #FFF8E6 0%, #FFFFFF 100%);
+                            border-radius: 8px;
+                            padding: 12px;
+                            margin-bottom: 8px;
+                            border-left: 4px solid #F2A922;
+                            cursor: pointer;
+                            transition: all 0.15s ease;
+                            border: 2px solid rgba(242, 169, 34, 0.3);
+                            box-shadow: 0 2px 6px rgba(242, 169, 34, 0.15);
+                            position: relative;
+                            overflow: hidden;">
+
+                    <!-- Header with Company Name and Days Badge -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px;">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-weight: 600; color: #012E40; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                ${deal.companyName || 'Unnamed'}
+                            </div>
+                        </div>
+                        <span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; white-space: nowrap; flex-shrink: 0;">
+                            ${daysInStage}d
+                        </span>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div style="margin-bottom: 10px;">
+                        <div style="font-size: 0.8rem; color: #64748B; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            👤 ${deal.contactName || 'No contact'}
+                        </div>
+                        ${mrr ? `
+                            <div style="font-size: 0.85rem; color: #05908C; font-weight: 600; margin-top: 4px;">
+                                💰 ${mrr}
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #EEF4D9;">
+                        ${isDeal ? `
+                            <button onclick="openDealModal('${deal.id}'); event.stopPropagation();"
+                                    style="flex: 1; padding: 6px 10px; background: #E8F5F3; border: 1px solid #05908C; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #05908C; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ✏️ Edit
+                            </button>
+                        ` : `
+                            <button onclick="editClient('${deal.clientPortalId}'); event.stopPropagation();"
+                                    style="flex: 1; padding: 6px 10px; background: #E8F5F3; border: 1px solid #05908C; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #05908C; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ✏️ Edit Portal
+                            </button>
+                        `}
+
+                        ${hasPortal ? `
+                            <button onclick="viewLinkedClient('${deal.clientPortalId}'); event.stopPropagation();"
+                                    style="flex: 1; padding: 6px 10px; background: #05908C; color: white; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                🔗 Portal
+                            </button>
+                        ` : `
+                            <button onclick="createPortalForDealAdmin('${deal.id}'); event.stopPropagation();"
+                                    style="flex: 1; padding: 6px 10px; background: #05908C; color: white; border: none; border-radius: 4px; font-size: 0.75rem; cursor: pointer; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                + Portal
+                            </button>
+                        `}
+
+                        ${!isDeal ? `
+                            <button onclick="openDealModal(null, '${deal.clientPortalId}'); event.stopPropagation();"
+                                    style="flex: 1; padding: 6px 10px; background: #FBE9D1; border: 1px solid #F2A922; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #92400e; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                + Deal
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Onboarding+ Card (Onboarding Portal → Resell)
+        function renderOnboardingCard(deal, daysInStage, statusBg, statusColor, mrr, hasPortal, isDeal) {
+            return `
+                <div class="deal-card"
+                     id="deal-${deal.id}"
+                     draggable="${isDeal ? 'true' : 'false'}"
+                     data-deal-id="${deal.id}"
+                     data-deal-stage="${deal.stage}"
+                     ${isDeal ? 'ondragstart="handleDealDragStart(event)" ondragend="handleDealDragEnd(event)"' : ''}
+                     style="background: linear-gradient(135deg, #E8F5F3 0%, #FFFFFF 100%);
+                            border-radius: 8px;
+                            padding: 12px;
+                            margin-bottom: 8px;
+                            border-left: 4px solid #85C7B3;
+                            cursor: pointer;
+                            transition: all 0.15s ease;
+                            border: 2px solid rgba(133, 199, 179, 0.3);
+                            box-shadow: 0 2px 6px rgba(5, 144, 140, 0.15);
+                            position: relative;
+                            overflow: hidden;">
+
+                    <!-- Header with Company Name and Days Badge -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px;">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-weight: 600; color: #012E40; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                ${deal.companyName || 'Unnamed'}
+                            </div>
+                        </div>
+                        <span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; white-space: nowrap; flex-shrink: 0;">
+                            ${daysInStage}d
+                        </span>
+                    </div>
+
+                    <!-- Portal Status or Create Button -->
+                    ${hasPortal ? `
+                        <div style="margin-bottom: 10px;">
+                            <button onclick="viewLinkedClient('${deal.clientPortalId}'); event.stopPropagation();"
+                                    style="width: 100%; padding: 8px 12px; background: linear-gradient(135deg, #85C7B3 0%, #05908C 100%); color: white; border: none; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box;">
+                                🔗 Open Client Portal
+                            </button>
+                        </div>
+                    ` : `
+                        <div style="margin-bottom: 10px;">
+                            <div style="background: #FEF3C7; color: #F59E0B; padding: 6px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-bottom: 6px; text-align: center; border: 1px solid #F59E0B;">
+                                ⚠️ Portal Not Created
+                            </div>
+                            <button onclick="createPortalForDealAdmin('${deal.id}'); event.stopPropagation();"
+                                    style="width: 100%; padding: 8px 12px; background: #05908C; color: white; border: none; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-sizing: border-box;">
+                                + Create Client Portal
+                            </button>
+                        </div>
+                    `}
+
+                    <!-- MRR and Contact -->
+                    <div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #D1F2EB;">
+                        ${mrr ? `
+                            <div style="font-size: 0.85rem; color: #05908C; font-weight: 600; margin-bottom: 4px;">
+                                💰 ${mrr}
+                            </div>
+                        ` : ''}
+                        <div style="font-size: 0.75rem; color: #64748B; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            👤 ${deal.contactName || 'No contact'}
+                        </div>
+                    </div>
+
+                    <!-- Progress Info (if portal exists) -->
+                    ${hasPortal ? `
+                        <div id="client-info-${deal.id}" style="margin-bottom: 10px;">
+                            <div class="client-portal-data" style="font-size: 0.75rem; color: #05908C; font-weight: 500;">
+                                Loading progress...
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 6px;">
+                        ${isDeal ? `
+                            <button onclick="openDealModal('${deal.id}'); event.stopPropagation();"
+                                    style="flex: 1; padding: 6px 10px; background: #E8F5F3; border: 1px solid #05908C; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #05908C; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ✏️ Edit
+                            </button>
+                        ` : `
+                            <button onclick="editClient('${deal.clientPortalId}'); event.stopPropagation();"
+                                    style="flex: 1; padding: 6px 10px; background: #E8F5F3; border: 1px solid #05908C; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #05908C; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                ✏️ Edit
+                            </button>
+                        `}
+
+                        ${!isDeal ? `
+                            <button onclick="openDealModal(null, '${deal.clientPortalId}'); event.stopPropagation();"
+                                    style="flex: 1; padding: 6px 10px; background: #FBE9D1; border: 1px solid #F2A922; border-radius: 4px; font-size: 0.75rem; cursor: pointer; color: #92400e; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                + Deal
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // DEPRECATED: Old rendering code below (kept temporarily for reference)
+        function renderDealCard_OLD(deal, stageCount) {
             // SPECIAL HANDLING FOR VIRTUAL DEALS (clients without linked deals)
             if (deal.isVirtualDeal) {
                 return `
