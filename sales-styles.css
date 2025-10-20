@@ -260,7 +260,56 @@ body {
     margin-top: 20px;
 }
 
-/* Deal Cards */
+.pipeline-column {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.column-header {
+    padding: 16px;
+    background: var(--bg-main);
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.column-header h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.deal-count {
+    background: var(--primary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.column-body {
+    padding: 12px;
+    min-height: 100px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.no-deals {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.875rem;
+    padding: 40px 20px;
+    font-style: italic;
+}
+
+/* Deal Cards - Base */
 .deal-card {
     background: linear-gradient(135deg, #FFF8E6 0%, #FFFFFF 100%);
     border: 1px solid var(--secondary);
@@ -268,14 +317,175 @@ body {
     padding: 16px;
     cursor: pointer;
     transition: all 0.15s ease-out;
-    border-left: 4px solid var(--accent-orange);
+    margin-bottom: 12px;
 }
 
 .deal-card:hover {
     box-shadow: 0 8px 20px rgba(242, 169, 34, 0.15);
     transform: translateY(-2px);
+}
+
+.deal-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.deal-card-header strong {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.deal-card-body {
+    font-size: 0.875rem;
+}
+
+/* Days Badge */
+.days-badge {
+    background: #EEF4D9;
+    color: #05908C;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Sales Card (Pre-Onboarding Stages) */
+.sales-card {
+    border-left: 4px solid #F2A922;
+}
+
+.sales-card:hover {
     border-left-color: var(--primary);
-    background: linear-gradient(135deg, #FFF8E6 0%, #FFFFFF 100%);
+}
+
+.sales-card .contact-name,
+.sales-card .contact-email,
+.sales-card .contact-phone {
+    font-size: 0.875rem;
+    margin: 6px 0;
+    color: #012E40;
+}
+
+.sales-card .deal-value-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #EEF4D9;
+}
+
+.sales-card .deal-mrr {
+    color: #05908C;
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 4px 0;
+}
+
+.sales-card .deal-total {
+    color: #666;
+    font-size: 0.875rem;
+    margin: 2px 0;
+}
+
+/* Client Card (Onboarding+ Stages) */
+.client-card {
+    border-left: 4px solid #85C7B3;
+}
+
+.client-card:hover {
+    border-left-color: #05908C;
+}
+
+/* Portal Status Section */
+.portal-status {
+    margin: 12px 0;
+}
+
+.portal-link-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #85C7B3 0%, #05908C 100%);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all 0.15s ease-out;
+    width: 100%;
+    text-align: center;
+}
+
+.portal-link-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3);
+    background: linear-gradient(135deg, #05908C 0%, #047a72 100%);
+}
+
+.portal-missing {
+    text-align: center;
+}
+
+.portal-missing-warning {
+    background: #FEF3C7;
+    color: #F59E0B;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    border: 1px solid #F59E0B;
+}
+
+.create-portal-btn {
+    background: #05908C;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.15s ease-out;
+    font-family: 'Inter', sans-serif;
+}
+
+.create-portal-btn:hover {
+    background: #047a72;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(5, 144, 140, 0.2);
+}
+
+.create-portal-btn:active {
+    transform: translateY(0);
+}
+
+/* Client Card Contact Info (smaller, less emphasis) */
+.client-card .contact-name-small,
+.client-card .deal-mrr-small {
+    font-size: 0.8125rem;
+    color: #666;
+    margin: 6px 0;
+}
+
+/* Onboarding Progress Checklist */
+.onboarding-progress {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #EEF4D9;
+}
+
+.progress-item {
+    font-size: 0.8125rem;
+    margin: 6px 0;
+    color: #012E40;
+    font-weight: 500;
+}
+
+.progress-item.completed {
+    color: #22c55e;
+    font-weight: 600;
 }
 
 /* Tables */
@@ -452,6 +662,166 @@ p {
     .btn {
         width: 100%;
     }
+}
+
+/* Deal Detail Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(1, 46, 64, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(1, 46, 64, 0.3);
+    max-width: 600px;
+    width: 90%;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 24px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-main);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    font-family: 'Bitter', serif;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.15s ease-out;
+}
+
+.modal-close-btn:hover {
+    background: rgba(5, 144, 140, 0.1);
+    color: var(--primary);
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.detail-section {
+    margin-bottom: 24px;
+}
+
+.detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.detail-section h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 12px 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    text-align: right;
+}
+
+.portal-link-btn {
+    display: block;
+    background: linear-gradient(135deg, #85C7B3 0%, #05908C 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.15s ease-out;
+}
+
+.portal-link-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3);
+    background: linear-gradient(135deg, #05908C 0%, #047a72 100%);
+}
+
+.modal-footer {
+    padding: 20px 24px;
+    border-top: 2px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: var(--bg-main);
 }
 
 /* Utility Classes */

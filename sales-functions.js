@@ -124,27 +124,309 @@
         pipelineBoard.innerHTML = html;
     }
 
+    // ============================================
+    // CARD RENDERING - STAGE-BASED UI
+    // ============================================
+
+    // Main router: determines which card type to render based on stage
     function renderDealCard(deal) {
+        // Pre-onboarding stages (sales focus)
+        const salesStages = ['qualified', 'cold-outreach', 'follow-up', 'discovery-scheduled', 'discovery-completed'];
+
+        if (salesStages.includes(deal.stage)) {
+            return renderSalesCard(deal);
+        } else {
+            // Onboarding+ stages (client focus)
+            return renderClientCard(deal);
+        }
+    }
+
+    // Sales Card: For pre-onboarding stages (Qualified → Discovery Completed)
+    function renderSalesCard(deal) {
         const mrr = deal.mrr ? `$${deal.mrr.toLocaleString()}/mo` : '';
-        const totalValue = deal.mrr && deal.contractLength ? `$${(deal.mrr * deal.contractLength).toLocaleString()}` : '';
+        const totalValue = deal.mrr && deal.contractLength ?
+            `$${(deal.mrr * deal.contractLength).toLocaleString()}` : '';
+        const daysInStage = getDaysInStage(deal);
 
         return `
-            <div class="deal-card" data-deal-id="${deal.id}" onclick="viewDeal('${deal.id}')">
+            <div class="deal-card sales-card" data-deal-id="${deal.id}" onclick="viewDeal('${deal.id}')">
                 <div class="deal-card-header">
                     <strong>${deal.companyName}</strong>
-                    ${deal.clientPortalId ? '<span class="deal-badge portal-linked">🔗 Portal</span>' : ''}
+                    <span class="days-badge">${daysInStage}d</span>
                 </div>
                 <div class="deal-card-body">
-                    ${deal.contactName ? `<p class="deal-contact">👤 ${deal.contactName}</p>` : ''}
-                    ${mrr ? `<p class="deal-mrr" style="color: #05908C; font-weight: 600;">${mrr}</p>` : ''}
-                    ${totalValue ? `<p class="deal-total" style="color: #999; font-size: 0.85rem;">${totalValue} total</p>` : ''}
+                    ${deal.contactName ? `<p class="contact-name">👤 ${deal.contactName}</p>` : ''}
+                    ${deal.email ? `<p class="contact-email">📧 ${deal.email}</p>` : ''}
+                    ${deal.phone ? `<p class="contact-phone">📞 ${deal.phone}</p>` : ''}
+
+                    <div class="deal-value-section">
+                        ${mrr ? `<p class="deal-mrr">💰 ${mrr}</p>` : ''}
+                        ${totalValue ? `<p class="deal-total">📊 ${totalValue} total</p>` : ''}
+                    </div>
                 </div>
             </div>
         `;
     }
 
-    window.viewDeal = function(dealId) {
-        alert(`Deal details for ${dealId} - Coming soon!`);
+    // Client Card: For onboarding+ stages (Onboarding Portal → Resell)
+    function renderClientCard(deal) {
+        const mrr = deal.mrr ? `$${deal.mrr.toLocaleString()}/mo` : '';
+        const hasPortal = !!deal.clientPortalId;
+        const daysInStage = getDaysInStage(deal);
+
+        return `
+            <div class="deal-card client-card" data-deal-id="${deal.id}">
+                <div class="deal-card-header">
+                    <strong>${deal.companyName}</strong>
+                    <span class="days-badge">${daysInStage}d</span>
+                </div>
+
+                ${hasPortal ? `
+                    <div class="portal-status">
+                        <a href="client-portal.html?id=${deal.clientPortalId}"
+                           class="portal-link-badge"
+                           onclick="event.stopPropagation();">
+                            🔗 Open Client Portal
+                        </a>
+                    </div>
+                ` : `
+                    <div class="portal-status portal-missing">
+                        <div class="portal-missing-warning">⚠️ Portal Not Created</div>
+                        <button class="create-portal-btn"
+                                onclick="event.stopPropagation(); createPortalForDeal('${deal.id}');">
+                            + Create Client Portal
+                        </button>
+                    </div>
+                `}
+
+                <div class="deal-card-body">
+                    ${deal.contactName ? `<p class="contact-name-small">👤 ${deal.contactName}</p>` : ''}
+                    ${mrr ? `<p class="deal-mrr-small">💰 ${mrr}</p>` : ''}
+
+                    ${renderOnboardingProgress(deal)}
+                </div>
+            </div>
+        `;
+    }
+
+    // Helper: Calculate days in current stage
+    function getDaysInStage(deal) {
+        if (!deal.lastUpdated) return 0;
+        const lastUpdate = deal.lastUpdated.toDate ? deal.lastUpdated.toDate() : new Date(deal.lastUpdated);
+        const today = new Date();
+        const diffTime = Math.abs(today - lastUpdate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays;
+    }
+
+    // Helper: Render onboarding progress checklist
+    function renderOnboardingProgress(deal) {
+        if (deal.stage !== 'onboarding-portal') return '';
+
+        const checklist = deal.onboardingChecklist || {};
+
+        return `
+            <div class="onboarding-progress">
+                <p class="progress-item ${checklist.contractSigned ? 'completed' : ''}">
+                    ${checklist.contractSigned ? '✅' : '⬜'} Contract Signed
+                </p>
+                <p class="progress-item ${checklist.setupInProgress ? 'completed' : ''}">
+                    ${checklist.setupInProgress ? '✅' : '⬜'} Setup In Progress
+                </p>
+                <p class="progress-item ${checklist.campaignReady ? 'completed' : ''}">
+                    ${checklist.campaignReady ? '✅' : '⬜'} Campaign Ready
+                </p>
+            </div>
+        `;
+    }
+
+    // Create portal for deal
+    window.createPortalForDeal = async function(dealId) {
+        if (!confirm('Create a new client portal for this deal?')) return;
+
+        try {
+            // Get deal data
+            const dealDoc = await db.collection('deals').doc(dealId).get();
+            if (!dealDoc.exists) {
+                alert('Deal not found');
+                return;
+            }
+
+            const dealData = dealDoc.data();
+
+            // Create new client portal
+            const portalData = {
+                companyName: dealData.companyName,
+                contactName: dealData.contactName || '',
+                email: dealData.email || '',
+                phone: dealData.phone || '',
+                status: 'onboarding',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                createdBy: currentRepId,
+                dealId: dealId
+            };
+
+            const portalRef = await db.collection('clientPortals').add(portalData);
+
+            // Link portal to deal
+            await db.collection('deals').doc(dealId).update({
+                clientPortalId: portalRef.id,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            alert('Client portal created successfully!');
+
+            // Reload pipeline to show updated card
+            loadMyPipeline();
+
+        } catch (error) {
+            console.error('Error creating portal:', error);
+            alert('Error creating portal. Please try again.');
+        }
+    };
+
+    window.viewDeal = async function(dealId) {
+        try {
+            const dealDoc = await db.collection('deals').doc(dealId).get();
+            if (!dealDoc.exists) {
+                alert('Deal not found');
+                return;
+            }
+
+            const deal = { id: dealDoc.id, ...dealDoc.data() };
+            showDealDetailModal(deal);
+        } catch (error) {
+            console.error('Error loading deal details:', error);
+            alert('Error loading deal details');
+        }
+    };
+
+    function showDealDetailModal(deal) {
+        const mrr = deal.mrr ? `$${deal.mrr.toLocaleString()}/mo` : 'Not set';
+        const totalValue = deal.mrr && deal.contractLength ?
+            `$${(deal.mrr * deal.contractLength).toLocaleString()}` : 'Not calculated';
+        const createdDate = deal.createdAt ? formatDate(deal.createdAt.toDate().toISOString().split('T')[0]) : 'Unknown';
+        const updatedDate = deal.lastUpdated ? formatDate(deal.lastUpdated.toDate().toISOString().split('T')[0]) : 'Unknown';
+        const daysInStage = getDaysInStage(deal);
+
+        const modalHtml = `
+            <div class="modal-overlay" onclick="closeDealModal()">
+                <div class="modal-content deal-detail-modal" onclick="event.stopPropagation();">
+                    <div class="modal-header">
+                        <h2>${deal.companyName}</h2>
+                        <button class="modal-close-btn" onclick="closeDealModal()">×</button>
+                    </div>
+
+                    <div class="modal-body">
+                        <!-- Stage Info -->
+                        <div class="detail-section">
+                            <h3>Pipeline Status</h3>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">Current Stage:</span>
+                                    <span class="detail-value">${formatStageName(deal.stage)}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Days in Stage:</span>
+                                    <span class="detail-value">${daysInStage} days</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Info -->
+                        <div class="detail-section">
+                            <h3>Contact Information</h3>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">Contact Name:</span>
+                                    <span class="detail-value">${deal.contactName || 'Not provided'}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Email:</span>
+                                    <span class="detail-value">${deal.email || 'Not provided'}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Phone:</span>
+                                    <span class="detail-value">${deal.phone || 'Not provided'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Deal Value -->
+                        <div class="detail-section">
+                            <h3>Deal Value</h3>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">MRR:</span>
+                                    <span class="detail-value" style="color: #05908C; font-weight: 600;">${mrr}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Contract Length:</span>
+                                    <span class="detail-value">${deal.contractLength ? deal.contractLength + ' months' : 'Not set'}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Total Value:</span>
+                                    <span class="detail-value" style="color: #05908C; font-weight: 600;">${totalValue}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Portal Link -->
+                        ${deal.clientPortalId ? `
+                            <div class="detail-section">
+                                <h3>Client Portal</h3>
+                                <a href="client-portal.html?id=${deal.clientPortalId}" class="portal-link-btn" target="_blank">
+                                    🔗 Open Client Portal
+                                </a>
+                            </div>
+                        ` : ''}
+
+                        <!-- Timestamps -->
+                        <div class="detail-section">
+                            <h3>Timeline</h3>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">Created:</span>
+                                    <span class="detail-value">${createdDate}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Last Updated:</span>
+                                    <span class="detail-value">${updatedDate}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeDealModal()">Close</button>
+                        <button class="btn btn-primary" onclick="editDeal('${deal.id}')">Edit Deal</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add modal to page
+        const modalContainer = document.createElement('div');
+        modalContainer.id = 'dealDetailModalContainer';
+        modalContainer.innerHTML = modalHtml;
+        document.body.appendChild(modalContainer);
+
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+    }
+
+    window.closeDealModal = function() {
+        const modal = document.getElementById('dealDetailModalContainer');
+        if (modal) {
+            modal.remove();
+            document.body.style.overflow = '';
+        }
+    };
+
+    window.editDeal = function(dealId) {
+        closeDealModal();
+        alert(`Edit deal functionality - Coming soon for deal ${dealId}`);
+        // This will be implemented later
     };
 
     // ============================================
