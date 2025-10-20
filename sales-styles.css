@@ -401,6 +401,70 @@ body {
     border-left-color: var(--primary);
 }
 
+/* Create Portal Section in Sales Cards */
+.create-portal-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #EEF4D9;
+}
+
+.create-portal-btn-small {
+    background: #05908C;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.15s ease-out;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+.create-portal-btn-small:hover {
+    background: #047a72;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(5, 144, 140, 0.2);
+}
+
+.create-portal-btn-small:active {
+    transform: translateY(0);
+}
+
+/* Portal Link Section in Sales Cards */
+.portal-link-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #EEF4D9;
+}
+
+.portal-link-small {
+    display: block;
+    background: linear-gradient(135deg, #85C7B3 0%, #05908C 100%);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-decoration: none;
+    transition: all 0.15s ease-out;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.portal-link-small:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 144, 140, 0.3);
+    background: linear-gradient(135deg, #05908C 0%, #047a72 100%);
+}
+
 .sales-card .contact-name,
 .sales-card .contact-email,
 .sales-card .contact-phone {

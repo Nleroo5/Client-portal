@@ -147,6 +147,7 @@
         const totalValue = deal.mrr && deal.contractLength ?
             `$${(deal.mrr * deal.contractLength).toLocaleString()}` : '';
         const daysInStage = getDaysInStage(deal);
+        const hasPortal = !!deal.clientPortalId;
 
         return `
             <div class="deal-card sales-card" data-deal-id="${deal.id}" onclick="viewDeal('${deal.id}')">
@@ -163,6 +164,23 @@
                         ${mrr ? `<p class="deal-mrr">💰 ${mrr}</p>` : ''}
                         ${totalValue ? `<p class="deal-total">📊 ${totalValue} total</p>` : ''}
                     </div>
+
+                    ${!hasPortal ? `
+                        <div class="create-portal-section">
+                            <button class="create-portal-btn-small"
+                                    onclick="event.stopPropagation(); createPortalForDeal('${deal.id}');">
+                                + Create Client Portal
+                            </button>
+                        </div>
+                    ` : `
+                        <div class="portal-link-section">
+                            <a href="client-portal.html?id=${deal.clientPortalId}"
+                               class="portal-link-small"
+                               onclick="event.stopPropagation();">
+                                🔗 View Portal
+                            </a>
+                        </div>
+                    `}
                 </div>
             </div>
         `;
