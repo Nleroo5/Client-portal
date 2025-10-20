@@ -1790,8 +1790,12 @@
             } else if (tabName === 'team') {
                 loadReps();
             } else if (tabName === 'sales-pipeline') {
-                // Pipeline data is already loaded, but ensure archived deals can be loaded
-                if (document.getElementById('archivedDealsSection').style.display !== 'none') {
+                // FIXED: Always load pipeline data when tab is accessed
+                loadCRMPipeline();
+
+                // Also load archived deals if that section is visible
+                if (document.getElementById('archivedDealsSection') &&
+                    document.getElementById('archivedDealsSection').style.display !== 'none') {
                     loadAdminArchivedDeals();
                 }
             }
@@ -1856,8 +1860,12 @@
                 const activeClients = clientsSnapshot.docs.filter(doc => doc.data().active !== false).length;
                 document.getElementById('dashboardActiveClients').textContent = activeClients;
 
-                // Load sales pipeline board on dashboard
-                loadCRMPipeline();
+                // Load sales pipeline board on dashboard (if not already loaded)
+                // Check if pipeline board is empty before loading
+                const pipelineBoard = document.getElementById('crmPipelineBoard');
+                if (pipelineBoard && pipelineBoard.children.length === 0) {
+                    loadCRMPipeline();
+                }
 
                 // Load dashboard notifications
                 loadDashboardNotifications();
@@ -4167,17 +4175,39 @@
 
         // Store reps data globally for pipeline
         let repsMap = {};
+        let isPipelineLoading = false; // Track loading state to prevent duplicate loads
 
         // Load and render CRM pipeline
         async function loadCRMPipeline(retryCount = 0) {
             const MAX_RETRIES = 3;
             const board = document.getElementById('crmPipelineBoard');
 
+            // Safety check: ensure board element exists
+            if (!board) {
+                console.warn('⚠️ Pipeline board element not found, deferring load...');
+                // Wait a bit and try again (in case DOM is still loading)
+                setTimeout(() => {
+                    const retryBoard = document.getElementById('crmPipelineBoard');
+                    if (retryBoard) {
+                        loadCRMPipeline(retryCount);
+                    } else {
+                        console.error('❌ Pipeline board element not found after retry');
+                    }
+                }, 500);
+                return;
+            }
+
+            // Prevent duplicate simultaneous loads
+            if (isPipelineLoading) {
+                console.log('⏳ Pipeline already loading, skipping duplicate request');
+                return;
+            }
+
+            isPipelineLoading = true;
+
             try {
                 // Show loading indicator
-                if (board) {
-                    board.innerHTML = '<div style="text-align: center; padding: 40px; color: #012E40;"><div style="font-size: 2rem; margin-bottom: 12px;">⏳</div><div>Loading sales pipeline...</div></div>';
-                }
+                board.innerHTML = '<div style="text-align: center; padding: 40px; color: #012E40;"><div style="font-size: 2rem; margin-bottom: 12px;">⏳</div><div>Loading sales pipeline...</div></div>';
 
                 // Verify admin is authenticated
                 const currentUser = firebase.auth().currentUser;
@@ -4263,7 +4293,13 @@
                 // Update metrics
                 updateMetrics(deals);
 
+                // Mark loading as complete
+                isPipelineLoading = false;
+                console.log('✅ Pipeline loaded successfully');
+
             } catch (error) {
+                // Reset loading flag on error
+                isPipelineLoading = false;
                 console.error('❌ Error loading CRM pipeline:', error);
                 console.error('Error code:', error.code);
                 console.error('Error details:', error);
@@ -4289,6 +4325,9 @@
 
                     // Wait before retrying (exponential backoff)
                     await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount)));
+
+                    // Reset loading flag before retry
+                    isPipelineLoading = false;
                     return loadCRMPipeline(retryCount + 1);
                 }
 
