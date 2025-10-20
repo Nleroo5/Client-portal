@@ -1693,10 +1693,21 @@
                     );
 
                     if (shouldCreate) {
+                        // Prompt for actual name
+                        const adminName = prompt(
+                            'Please enter your full name for the admin account:',
+                            user.displayName || user.email.split('@')[0]
+                        );
+
+                        if (!adminName || adminName.trim() === '') {
+                            alert('Admin account creation cancelled. Name is required.');
+                            return;
+                        }
+
                         try {
                             await db.collection('salesReps').doc(user.uid).set({
                                 email: user.email,
-                                name: 'Admin',
+                                name: adminName.trim(),
                                 role: 'admin',
                                 active: true,
                                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
