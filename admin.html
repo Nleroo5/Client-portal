@@ -2120,7 +2120,48 @@
                     const deal = doc.data();
                     // Only include active deals (exclude completed and closed-lost stages)
                     if (deal.stage !== 'completed' && deal.stage !== 'closed-lost') {
-                        deals.push(deal);
+                        deals.push({ id: doc.id, ...deal });
+                    }
+                });
+
+                // Fetch all active clients without linked deals and create virtual deals
+                // This matches the exact logic from loadCRMPipeline()
+                const clientsSnapshot = await db.collection('clients').get();
+                clientsSnapshot.forEach(clientDoc => {
+                    const clientData = clientDoc.data();
+                    const clientId = clientDoc.id;
+
+                    // Only create virtual deal if:
+                    // 1. Client is active
+                    // 2. Client has no linked deal
+                    // 3. Client has started onboarding (at least one step complete OR has progress)
+                    if (clientData.active && !clientData.linkedDealId) {
+                        const hasProgress = clientData.step1Complete ||
+                                          clientData.step2Complete ||
+                                          clientData.step3Complete ||
+                                          clientData.step4Complete ||
+                                          clientData.step5Complete ||
+                                          clientData.step6Complete;
+
+                        if (hasProgress) {
+                            // Create a virtual deal for this client
+                            deals.push({
+                                id: `virtual-${clientId}`,
+                                companyName: clientData.clientName,
+                                contactName: clientData.clientEmail,
+                                email: clientData.clientEmail,
+                                phone: null,
+                                assignedTo: 'unassigned',
+                                stage: 'onboarding-portal',
+                                mrr: 0,
+                                contractLength: 0,
+                                clientPortalId: clientId,
+                                notes: null,
+                                isVirtualDeal: true,
+                                createdAt: clientData.createdAt,
+                                updatedAt: clientData.lastUpdated || clientData.createdAt
+                            });
+                        }
                     }
                 });
 
@@ -2131,7 +2172,7 @@
                     return sum + (deal.mrr * contractLength);
                 }, 0);
 
-                // Count active (non-archived) deals
+                // Count active deals (including virtual deals from clients)
                 const activeDeals = deals.length;
 
                 // Calculate MRR for deals in campaign-live or follow-up-resell stages
@@ -2144,9 +2185,8 @@
                 document.getElementById('dashboardActiveDeals').textContent = activeDeals;
                 document.getElementById('dashboardMonthlyMRR').textContent = '$' + monthlyMRR.toLocaleString();
 
-                // Load active clients count
-                const clientsSnapshot = await db.collection('clients').get();
-                const activeClients = clientsSnapshot.docs.filter(doc => doc.data().active !== false).length;
+                // Count active clients (we already have clientsSnapshot from above)
+                const activeClients = Array.from(clientsSnapshot.docs).filter(doc => doc.data().active !== false).length;
                 document.getElementById('dashboardActiveClients').textContent = activeClients;
 
                 // Load sales pipeline board on dashboard (if not already loaded)
