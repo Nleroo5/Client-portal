@@ -5420,7 +5420,9 @@
                 console.log('📋 Active deals list:', deals.map(d => ({ id: d.id, company: d.companyName, stage: d.stage })));
 
                 // Fetch all active clients without linked deals and create virtual deals
+                console.log('📊 Loading clients for virtual deals...');
                 const clientsSnapshot = await db.collection('clients').get();
+                let virtualDealsCreated = 0;
                 clientsSnapshot.forEach(clientDoc => {
                     const clientData = clientDoc.data();
                     const clientId = clientDoc.id;
@@ -5455,9 +5457,12 @@
                                 createdAt: clientData.createdAt,
                                 updatedAt: clientData.lastUpdated || clientData.createdAt
                             });
+                            virtualDealsCreated++;
                         }
                     }
                 });
+                console.log(`✅ Created ${virtualDealsCreated} virtual deals from clients`);
+                console.log(`✅ Total deals for pipeline = ${deals.length} (${deals.length - virtualDealsCreated} real + ${virtualDealsCreated} virtual)`);
 
                 // Render pipeline board
                 await renderPipelineBoard(deals);
