@@ -2113,11 +2113,22 @@
                 const dealsSnapshot = await db.collection('deals').get();
                 const deals = [];
 
+                // Valid stages for active deals
+                const validStages = ['contact', 'qualified', 'cold-outreach', 'follow-up', 'discovery-scheduled',
+                                    'discovery-completed', 'proposal', 'negotiation', 'onboarding-portal',
+                                    'campaign-live', 'follow-up-resell'];
+
                 dealsSnapshot.forEach(doc => {
                     const deal = doc.data();
-                    // Only include active deals (exclude completed and closed-lost stages)
-                    if (deal.stage !== 'completed' && deal.stage !== 'closed-lost') {
+
+                    // Only include active deals with valid stages
+                    if (deal.stage && validStages.includes(deal.stage)) {
                         deals.push({ id: doc.id, ...deal });
+                    } else if (deal.stage === 'completed' || deal.stage === 'closed-lost') {
+                        // Skip archived deals
+                    } else {
+                        // Log deals with invalid/missing stages
+                        console.warn(`⚠️ Dashboard: Skipping deal with invalid stage: ${deal.companyName || 'Unknown'} (ID: ${doc.id}, stage: ${deal.stage || 'undefined'})`);
                     }
                 });
                 console.log(`✅ Dashboard: Loaded ${deals.length} real deals (excluding completed/closed-lost)`);
@@ -5384,10 +5395,18 @@
                     const data = doc.data();
                     const deal = { id: doc.id, ...data };
 
+                    // Valid stages for active deals
+                    const validStages = ['contact', 'qualified', 'cold-outreach', 'follow-up', 'discovery-scheduled',
+                                        'discovery-completed', 'proposal', 'negotiation', 'onboarding-portal',
+                                        'campaign-live', 'follow-up-resell'];
+
                     if (data.stage === 'completed' || data.stage === 'closed-lost') {
                         archivedDeals[data.stage].push(deal);
-                    } else {
+                    } else if (data.stage && validStages.includes(data.stage)) {
                         deals.push(deal);
+                    } else {
+                        // Log deals with invalid/missing stages
+                        console.warn(`⚠️ Skipping deal with invalid stage: ${deal.companyName || 'Unknown'} (ID: ${deal.id}, stage: ${data.stage || 'undefined'})`);
                     }
                 });
                 console.log(`✅ Loaded ${deals.length} active deals, ${archivedDeals.completed.length + archivedDeals['closed-lost'].length} archived`);
