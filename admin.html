@@ -5391,6 +5391,14 @@
                     }
                 });
                 console.log(`✅ Loaded ${deals.length} active deals, ${archivedDeals.completed.length + archivedDeals['closed-lost'].length} archived`);
+                console.log('📋 Active deals breakdown by stage:');
+                const stageBreakdown = {};
+                deals.forEach(d => {
+                    const stage = d.stage || 'unknown';
+                    stageBreakdown[stage] = (stageBreakdown[stage] || 0) + 1;
+                });
+                console.table(stageBreakdown);
+                console.log('📋 Active deals list:', deals.map(d => ({ id: d.id, company: d.companyName, stage: d.stage })));
 
                 // Fetch all active clients without linked deals and create virtual deals
                 const clientsSnapshot = await db.collection('clients').get();
