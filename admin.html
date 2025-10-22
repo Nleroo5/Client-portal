@@ -2118,8 +2118,8 @@
 
                 dealsSnapshot.forEach(doc => {
                     const deal = doc.data();
-                    // Only include non-archived deals
-                    if (!deal.archived) {
+                    // Only include active deals (exclude completed and closed-lost stages)
+                    if (deal.stage !== 'completed' && deal.stage !== 'closed-lost') {
                         deals.push(deal);
                     }
                 });
