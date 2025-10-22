@@ -2114,29 +2114,30 @@
             try {
                 // Load pipeline metrics
                 const dealsSnapshot = await db.collection('deals').get();
-                let totalPipeline = 0;
-                let activeDeals = 0;
-                let monthlyMRR = 0;
-
-                const currentMonth = new Date().getMonth();
-                const currentYear = new Date().getFullYear();
+                const deals = [];
 
                 dealsSnapshot.forEach(doc => {
                     const deal = doc.data();
-                    if (deal.stage !== 'Lost' && deal.stage !== 'Won') {
-                        activeDeals++;
-                        const dealValue = parseFloat(deal.value) || 0;
-                        totalPipeline += dealValue;
-                    }
-
-                    // Calculate MRR for deals won this month
-                    if (deal.stage === 'Won' && deal.closedDate) {
-                        const closedDate = deal.closedDate.toDate();
-                        if (closedDate.getMonth() === currentMonth && closedDate.getFullYear() === currentYear) {
-                            monthlyMRR += parseFloat(deal.value) || 0;
-                        }
+                    // Only include non-archived deals
+                    if (!deal.archived) {
+                        deals.push(deal);
                     }
                 });
+
+                // Calculate total pipeline value using MRR * Contract Length
+                const totalPipeline = deals.reduce((sum, deal) => {
+                    if (!deal.mrr || deal.mrr === 0) return sum;
+                    const contractLength = (deal.contractLength && deal.contractLength > 0) ? deal.contractLength : 1;
+                    return sum + (deal.mrr * contractLength);
+                }, 0);
+
+                // Count active (non-archived) deals
+                const activeDeals = deals.length;
+
+                // Calculate MRR for deals in campaign-live or follow-up-resell stages
+                const monthlyMRR = deals
+                    .filter(d => d.stage === 'campaign-live' || d.stage === 'follow-up-resell')
+                    .reduce((sum, deal) => sum + (deal.mrr || 0), 0);
 
                 // Update dashboard metrics
                 document.getElementById('dashboardTotalPipeline').textContent = '$' + totalPipeline.toLocaleString();
