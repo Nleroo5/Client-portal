@@ -2163,8 +2163,62 @@
             }
         }
 
-        // Load Dashboard Notifications
+        // Global variable to store notification listener unsubscribe function
+        let notificationUnsubscribe = null;
+
+        // Load Dashboard Notifications with Real-Time Updates
         async function loadDashboardNotifications() {
+            try {
+                // Get current user
+                const currentUser = firebase.auth().currentUser;
+                if (!currentUser) {
+                    console.warn('No authenticated user for notifications');
+                    renderDashboardNotifications([]);
+                    return;
+                }
+
+                // Unsubscribe from previous listener if exists
+                if (notificationUnsubscribe) {
+                    notificationUnsubscribe();
+                    notificationUnsubscribe = null;
+                }
+
+                // Set up real-time listener for admin notifications
+                notificationUnsubscribe = db.collection('notifications')
+                    .where('recipientType', '==', 'admin')
+                    .orderBy('createdAt', 'desc')
+                    .limit(50)
+                    .onSnapshot(snapshot => {
+                        const notifications = [];
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            notifications.push({
+                                id: doc.id,
+                                type: data.type,
+                                message: data.message,
+                                read: data.read || false,
+                                createdAt: data.createdAt?.toDate() || new Date(),
+                                relatedId: data.relatedId,
+                                metadata: data.metadata || {},
+                                actionUrl: data.actionUrl
+                            });
+                        });
+
+                        console.log(`📬 Loaded ${notifications.length} notifications (${notifications.filter(n => !n.read).length} unread)`);
+                        renderDashboardNotifications(notifications);
+                    }, error => {
+                        console.error('Error listening for notifications:', error);
+                        renderDashboardNotifications([]);
+                    });
+
+            } catch (error) {
+                console.error('Error setting up notification listener:', error);
+                renderDashboardNotifications([]);
+            }
+        }
+
+        // Legacy: Keep old notification scanning for backward compatibility
+        async function loadLegacyDashboardNotifications() {
             try {
                 // Get current user email to filter notifications
                 const currentUser = firebase.auth().currentUser;
@@ -2373,19 +2427,22 @@
             }
         }
 
-        // Render Dashboard Notifications
+        // Render Dashboard Notifications (Unified Format)
         function renderDashboardNotifications(notifications) {
             const container = document.getElementById('dashboardNotificationsList');
             const countBadge = document.getElementById('dashboardNotificationCount');
             const markAllBtn = document.getElementById('markAllReadBtn');
 
-            if (notifications.length === 0) {
+            // Filter unread notifications only
+            const unreadNotifications = notifications.filter(n => !n.read);
+
+            if (unreadNotifications.length === 0) {
                 // Show "All Caught Up" message
                 container.innerHTML = `
                     <div style="text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px; border: 2px solid #22c55e;">
                         <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
                         <div style="font-size: 1.1rem; font-weight: 600; color: #166534; margin-bottom: 4px;">All Caught Up!</div>
-                        <div style="color: #15803d; font-size: 0.9rem;">No pending notifications at this time</div>
+                        <div style="color: #15803d; font-size: 0.9rem;">No unread notifications at this time</div>
                     </div>
                 `;
                 countBadge.style.display = 'none';
@@ -2393,40 +2450,89 @@
                 return;
             }
 
-            // Show notification count and Mark All Read button
-            countBadge.textContent = notifications.length;
+            // Show unread notification count and Mark All Read button
+            countBadge.textContent = unreadNotifications.length;
             countBadge.style.display = 'inline-block';
             markAllBtn.style.display = 'inline-block';
 
-            // Render each notification
-            container.innerHTML = notifications.map(notification => {
-                const timeAgo = getTimeAgo(notification.timestamp);
-                const bgColor = notification.priority === 'high' ? '#fee2e2' :
-                               notification.priority === 'medium' ? '#fff7ed' : '#f0f9ff';
-                const borderColor = notification.priority === 'high' ? '#ef4444' :
-                                   notification.priority === 'medium' ? '#f97316' : '#3b82f6';
+            // Get notification type definitions from notifications-system.js
+            const NOTIFICATION_TYPES = {
+                CLIENT_STEP_COMPLETE: { icon: '✅', color: '#10b981', title: 'Client Progress' },
+                QUOTE_SUBMITTED: { icon: '📝', color: '#F2A922', title: 'New Website Quote' },
+                DEAL_ASSIGNED: { icon: '👤', color: '#3b82f6', title: 'Deal Assigned' },
+                DEAL_STAGE_CHANGE: { icon: '📊', color: '#8b5cf6', title: 'Deal Updated' },
+                MESSAGE_RECEIVED: { icon: '💬', color: '#ec4899', title: 'New Message' },
+                MESSAGE_REPLY: { icon: '💬', color: '#05908C', title: 'Admin Replied' },
+                REVISION_REQUEST: { icon: '⚠️', color: '#f59e0b', title: 'Revision Request' }
+            };
+
+            // Render each unread notification
+            container.innerHTML = unreadNotifications.map(notification => {
+                const typeInfo = NOTIFICATION_TYPES[notification.type] || {
+                    icon: '🔔',
+                    color: '#6b7280',
+                    title: 'Notification'
+                };
+                const timeAgo = getTimeAgo(notification.createdAt);
 
                 return `
-                    <div style="background: ${bgColor}; border-left: 4px solid ${borderColor}; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease;"
-                         onclick="handleNotificationClick('${notification.type}', '${notification.clientId || notification.quoteId}')"
+                    <div style="background: white; border-left: 4px solid ${typeInfo.color}; border-radius: 8px; padding: 16px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"
+                         onclick="handleUnifiedNotificationClick('${notification.id}', '${notification.type}', '${notification.relatedId || ''}', '${notification.actionUrl || ''}')"
                          onmouseover="this.style.transform='translateX(4px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'"
-                         onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                         onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.05)'">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="font-size: 1.5rem;">${notification.icon}</span>
-                                <div style="font-weight: 700; color: #000000; font-size: 0.95rem;">${notification.title}</div>
+                                <span style="font-size: 1.5rem;">${typeInfo.icon}</span>
+                                <div style="font-weight: 700; color: #000000; font-size: 0.95rem;">${typeInfo.title}</div>
                             </div>
                             <span style="font-size: 0.75rem; color: #6b7280; white-space: nowrap;">${timeAgo}</span>
                         </div>
                         <div style="margin-left: 40px; color: #374151; font-size: 0.9rem; line-height: 1.5;">${notification.message}</div>
                         <div style="margin-left: 40px; margin-top: 8px;">
-                            <button style="background: ${borderColor}; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                            <button style="background: ${typeInfo.color}; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
                                 View Details
                             </button>
                         </div>
                     </div>
                 `;
             }).join('');
+        }
+
+        // Handle unified notification click
+        async function handleUnifiedNotificationClick(notificationId, type, relatedId, actionUrl) {
+            // Mark as read
+            try {
+                await db.collection('notifications').doc(notificationId).update({ read: true });
+                console.log(`✓ Marked notification ${notificationId} as read`);
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+            }
+
+            // Navigate based on notification type
+            if (type === 'DEAL_ASSIGNED' || type === 'DEAL_STAGE_CHANGE') {
+                switchAdminTab('sales-pipeline');
+                setTimeout(() => {
+                    const dealCard = document.querySelector(`[data-deal-id="${relatedId}"]`);
+                    if (dealCard) {
+                        dealCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        dealCard.style.animation = 'pulse 1s ease 2';
+                    }
+                }, 300);
+            } else if (type === 'CLIENT_STEP_COMPLETE' || type === 'REVISION_REQUEST' || type === 'MESSAGE_RECEIVED') {
+                switchAdminTab('clients');
+                setTimeout(() => {
+                    const clientCard = document.querySelector(`[data-client-id="${relatedId}"]`);
+                    if (clientCard) {
+                        clientCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        clientCard.style.animation = 'pulse 1s ease 2';
+                    }
+                }, 300);
+            } else if (type === 'QUOTE_SUBMITTED') {
+                switchAdminTab('website-forms');
+            } else if (actionUrl) {
+                // Use custom action URL if provided
+                window.location.href = actionUrl;
+            }
         }
 
         // Handle notification click
@@ -2462,33 +2568,32 @@
             }
         }
 
-        // Mark all dashboard notifications as read
+        // Mark all dashboard notifications as read (Unified)
         async function markAllDashboardNotificationsRead() {
             try {
-                const clientsSnapshot = await db.collection('clients').get();
+                // Get all unread notifications for admin
+                const unreadSnapshot = await db.collection('notifications')
+                    .where('recipientType', '==', 'admin')
+                    .where('read', '==', false)
+                    .get();
+
+                if (unreadSnapshot.empty) {
+                    showToast('No unread notifications', 'info');
+                    return;
+                }
+
+                // Mark all as read using batch
                 const batch = db.batch();
-
-                clientsSnapshot.forEach(doc => {
-                    const data = doc.data();
-
-                    // Mark revision requests as reviewed
-                    if (data.revisionRequests && data.revisionRequests.length > 0) {
-                        const updatedRevisions = data.revisionRequests.map(r => ({
-                            ...r,
-                            status: 'reviewed'
-                        }));
-                        batch.update(doc.ref, { revisionRequests: updatedRevisions });
-                    }
-
-                    // Mark website access as reviewed
-                    if (data.hasUnreviewedWebsiteAccess) {
-                        batch.update(doc.ref, { hasUnreviewedWebsiteAccess: false });
-                    }
+                unreadSnapshot.forEach(doc => {
+                    batch.update(doc.ref, { read: true });
                 });
 
                 await batch.commit();
-                loadDashboardNotifications(); // Reload to show "All Caught Up"
-                showToast('All notifications marked as read', 'success');
+                console.log(`✓ Marked ${unreadSnapshot.size} notifications as read`);
+                showToast(`Marked ${unreadSnapshot.size} notifications as read`, 'success');
+
+                // Real-time listener will automatically update the UI
+
             } catch (error) {
                 console.error('Error marking notifications as read:', error);
                 showToast('Error marking notifications as read', 'error');
@@ -4388,6 +4493,501 @@
             }
         }
 
+        // ============================================================================
+        // ACTIVITY MANAGEMENT FUNCTIONS
+        // ============================================================================
+
+        // Standard activity types
+        const ACTIVITY_TYPES = [
+            { id: 'call', label: 'Call', icon: '📞' },
+            { id: 'email', label: 'Email', icon: '📧' },
+            { id: 'textSMS', label: 'Text/SMS', icon: '💬' },
+            { id: 'dropIn', label: 'Drop In', icon: '🚶' },
+            { id: 'sendProposal', label: 'Send Proposal', icon: '📄' },
+            { id: 'sendCreative', label: 'Send Creative', icon: '🎨' },
+            { id: 'addOnLinkedIn', label: 'Add on LinkedIn', icon: '💼' },
+            { id: 'askForReferral', label: 'Ask for Referral', icon: '🤝' },
+            { id: 'followUpCall', label: 'Follow-up Call', icon: '📲' },
+            { id: 'scheduleMeeting', label: 'Schedule Meeting', icon: '📅' }
+        ];
+
+        // Global variable to store current deal's activities
+        let currentDealActivities = [];
+
+        // Load activities for a deal from subcollection
+        async function loadDealActivities(dealId) {
+            try {
+                const activitiesSnapshot = await db.collection('deals').doc(dealId).collection('activities').get();
+                currentDealActivities = [];
+                activitiesSnapshot.forEach(doc => {
+                    currentDealActivities.push({ id: doc.id, ...doc.data() });
+                });
+                renderActivitiesList(currentDealActivities);
+            } catch (error) {
+                console.error('Error loading activities:', error);
+                renderActivitiesList([]);
+            }
+        }
+
+        // Render the activities list in the modal
+        function renderActivitiesList(activities) {
+            const container = document.getElementById('activitiesList');
+            if (!container) return;
+
+            let html = '';
+
+            // Render standard activities
+            ACTIVITY_TYPES.forEach(activityType => {
+                const activity = activities.find(a => a.type === activityType.id && !a.isCustom);
+                html += renderActivityItem(activityType, activity);
+            });
+
+            // Render custom "Other" activities
+            const customActivities = activities.filter(a => a.isCustom);
+            customActivities.forEach(activity => {
+                html += renderCustomActivityItem(activity);
+            });
+
+            // Add "Other" input for new custom activity
+            html += renderAddCustomActivityInput();
+
+            container.innerHTML = html;
+        }
+
+        // Render a single activity item
+        function renderActivityItem(activityType, activity = null) {
+            const isCompleted = activity && activity.completed;
+            const reminderAt = activity && activity.reminderAt ? activity.reminderAt.toDate() : null;
+
+            return `
+                <div style="background: ${isCompleted ? '#F0FDF4' : '#FFFFFF'}; border: 1px solid ${isCompleted ? '#86EFAC' : '#E5E7EB'}; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+                    <!-- Checkbox and Label -->
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: ${isCompleted || reminderAt ? '8px' : '0'};">
+                        <input type="checkbox"
+                               id="activity_${activityType.id}"
+                               ${isCompleted ? 'checked' : ''}
+                               onchange="toggleActivity('${activityType.id}', this.checked, ${activity ? "'" + activity.id + "'" : 'null'})"
+                               style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="activity_${activityType.id}" style="font-weight: 600; color: #1F2937; cursor: pointer; flex: 1;">
+                            ${activityType.icon} ${activityType.label}
+                        </label>
+                    </div>
+
+                    ${isCompleted ? `
+                        <!-- Completed State -->
+                        <div style="padding-left: 26px; font-size: 0.85rem; color: #059669;">
+                            ✓ Completed: ${activity.completedAt ? new Date(activity.completedAt.toDate()).toLocaleString() : 'Unknown'}
+                        </div>
+                    ` : reminderAt ? `
+                        <!-- Has Reminder -->
+                        <div style="padding-left: 26px; font-size: 0.85rem;">
+                            <div style="color: #0F172A; margin-bottom: 4px;">
+                                🔔 Reminder set for: <strong>${reminderAt.toLocaleString()}</strong>
+                                <button onclick="clearActivityReminder('${activityType.id}', '${activity.id}')"
+                                        style="background: #DC2626; color: white; border: none; border-radius: 4px; padding: 2px 8px; margin-left: 8px; cursor: pointer; font-size: 0.75rem;">
+                                    Clear
+                                </button>
+                            </div>
+                            <div style="color: #64748B; font-size: 0.8rem;">
+                                💬 24hr reminder: ${new Date(reminderAt.getTime() - 24*60*60*1000).toLocaleString()}<br>
+                                💬 15min reminder: ${new Date(reminderAt.getTime() - 15*60*1000).toLocaleString()}
+                            </div>
+                        </div>
+                    ` : `
+                        <!-- Set Reminder -->
+                        <div style="padding-left: 26px; display: flex; gap: 8px; align-items: center;">
+                            <span style="font-size: 0.85rem; color: #64748B;">📅 Remind:</span>
+                            <input type="datetime-local"
+                                   id="reminder_${activityType.id}"
+                                   style="padding: 4px 8px; border: 1px solid #D1D5DB; border-radius: 4px; font-size: 0.85rem;">
+                            <button onclick="setActivityReminder('${activityType.id}')"
+                                    style="background: #05908C; color: white; border: none; border-radius: 4px; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">
+                                Set Reminder
+                            </button>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        // Render custom activity item
+        function renderCustomActivityItem(activity) {
+            const isCompleted = activity.completed;
+            const reminderAt = activity.reminderAt ? activity.reminderAt.toDate() : null;
+
+            return `
+                <div style="background: ${isCompleted ? '#F0FDF4' : '#FEF3C7'}; border: 1px solid ${isCompleted ? '#86EFAC' : '#F59E0B'}; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: ${isCompleted || reminderAt ? '8px' : '0'};">
+                        <input type="checkbox"
+                               id="activity_custom_${activity.id}"
+                               ${isCompleted ? 'checked' : ''}
+                               onchange="toggleActivity('custom', this.checked, '${activity.id}')"
+                               style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="activity_custom_${activity.id}" style="font-weight: 600; color: #1F2937; cursor: pointer; flex: 1;">
+                            ✏️ ${activity.customName || 'Other'}
+                        </label>
+                        <button onclick="deleteCustomActivity('${activity.id}')"
+                                style="background: #DC2626; color: white; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.75rem;">
+                            Delete
+                        </button>
+                    </div>
+
+                    ${isCompleted ? `
+                        <div style="padding-left: 26px; font-size: 0.85rem; color: #059669;">
+                            ✓ Completed: ${activity.completedAt ? new Date(activity.completedAt.toDate()).toLocaleString() : 'Unknown'}
+                        </div>
+                    ` : reminderAt ? `
+                        <div style="padding-left: 26px; font-size: 0.85rem;">
+                            <div style="color: #0F172A; margin-bottom: 4px;">
+                                🔔 Reminder set for: <strong>${reminderAt.toLocaleString()}</strong>
+                                <button onclick="clearActivityReminder('custom', '${activity.id}')"
+                                        style="background: #DC2626; color: white; border: none; border-radius: 4px; padding: 2px 8px; margin-left: 8px; cursor: pointer; font-size: 0.75rem;">
+                                    Clear
+                                </button>
+                            </div>
+                            <div style="color: #64748B; font-size: 0.8rem;">
+                                💬 24hr reminder: ${new Date(reminderAt.getTime() - 24*60*60*1000).toLocaleString()}<br>
+                                💬 15min reminder: ${new Date(reminderAt.getTime() - 15*60*1000).toLocaleString()}
+                            </div>
+                        </div>
+                    ` : `
+                        <div style="padding-left: 26px; display: flex; gap: 8px; align-items: center;">
+                            <span style="font-size: 0.85rem; color: #64748B;">📅 Remind:</span>
+                            <input type="datetime-local"
+                                   id="reminder_custom_${activity.id}"
+                                   style="padding: 4px 8px; border: 1px solid #D1D5DB; border-radius: 4px; font-size: 0.85rem;">
+                            <button onclick="setActivityReminder('custom', '${activity.id}')"
+                                    style="background: #05908C; color: white; border: none; border-radius: 4px; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">
+                                Set Reminder
+                            </button>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        // Render input for adding custom activity
+        function renderAddCustomActivityInput() {
+            return `
+                <div style="background: #FFFFFF; border: 2px dashed #D1D5DB; border-radius: 8px; padding: 12px; margin-top: 12px;">
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span style="font-weight: 600; color: #6B7280;">✏️ Other:</span>
+                        <input type="text"
+                               id="customActivityName"
+                               placeholder="Type custom activity name..."
+                               style="flex: 1; padding: 6px 12px; border: 1px solid #D1D5DB; border-radius: 4px; font-size: 0.9rem;">
+                        <button onclick="addCustomActivity()"
+                                style="background: #F59E0B; color: white; border: none; border-radius: 4px; padding: 6px 16px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+                            Add Activity
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Toggle activity completion
+        async function toggleActivity(activityType, isCompleted, activityId) {
+            const dealId = document.getElementById('dealId').value;
+            if (!dealId) {
+                alert('Please save the deal first before managing activities');
+                return;
+            }
+
+            try {
+                if (isCompleted) {
+                    // Mark as completed
+                    if (activityId && activityId !== 'null') {
+                        // Update existing activity
+                        await db.collection('deals').doc(dealId).collection('activities').doc(activityId).update({
+                            completed: true,
+                            completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            reminderAt: null,
+                            reminder24hrSent: false,
+                            reminder15minSent: false,
+                            lastReminderSent: null
+                        });
+                    } else {
+                        // Create new completed activity
+                        await db.collection('deals').doc(dealId).collection('activities').add({
+                            type: activityType,
+                            completed: true,
+                            completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            reminderAt: null,
+                            reminder24hrSent: false,
+                            reminder15minSent: false,
+                            lastReminderSent: null,
+                            isCustom: false
+                        });
+                    }
+                } else {
+                    // Mark as incomplete
+                    if (activityId && activityId !== 'null') {
+                        await db.collection('deals').doc(dealId).collection('activities').doc(activityId).update({
+                            completed: false,
+                            completedAt: null
+                        });
+                    }
+                }
+
+                // Reload activities
+                await loadDealActivities(dealId);
+            } catch (error) {
+                console.error('Error toggling activity:', error);
+                alert('Error updating activity: ' + error.message);
+            }
+        }
+
+        // Set reminder for an activity
+        async function setActivityReminder(activityType, activityId = null) {
+            const dealId = document.getElementById('dealId').value;
+            if (!dealId) {
+                alert('Please save the deal first before setting reminders');
+                return;
+            }
+
+            const inputId = activityId ? `reminder_custom_${activityId}` : `reminder_${activityType}`;
+            const reminderInput = document.getElementById(inputId);
+            const reminderValue = reminderInput.value;
+
+            if (!reminderValue) {
+                alert('Please select a date and time for the reminder');
+                return;
+            }
+
+            const reminderDate = new Date(reminderValue);
+            if (reminderDate < new Date()) {
+                alert('Reminder time must be in the future');
+                return;
+            }
+
+            try {
+                if (activityId) {
+                    // Update existing custom activity
+                    await db.collection('deals').doc(dealId).collection('activities').doc(activityId).update({
+                        reminderAt: firebase.firestore.Timestamp.fromDate(reminderDate),
+                        reminder24hrSent: false,
+                        reminder15minSent: false,
+                        lastReminderSent: null
+                    });
+                } else {
+                    // Check if activity already exists
+                    const existingActivity = currentDealActivities.find(a => a.type === activityType && !a.isCustom);
+
+                    if (existingActivity) {
+                        // Update existing
+                        await db.collection('deals').doc(dealId).collection('activities').doc(existingActivity.id).update({
+                            reminderAt: firebase.firestore.Timestamp.fromDate(reminderDate),
+                            reminder24hrSent: false,
+                            reminder15minSent: false,
+                            lastReminderSent: null
+                        });
+                    } else {
+                        // Create new activity with reminder
+                        await db.collection('deals').doc(dealId).collection('activities').add({
+                            type: activityType,
+                            completed: false,
+                            completedAt: null,
+                            reminderAt: firebase.firestore.Timestamp.fromDate(reminderDate),
+                            reminder24hrSent: false,
+                            reminder15minSent: false,
+                            lastReminderSent: null,
+                            isCustom: false
+                        });
+                    }
+                }
+
+                // Reload activities
+                await loadDealActivities(dealId);
+                showAlert('Reminder set successfully! You will receive notifications 24 hours and 15 minutes before.', 'success');
+            } catch (error) {
+                console.error('Error setting reminder:', error);
+                alert('Error setting reminder: ' + error.message);
+            }
+        }
+
+        // Clear activity reminder
+        async function clearActivityReminder(activityType, activityId) {
+            const dealId = document.getElementById('dealId').value;
+            if (!dealId || !activityId) return;
+
+            try {
+                await db.collection('deals').doc(dealId).collection('activities').doc(activityId).update({
+                    reminderAt: null,
+                    reminder24hrSent: false,
+                    reminder15minSent: false,
+                    lastReminderSent: null
+                });
+
+                await loadDealActivities(dealId);
+                showAlert('Reminder cleared', 'success');
+            } catch (error) {
+                console.error('Error clearing reminder:', error);
+                alert('Error clearing reminder: ' + error.message);
+            }
+        }
+
+        // Add custom activity
+        async function addCustomActivity() {
+            const dealId = document.getElementById('dealId').value;
+            if (!dealId) {
+                alert('Please save the deal first before adding activities');
+                return;
+            }
+
+            const customNameInput = document.getElementById('customActivityName');
+            const customName = customNameInput.value.trim();
+
+            if (!customName) {
+                alert('Please enter a name for the custom activity');
+                return;
+            }
+
+            try {
+                await db.collection('deals').doc(dealId).collection('activities').add({
+                    type: 'other',
+                    customName: customName,
+                    completed: false,
+                    completedAt: null,
+                    reminderAt: null,
+                    reminder24hrSent: false,
+                    reminder15minSent: false,
+                    lastReminderSent: null,
+                    isCustom: true,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                customNameInput.value = '';
+                await loadDealActivities(dealId);
+                showAlert('Custom activity added', 'success');
+            } catch (error) {
+                console.error('Error adding custom activity:', error);
+                alert('Error adding activity: ' + error.message);
+            }
+        }
+
+        // Delete custom activity
+        async function deleteCustomActivity(activityId) {
+            const dealId = document.getElementById('dealId').value;
+            if (!dealId || !activityId) return;
+
+            if (!confirm('Delete this custom activity?')) return;
+
+            try {
+                await db.collection('deals').doc(dealId).collection('activities').doc(activityId).delete();
+                await loadDealActivities(dealId);
+                showAlert('Activity deleted', 'success');
+            } catch (error) {
+                console.error('Error deleting activity:', error);
+                alert('Error deleting activity: ' + error.message);
+            }
+        }
+
+        // Get next upcoming activity reminder for a deal
+        async function getNextActivityReminder(dealId) {
+            try {
+                const activitiesSnapshot = await db.collection('deals').doc(dealId).collection('activities')
+                    .where('completed', '==', false)
+                    .where('reminderAt', '!=', null)
+                    .orderBy('reminderAt', 'asc')
+                    .limit(1)
+                    .get();
+
+                if (activitiesSnapshot.empty) {
+                    return null;
+                }
+
+                const activity = activitiesSnapshot.docs[0].data();
+                return {
+                    id: activitiesSnapshot.docs[0].id,
+                    type: activity.type,
+                    customName: activity.customName,
+                    reminderAt: activity.reminderAt.toDate(),
+                    isCustom: activity.isCustom
+                };
+            } catch (error) {
+                console.error('Error getting next reminder:', error);
+                return null;
+            }
+        }
+
+        // Format activity reminder badge HTML
+        function formatActivityReminderBadge(reminder) {
+            if (!reminder) return '';
+
+            const now = new Date();
+            const reminderDate = reminder.reminderAt;
+            const hoursDiff = (reminderDate - now) / (1000 * 60 * 60);
+
+            // Determine color based on urgency
+            let bgColor, textColor, label;
+            if (hoursDiff < 0) {
+                // Overdue
+                bgColor = '#FEE2E2';
+                textColor = '#991B1B';
+                label = 'OVERDUE';
+            } else if (hoursDiff < 24) {
+                // Today
+                bgColor = '#FEF3C7';
+                textColor = '#92400E';
+                label = 'TODAY';
+            } else {
+                // Upcoming
+                bgColor = '#D1FAE5';
+                textColor = '#065F46';
+                label = 'UPCOMING';
+            }
+
+            // Get activity label
+            let activityLabel;
+            if (reminder.isCustom) {
+                activityLabel = reminder.customName || 'Other';
+            } else {
+                const activityType = ACTIVITY_TYPES.find(a => a.id === reminder.type);
+                activityLabel = activityType ? activityType.label : reminder.type;
+            }
+
+            // Format date
+            const dateStr = hoursDiff < 0
+                ? `${Math.abs(Math.floor(hoursDiff / 24))}d ago`
+                : (hoursDiff < 24
+                    ? reminderDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+                    : reminderDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+
+            return `
+                <div style="background: ${bgColor}; color: ${textColor}; padding: 6px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; margin-top: 8px; border: 1px solid ${textColor}30;">
+                    🔔 ${label}: ${activityLabel} (${dateStr})
+                </div>
+            `;
+        }
+
+        // Load activity reminders for all deals and update card badges
+        async function loadActivityRemindersForDeals(deals) {
+            console.log(`📋 Loading activity reminders for ${deals.length} deals...`);
+
+            // Filter out virtual deals (they don't have real IDs in deals collection)
+            const realDeals = deals.filter(d => !d.isVirtualDeal);
+
+            // Load reminders for all deals in parallel
+            const reminderPromises = realDeals.map(async (deal) => {
+                try {
+                    const reminder = await getNextActivityReminder(deal.id);
+                    const badgeContainer = document.getElementById(`activity-reminder-${deal.id}`);
+                    if (badgeContainer) {
+                        badgeContainer.innerHTML = formatActivityReminderBadge(reminder);
+                    }
+                } catch (error) {
+                    console.error(`Error loading reminder for deal ${deal.id}:`, error);
+                }
+            });
+
+            await Promise.all(reminderPromises);
+            console.log(`✅ Activity reminders loaded`);
+        }
+
+        // ============================================================================
+        // END ACTIVITY MANAGEMENT FUNCTIONS
+        // ============================================================================
+
         // Open deal modal
         async function openDealModal(dealId = null, linkedPortalId = null) {
             const modal = document.getElementById('dealModal');
@@ -4451,6 +5051,14 @@
                         console.error('Error loading portal data:', error);
                     }
                 }
+            }
+
+            // Load activities for this deal
+            if (dealId) {
+                await loadDealActivities(dealId);
+            } else {
+                // New deal - show empty activities
+                renderActivitiesList([]);
             }
 
             modal.style.display = 'flex';
@@ -4786,6 +5394,9 @@
 
                 // Render pipeline board
                 await renderPipelineBoard(deals);
+
+                // Load activity reminders for all deals (async, non-blocking)
+                loadActivityRemindersForDeals(deals);
 
                 // Update metrics
                 updateMetrics(deals);
@@ -5291,9 +5902,12 @@
                     </div>
 
                     <!-- Contact Name -->
-                    <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         ${deal.contactName || 'No contact'}
                     </div>
+
+                    <!-- Activity Reminder Placeholder -->
+                    <div id="activity-reminder-${deal.id}"></div>
 
                     <!-- Action Buttons -->
                     <div style="display: flex; gap: 6px;">
@@ -5380,6 +5994,9 @@
                             </div>
                         ` : ''}
                     </div>
+
+                    <!-- Activity Reminder Placeholder -->
+                    <div id="activity-reminder-${deal.id}"></div>
 
                     <!-- Action Buttons -->
                     <div style="display: flex; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #EEF4D9;">
@@ -5482,6 +6099,9 @@
                             👤 ${deal.contactName || 'No contact'}
                         </div>
                     </div>
+
+                    <!-- Activity Reminder Placeholder -->
+                    <div id="activity-reminder-${deal.id}"></div>
 
                     <!-- Progress Info (if portal exists) -->
                     ${hasPortal ? `
@@ -7751,6 +8371,16 @@ Start with Phase 1 and work through systematically. Show your progress after eac
                 <div class="form-group">
                     <label for="dealNotes">Notes</label>
                     <textarea id="dealNotes" rows="4" placeholder="Add any notes about this deal..."></textarea>
+                </div>
+
+                <!-- Sales Activities Section -->
+                <div class="form-group" id="dealActivitiesSection">
+                    <label style="font-size: 1.1rem; font-weight: 700; color: #012E40; margin-bottom: 16px; display: block; border-bottom: 2px solid #05908C; padding-bottom: 8px;">
+                        📋 Sales Activities
+                    </label>
+                    <div id="activitiesList" style="max-height: 400px; overflow-y: auto; padding: 8px 0;">
+                        <!-- Activities will be loaded here dynamically -->
+                    </div>
                 </div>
 
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">

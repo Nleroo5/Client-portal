@@ -39,6 +39,11 @@
             icon: '💬',
             color: '#05908C',
             title: 'Admin Replied'
+        },
+        REVISION_REQUEST: {
+            icon: '⚠️',
+            color: '#f59e0b',
+            title: 'Revision Request'
         }
     };
 
