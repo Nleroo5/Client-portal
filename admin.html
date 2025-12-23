@@ -7367,21 +7367,19 @@
             const quote = allWebsiteQuotes.find(q => q.id === quoteId);
             if (!quote) return;
 
-            // Helper function to determine tech stack based on features
+            // Helper function to determine tech stack - ALWAYS uses Next.js with React
             const determineTechStack = () => {
                 const features = quote.specialFeatures || [];
                 const needsEcommerce = quote.needsEcommerce === 'yes';
-                const hasComplexFeatures = features.includes('search') || features.includes('language') || features.includes('user-accounts');
                 const productCount = parseInt(quote.productCount) || 0;
 
+                // Always use Next.js 14+ with React 18+ and TypeScript
                 if (needsEcommerce && productCount > 50) {
-                    return 'Next.js + Shopify Storefront API (large product catalog with custom frontend)';
+                    return 'Next.js 14+ with TypeScript + Shopify Storefront API (large product catalog with custom React frontend)';
                 } else if (needsEcommerce) {
-                    return 'Next.js + Stripe integration (custom e-commerce solution)';
-                } else if (hasComplexFeatures) {
-                    return 'Next.js with React (requires interactive features and client-side state management)';
+                    return 'Next.js 14+ with TypeScript + Stripe integration (custom React e-commerce solution)';
                 } else {
-                    return 'HTML5/CSS3/Vanilla JavaScript (static site with optimal performance)';
+                    return 'Next.js 14+ with TypeScript and React 18+ (App Router with Server Components)';
                 }
             };
 
@@ -7653,57 +7651,105 @@ Legal Pages Needed:
 ${formatArray(quote.legalPages)}
 
 FILE STRUCTURE:
-${techStack.includes('Next.js') ? `
-Next.js Project Structure:
-/
-├── app/ (App Router - Next.js 13+)
-│   ├── layout.js (root layout with nav/footer)
-│   ├── page.js (homepage)
-${quote.pagesNeeded?.includes('about') ? '│   ├── about/page.js' : ''}
-${quote.pagesNeeded?.includes('services') ? '│   ├── services/page.js' : ''}
-${quote.pagesNeeded?.includes('contact') ? '│   ├── contact/page.js' : ''}
-${quote.pagesNeeded?.includes('portfolio') ? '│   ├── portfolio/page.js' : ''}
-${quote.pagesNeeded?.includes('testimonials') ? '│   ├── testimonials/page.js' : ''}
-│   └── api/ (API routes for forms, integrations)
-├── components/
-│   ├── Header.jsx
-│   ├── Footer.jsx
-│   ├── Button.jsx
-│   └── [other reusable components]
-├── styles/
-│   ├── globals.css (design system variables)
-│   └── [component-specific styles]
-├── public/
-│   ├── images/
-│   └── assets/
-├── lib/ (utility functions, Firebase config)
-└── package.json
 
-Deploy to Vercel: Connect GitHub repo, auto-deploys on push to main
-` : `
-Static HTML/CSS/JS Structure:
+PROFESSIONAL NEXT.JS 14+ PROJECT STRUCTURE (TypeScript):
 /
-├── index.html (Homepage)
-${quote.pagesNeeded?.includes('about') ? '├── about.html' : ''}
-${quote.pagesNeeded?.includes('services') ? '├── services.html' : ''}
-${quote.pagesNeeded?.includes('contact') ? '├── contact.html' : ''}
-${quote.pagesNeeded?.includes('portfolio') ? '├── portfolio.html' : ''}
-${quote.pagesNeeded?.includes('testimonials') ? '├── testimonials.html' : ''}
-├── css/
-│   ├── reset.css (normalize browser styles)
-│   ├── variables.css (design tokens)
-│   ├── components.css (reusable components)
-│   └── main.css (page-specific styles)
-├── js/
-│   ├── utils.js (helper functions)
-│   ├── components.js (interactive components)
-│   └── main.js (initialization)
-├── images/
-├── assets/
-└── vercel.json (Vercel configuration)
+├── app/                                    (App Router - Next.js 14+)
+│   ├── layout.tsx                          (Root layout with metadata, fonts, providers)
+│   ├── page.tsx                            (Homepage - Server Component by default)
+│   ├── globals.css                         (Design system with CSS variables)
+│   ├── loading.tsx                         (Loading UI with skeleton screens)
+│   ├── error.tsx                           (Error boundary)
+│   ├── not-found.tsx                       (Custom 404 page)
+${quote.pagesNeeded?.includes('about') ? '│   ├── about/\n│   │   ├── page.tsx                    (About page)\n│   │   └── loading.tsx                 (About loading state)' : ''}
+${quote.pagesNeeded?.includes('services') ? '│   ├── services/\n│   │   ├── page.tsx                    (Services listing)\n│   │   ├── [slug]/page.tsx             (Individual service pages)\n│   │   └── loading.tsx' : ''}
+${quote.pagesNeeded?.includes('contact') ? '│   ├── contact/\n│   │   └── page.tsx                    (Contact page with form)' : ''}
+${quote.pagesNeeded?.includes('portfolio') ? '│   ├── portfolio/\n│   │   ├── page.tsx                    (Portfolio listing)\n│   │   ├── [slug]/page.tsx             (Individual project pages)\n│   │   └── loading.tsx' : ''}
+${quote.pagesNeeded?.includes('testimonials') ? '│   ├── testimonials/\n│   │   └── page.tsx                    (Testimonials page)' : ''}
+│   └── api/                                (API Routes)
+│       ├── contact/route.ts                (Contact form submission)
+${quote.specialFeatures?.includes('booking') ? '│       ├── booking/route.ts            (Booking API endpoint)' : ''}
+${quote.needsEcommerce === 'yes' ? '│       ├── checkout/route.ts           (Stripe checkout)\n│       └── webhooks/route.ts           (Payment webhooks)' : ''}
+│
+├── components/                             (React Components)
+│   ├── ui/                                 (Reusable UI components)
+│   │   ├── Button.tsx
+│   │   ├── Card.tsx
+│   │   ├── Input.tsx
+│   │   ├── Modal.tsx
+│   │   └── index.ts                        (Barrel export)
+│   ├── layout/                             (Layout components)
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   ├── Navigation.tsx
+│   │   └── MobileMenu.tsx                  (Client Component)
+│   ├── sections/                           (Page sections)
+│   │   ├── Hero.tsx
+│   │   ├── Features.tsx
+│   │   ├── Testimonials.tsx
+│   │   ├── CTA.tsx
+│   │   └── ContactForm.tsx                 (Client Component)
+${quote.needsEcommerce === 'yes' ? '│   └── ecommerce/                      (E-commerce components)\n│       ├── ProductCard.tsx\n│       ├── ShoppingCart.tsx            (Client Component)\n│       ├── CheckoutForm.tsx            (Client Component)\n│       └── OrderSummary.tsx' : '│   └── [feature-specific]/             (Feature components)'}
+│
+├── lib/                                    (Utilities & Configuration)
+│   ├── utils.ts                            (Helper functions)
+│   ├── constants.ts                        (App constants)
+│   ├── validations.ts                      (Zod schemas for forms)
+│   ├── firebase/                           (Firebase configuration)
+│   │   ├── config.ts
+│   │   ├── auth.ts
+│   │   └── firestore.ts
+${quote.needsEcommerce === 'yes' ? '│   └── stripe/                         (Stripe integration)\n│       ├── config.ts\n│       └── utils.ts' : '│   └── api-client.ts                   (API utilities)'}
+│
+├── hooks/                                  (Custom React Hooks)
+│   ├── useMediaQuery.ts                    (Responsive design hook)
+│   ├── useIntersectionObserver.ts          (Scroll animations)
+${quote.specialFeatures?.includes('search') ? '│   ├── useSearch.ts                    (Search functionality)' : ''}
+│   └── useForm.ts                          (Form handling)
+│
+├── types/                                  (TypeScript Definitions)
+│   ├── index.ts                            (Shared types)
+${quote.needsEcommerce === 'yes' ? '│   ├── product.ts                      (Product types)\n│   ├── order.ts                        (Order types)' : ''}
+│   └── api.ts                              (API response types)
+│
+├── styles/                                 (Additional Styles)
+│   └── components/                         (Component-specific CSS Modules)
+│       ├── Header.module.css
+│       ├── Hero.module.css
+│       └── [component].module.css
+│
+├── public/                                 (Static Assets)
+│   ├── images/                             (Optimized images)
+│   │   ├── logo.svg
+│   │   ├── hero/
+│   │   └── products/
+│   ├── fonts/                              (Custom fonts if needed)
+│   ├── icons/
+│   └── favicon.ico
+│
+├── .env.local                              (Environment variables - NOT committed)
+├── .env.example                            (Environment template)
+├── next.config.js                          (Next.js configuration)
+├── tsconfig.json                           (TypeScript configuration)
+├── tailwind.config.ts                      (Tailwind CSS config - if using)
+├── postcss.config.js                       (PostCSS config)
+├── .eslintrc.json                          (ESLint rules)
+├── .prettierrc                             (Prettier formatting)
+├── package.json                            (Dependencies)
+└── README.md                               (Project documentation)
 
-Deploy to Vercel: Drag & drop or connect GitHub repo
-`}
+COMPONENT ARCHITECTURE PATTERNS:
+1. Server Components (Default): Use for static content, data fetching, SEO
+2. Client Components ('use client'): Use ONLY for interactivity, state, browser APIs
+3. Composition: Build complex UIs from small, focused components
+4. Colocation: Keep related files close (components with their styles/tests)
+
+Deploy to Vercel:
+1. Push to GitHub repository
+2. Import project in Vercel dashboard
+3. Configure environment variables
+4. Auto-deploys on every push to main branch
+5. Preview deployments for all pull requests
 
 ═══════════════════════════════════════════════════════════
 
@@ -7879,6 +7925,285 @@ CORE TECHNICAL STANDARDS:
 
 ═══════════════════════════════════════════════════════════
 
+REACT & NEXT.JS PROFESSIONAL STANDARDS:
+
+✓ COMPONENT ARCHITECTURE
+  Server Components (Default):
+  - Use for: Static content, data fetching, SEO-critical content
+  - Benefits: Zero JavaScript sent to client, better performance, SEO-friendly
+  - Data Fetching: Fetch directly in component using async/await
+  - Example use: Layout, Hero sections, Product listings, Blog posts
+
+  Client Components ('use client' directive):
+  - Use ONLY for: User interactions, state management, browser APIs, event handlers
+  - Mark with 'use client' at top of file
+  - Example use: Forms, Shopping cart, Mobile menu, Modals, Animations
+  - Keep client components small and leaf-level when possible
+
+  Component Composition:
+  - Build complex UIs from small, single-responsibility components
+  - Use prop drilling sparingly (max 2-3 levels)
+  - Lift state only as high as needed
+  - Prefer composition over complex prop passing
+
+✓ STATE MANAGEMENT
+  Built-in React State:
+  - useState: Local component state (counters, toggles, form inputs)
+  - useReducer: Complex state logic with multiple sub-values
+  - useContext: Share state across component tree (theme, auth, cart)
+
+  URL State:
+  - Use searchParams for filters, pagination, sorting
+  - Enables shareable URLs and back/forward navigation
+  - Example: /products?category=electronics&sort=price
+
+  Server State:
+  - Data fetching in Server Components (no useState/useEffect needed)
+  - Use React Server Components for initial data load
+  - Revalidation strategies: revalidate, no-store, force-cache
+
+  External State (if needed):
+  - Zustand: Lightweight, simple API (recommended for client state)
+  - Jotai: Atomic state management
+  - React Context: Built-in, good for theme/auth
+
+✓ DATA FETCHING PATTERNS
+  Server Components (Preferred):
+  \`\`\`typescript
+  // app/products/page.tsx
+  async function ProductsPage() {
+    const products = await fetch('https://api.example.com/products', {
+      next: { revalidate: 3600 } // Revalidate every hour
+    }).then(res => res.json())
+
+    return <ProductGrid products={products} />
+  }
+  \`\`\`
+
+  Caching Strategies:
+  - { cache: 'force-cache' } - Cache forever (default)
+  - { cache: 'no-store' } - Never cache, always fresh
+  - { next: { revalidate: 60 } } - ISR, revalidate every 60 seconds
+
+  Client-Side Fetching (when needed):
+  - Use native fetch with useEffect
+  - Or use React Query / SWR for advanced caching
+  - Only when data must update client-side
+
+✓ PERFORMANCE OPTIMIZATION
+  Images:
+  - ALWAYS use next/image component, NEVER <img> tags
+  - Automatic WebP/AVIF format conversion
+  - Lazy loading by default
+  - Responsive images with sizes prop
+  \`\`\`typescript
+  import Image from 'next/image'
+  <Image src="/hero.jpg" alt="Hero" width={1200} height={600} priority />
+  \`\`\`
+
+  Fonts:
+  - Use next/font for automatic font optimization
+  - Eliminates layout shift, self-hosts fonts
+  \`\`\`typescript
+  import { Inter, Playfair_Display } from 'next/font/google'
+  const inter = Inter({ subsets: ['latin'] })
+  const playfair = Playfair_Display({ subsets: ['latin'] })
+  \`\`\`
+
+  Code Splitting:
+  - Automatic with App Router (each route is a separate bundle)
+  - Dynamic imports for heavy components:
+  \`\`\`typescript
+  const HeavyChart = dynamic(() => import('@/components/Chart'), {
+    loading: () => <ChartSkeleton />,
+    ssr: false // Disable SSR if component uses browser APIs
+  })
+  \`\`\`
+
+  Streaming & Suspense:
+  - Wrap slow components in Suspense boundaries
+  - Show loading states while data fetches
+  \`\`\`typescript
+  <Suspense fallback={<ProductsSkeleton />}>
+    <ProductsGrid />
+  </Suspense>
+  \`\`\`
+
+✓ FORMS & VALIDATION
+  React Hook Form (Recommended):
+  - Performant form handling with minimal re-renders
+  - Built-in validation and error handling
+  \`\`\`typescript
+  import { useForm } from 'react-hook-form'
+  import { zodResolver } from '@hookform/resolvers/zod'
+  \`\`\`
+
+  Schema Validation:
+  - Use Zod for type-safe validation
+  - Define schemas in lib/validations.ts
+  \`\`\`typescript
+  import { z } from 'zod'
+  const contactSchema = z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    message: z.string().min(10, 'Message too short')
+  })
+  \`\`\`
+
+  Form Submission:
+  - Use Server Actions (Next.js 14+) for form handling
+  - Progressive enhancement (works without JavaScript)
+  - Automatic revalidation and error handling
+
+✓ STYLING APPROACHES
+  Choose ONE primary approach:
+
+  Option 1 - Tailwind CSS (Recommended for rapid development):
+  - Utility-first CSS framework
+  - No context switching between files
+  - Excellent VS Code autocomplete
+  - Purges unused styles automatically
+
+  Option 2 - CSS Modules:
+  - Scoped CSS, no class name conflicts
+  - Standard CSS syntax
+  - Good for teams preferring traditional CSS
+
+  Global Styles:
+  - Define design tokens in app/globals.css
+  - Use CSS custom properties (--color-primary, etc.)
+  - Apply to :root for theme consistency
+
+✓ TYPESCRIPT BEST PRACTICES
+  Type Everything:
+  - Component props with interfaces or types
+  - API responses with type definitions
+  - Form data with Zod schemas
+  \`\`\`typescript
+  interface ButtonProps {
+    children: React.ReactNode
+    variant?: 'primary' | 'secondary' | 'ghost'
+    onClick?: () => void
+  }
+
+  export function Button({ children, variant = 'primary', onClick }: ButtonProps) {
+    return <button onClick={onClick}>{children}</button>
+  }
+  \`\`\`
+
+  Avoid 'any':
+  - Use 'unknown' if type is truly unknown
+  - Use generics for reusable components
+  - Define proper types in types/ directory
+
+✓ ERROR HANDLING
+  Error Boundaries:
+  - Create error.tsx in route segments
+  - Catches errors in Server and Client Components
+  - Shows user-friendly error UI
+
+  Try-Catch in Server Components:
+  \`\`\`typescript
+  try {
+    const data = await fetchData()
+    return <Content data={data} />
+  } catch (error) {
+    return <ErrorMessage message="Failed to load data" />
+  }
+  \`\`\`
+
+  Form Error Handling:
+  - Show field-level errors from validation
+  - Display server-side errors from API
+  - Provide clear, actionable error messages
+
+✓ SEO & METADATA
+  Metadata API (Next.js 14+):
+  \`\`\`typescript
+  // app/page.tsx
+  export const metadata: Metadata = {
+    title: 'Business Name - Industry Leader',
+    description: 'Compelling 155-character description for search results',
+    openGraph: {
+      title: 'Business Name',
+      description: 'Share description',
+      images: ['/og-image.jpg'],
+    },
+  }
+  \`\`\`
+
+  Dynamic Metadata:
+  \`\`\`typescript
+  export async function generateMetadata({ params }): Promise<Metadata> {
+    const product = await fetchProduct(params.id)
+    return {
+      title: product.name,
+      description: product.description,
+    }
+  }
+  \`\`\`
+
+  Structured Data:
+  - Add JSON-LD schemas for rich snippets
+  - Use for LocalBusiness, Organization, Product, etc.
+
+✓ ENVIRONMENT VARIABLES
+  Public Variables (exposed to browser):
+  - Prefix with NEXT_PUBLIC_
+  - Example: NEXT_PUBLIC_STRIPE_KEY
+  - Access via process.env.NEXT_PUBLIC_STRIPE_KEY
+
+  Private Variables (server-only):
+  - No prefix needed
+  - Example: STRIPE_SECRET_KEY, DATABASE_URL
+  - Only accessible in Server Components and API Routes
+
+  Setup:
+  - Store in .env.local (gitignored)
+  - Provide .env.example template
+  - Document all required variables
+
+✓ AVOID THESE COMMON MISTAKES
+  ❌ DON'T:
+  - Use 'use client' on every component (only when needed)
+  - Fetch data with useEffect in Server Components (fetch directly)
+  - Use <img> instead of next/image
+  - Use <a> instead of next/link for internal navigation
+  - Store sensitive keys in NEXT_PUBLIC_ variables
+  - Fetch inside loops (N+1 problem)
+  - Use inline styles everywhere (use CSS Modules or Tailwind)
+  - Skip TypeScript types (use 'any' everywhere)
+  - Ignore loading and error states
+  - Prop drill more than 2-3 levels (use Context)
+
+  ✅ DO:
+  - Server Components by default, Client Components only when needed
+  - Fetch data in Server Components with async/await
+  - Use next/image for all images
+  - Use next/link for internal navigation (prefetching)
+  - Keep secrets in server-only env variables
+  - Batch API requests, use parallel Promise.all when possible
+  - Use consistent styling approach (Tailwind or CSS Modules)
+  - Properly type all components and functions
+  - Always provide loading and error states
+  - Use Context or state management for shared state
+
+✓ TESTING & QUALITY ASSURANCE
+  Type Safety:
+  - Run 'npm run type-check' (tsc --noEmit)
+  - Fix all TypeScript errors before deployment
+
+  Linting:
+  - Run 'npm run lint' to catch code issues
+  - Fix all ESLint warnings and errors
+
+  Build Verification:
+  - Run 'npm run build' locally before pushing
+  - Ensure no build errors or warnings
+  - Check bundle sizes (aim for <200KB initial load)
+
+═══════════════════════════════════════════════════════════
+
 SECTION 12: GOALS & SUCCESS METRICS
 
 Primary Goal:
@@ -7919,73 +8244,574 @@ ${quote.additionalNotes || 'None'}
 
 ═══════════════════════════════════════════════════════════
 
-BUILD PROCESS - FOLLOW THESE STEPS:
+BUILD PROCESS - NEXT.JS DEVELOPMENT WORKFLOW:
 
-PHASE 1: FOUNDATION (Complete this first)
-1. Create file structure (as outlined above)
-2. Create reset.css (normalize browser styles)
-3. Create variables.css with design system (all CSS custom properties)
-4. Create base component styles (buttons, forms, cards, etc.)
-5. Set up responsive grid system
+PHASE 1: PROJECT INITIALIZATION
+1. Initialize Next.js project with TypeScript:
+   \`\`\`bash
+   npx create-next-app@latest project-name --typescript --tailwind --app --eslint
+   cd project-name
+   \`\`\`
 
-PHASE 2: HOMEPAGE BUILD
-1. Header/Navigation (sticky on scroll if appropriate)
-2. Hero section (compelling headline, subheadline, CTA, hero image/video)
-3. Key features/services section (3-6 items with icons)
-4. Social proof (testimonials, logos, stats)
-5. Call-to-action section
-6. Footer (contact info, social links, legal pages)
+2. Install essential dependencies:
+   \`\`\`bash
+   npm install zod react-hook-form @hookform/resolvers/zod
+   npm install firebase  # If using Firebase
+   npm install @vercel/analytics @vercel/speed-insights  # Analytics
+   \`\`\`
 
-PHASE 3: ADDITIONAL PAGES
-Build each page from Section 6 following the same design system
+3. Configure project structure:
+   - Create directories: components/, lib/, hooks/, types/
+   - Set up path aliases in tsconfig.json (@/ for root)
+   - Configure .env.local with environment variables
+   - Create .env.example template
 
-PHASE 4: INTERACTIVE FEATURES
-Implement features from Section 7:
-- Contact forms with validation
-- Mobile menu toggle
-- Image galleries/lightboxes
-- Booking integration
-- E-commerce functionality
-- Any custom features
+4. Set up design system:
+   - Configure app/globals.css with CSS custom properties
+   - Set up Tailwind theme (if using Tailwind)
+   - Define color palette, typography scale, spacing
+   - Configure next/font for typography
 
-PHASE 5: OPTIMIZATION
-1. Compress all images (TinyPNG or similar)
-2. Minify CSS and JavaScript
-3. Add lazy loading to images
-4. Test on mobile devices (real devices if possible)
-5. Run Lighthouse audit (fix issues to reach 90+ scores)
-6. Validate HTML/CSS (W3C validators)
-7. Test accessibility (aXe DevTools or WAVE)
-8. Cross-browser testing
+5. Create base configuration files:
+   - next.config.js (image domains, env variables)
+   - .eslintrc.json (linting rules)
+   - .prettierrc (code formatting)
 
-PHASE 6: PRE-LAUNCH CHECKLIST
-□ All pages created and linked properly
-□ All images have alt text
-□ Forms tested (validation, submissions)
-□ Mobile responsive on all devices
-□ Fast loading (< 3 seconds)
-□ SEO meta tags on all pages
-□ Analytics tracking installed
-□ Favicon added
-□ 404 page created
-□ Contact information accurate
-□ Social media links working
-□ Legal pages (privacy policy, terms) if needed
+PHASE 2: LAYOUT & FOUNDATION COMPONENTS
+1. Create root layout (app/layout.tsx):
+   - Import and configure fonts with next/font
+   - Add metadata (title, description, Open Graph)
+   - Set up global providers (if needed)
+   - Include Analytics components
+
+2. Build reusable UI components (components/ui/):
+   - Button.tsx (variants: primary, secondary, ghost)
+   - Card.tsx (for content containers)
+   - Input.tsx (form inputs with error states)
+   - Modal.tsx (Client Component for dialogs)
+   - Create index.ts for barrel exports
+
+3. Create layout components (components/layout/):
+   - Header.tsx (Server Component with logo, nav)
+   - Navigation.tsx (Server Component with links)
+   - MobileMenu.tsx (Client Component with state)
+   - Footer.tsx (Server Component with links, social)
+
+4. Set up error handling:
+   - Create app/error.tsx (error boundary)
+   - Create app/not-found.tsx (custom 404 page)
+   - Create app/loading.tsx (root loading state)
+
+PHASE 3: HOMEPAGE DEVELOPMENT
+1. Build homepage (app/page.tsx) with Server Components:
+   - Hero section with next/image for hero image
+   - Value proposition with clear headline
+   - Features/Services section (3-6 key offerings)
+   - Social proof (testimonials, stats, logos)
+   - CTA section with clear action button
+
+2. Create section components (components/sections/):
+   - Hero.tsx (Server Component)
+   - Features.tsx (Server Component with icons)
+   - Testimonials.tsx (fetch from CMS/database)
+   - CTA.tsx (Server Component with client button)
+
+3. Implement responsive design:
+   - Mobile-first approach (design for 375px first)
+   - Test breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)
+   - Ensure touch targets are 44x44px minimum
+
+4. Add metadata and SEO:
+   - Configure metadata object in page.tsx
+   - Add JSON-LD structured data (LocalBusiness/Organization)
+   - Optimize meta descriptions (155 characters)
+
+PHASE 4: ADDITIONAL PAGES & ROUTES
+1. Create route pages from Section 6:
+   - Each page gets its own folder with page.tsx
+   - Add loading.tsx for loading states
+   - Implement metadata for each page
+   - Use Server Components for static content
+
+2. Implement dynamic routes (if needed):
+   - [slug]/page.tsx for dynamic pages
+   - generateStaticParams for static generation
+   - generateMetadata for dynamic metadata
+
+3. Build contact page with form:
+   - Create ContactForm.tsx (Client Component)
+   - Use React Hook Form + Zod validation
+   - Create API route: app/api/contact/route.ts
+   - Implement server-side email sending
+   - Add loading and success states
+
+PHASE 5: INTERACTIVE FEATURES & API ROUTES
+1. Implement required features from Section 7:
+${quote.specialFeatures?.includes('booking') ? '   - Booking system integration (Cal.com or Calendly)\n' : ''}${quote.specialFeatures?.includes('search') ? '   - Search functionality with client-side filtering\n' : ''}${quote.specialFeatures?.includes('live-chat') ? '   - Live chat widget (Tawk.to or Intercom)\n' : ''}   - Contact form with validation and submission
+   - Mobile menu with hamburger toggle
+   - Image galleries with next/image optimization
+   - Any custom interactive components
+
+2. Create API routes (app/api/):
+   - POST /api/contact - Handle contact form submissions
+${quote.needsEcommerce === 'yes' ? '   - POST /api/checkout - Stripe checkout session\n   - POST /api/webhooks - Payment webhooks\n' : ''}   - Implement proper error handling and validation
+   - Return appropriate HTTP status codes
+
+3. Set up Firebase integration (if needed):
+   - Configure Firebase in lib/firebase/config.ts
+   - Implement auth helpers (if using authentication)
+   - Set up Firestore queries for dynamic content
+   - Add Firebase security rules
+
+${quote.needsEcommerce === 'yes' ? `4. E-commerce implementation:
+   - Product listing page with grid layout
+   - Individual product pages with [slug]/page.tsx
+   - Shopping cart (Client Component with Context)
+   - Stripe integration for payments
+   - Order confirmation page
+` : ''}
+PHASE 6: PERFORMANCE OPTIMIZATION
+1. Image optimization:
+   - Convert images to WebP/AVIF format
+   - Use next/image with proper width/height
+   - Add priority prop to above-the-fold images
+   - Implement blur placeholders for loading states
+
+2. Code optimization:
+   - Use dynamic imports for heavy components
+   - Wrap slow sections in Suspense boundaries
+   - Implement streaming for long data fetches
+   - Minimize client-side JavaScript (prefer Server Components)
+
+3. Caching strategy:
+   - Configure revalidation times for data fetching
+   - Use ISR for semi-dynamic content
+   - Implement no-store for real-time data
+
+4. Bundle analysis:
+   - Install @next/bundle-analyzer
+   - Analyze bundle sizes (keep initial load <200KB)
+   - Remove unused dependencies
+   - Code-split large libraries
+
+PHASE 7: TESTING & QUALITY ASSURANCE
+1. TypeScript validation:
+   \`\`\`bash
+   npm run type-check  # or: tsc --noEmit
+   \`\`\`
+   Fix all type errors before proceeding
+
+2. Linting and formatting:
+   \`\`\`bash
+   npm run lint
+   npm run format  # if Prettier is configured
+   \`\`\`
+
+3. Build verification:
+   \`\`\`bash
+   npm run build
+   \`\`\`
+   - Fix all build errors and warnings
+   - Check for console errors in production build
+
+4. Lighthouse audit:
+   - Run Lighthouse in Chrome DevTools
+   - Target scores: 90+ in all categories
+   - Fix performance, accessibility, SEO issues
+
+5. Accessibility testing:
+   - Use aXe DevTools or WAVE browser extension
+   - Test keyboard navigation (Tab, Enter, Escape)
+   - Verify color contrast ratios (4.5:1 minimum)
+   - Test with screen reader (VoiceOver on Mac, NVDA on Windows)
+
+6. Cross-browser testing:
+   - Chrome (latest 2 versions)
+   - Safari (latest 2 versions)
+   - Firefox (latest 2 versions)
+   - Edge (latest 2 versions)
+
+7. Device testing:
+   - iPhone SE (320px width - smallest common device)
+   - iPhone 12/13/14 (390px width)
+   - iPad (768px width)
+   - Desktop (1280px+ width)
+
+PHASE 8: DEPLOYMENT & PRE-LAUNCH
+1. Environment setup:
+   - Create production environment variables in Vercel
+   - Verify all API keys and secrets are configured
+   - Test environment variables are accessible
+
+2. Deploy to Vercel:
+   \`\`\`bash
+   git push origin main  # Triggers automatic deployment
+   \`\`\`
+   - Or connect GitHub repo in Vercel dashboard
+   - Configure custom domain (if ready)
+   - Set up preview deployments for branches
+
+3. Post-deployment verification:
+   - Test all pages load correctly
+   - Verify forms submit successfully
+${quote.needsEcommerce === 'yes' ? '   - Test checkout flow end-to-end\n' : ''}   - Check API routes respond correctly
+   - Verify analytics tracking is working
+
+4. PRE-LAUNCH CHECKLIST:
+□ TypeScript: No type errors (npm run type-check passes)
+□ Build: Production build successful (npm run build passes)
+□ Linting: No ESLint errors or warnings
+□ Performance: Lighthouse score 90+ (all categories)
+□ Accessibility: aXe/WAVE tests pass, WCAG 2.1 AA compliant
+□ SEO: All pages have proper metadata and structured data
+□ Images: All use next/image, have alt text, proper sizes
+□ Forms: Validation works, submissions successful, error handling
+□ Navigation: All internal links use next/link, no broken links
+□ Mobile: Responsive on all device sizes, no horizontal scroll
+□ Cross-browser: Tested in Chrome, Safari, Firefox, Edge
+□ Error handling: error.tsx and not-found.tsx implemented
+□ Loading states: Suspense boundaries and loading.tsx added
+□ Environment: All .env variables documented and configured
+□ Analytics: Google Analytics / Vercel Analytics installed
+□ Favicon: Added to public/ directory
+□ Robots.txt: Created (allow all or specific rules)
+□ Sitemap: Generated (use next-sitemap package)
+${quote.legalPages?.length > 0 ? '□ Legal pages: Privacy policy, Terms of service created\n' : ''}□ Contact info: Email, phone, address accurate
+□ Social links: All social media links working
+□ Domain: Connected and SSL certificate active
+□ Performance: Initial load < 3 seconds on 3G
+□ Security: No sensitive data exposed in client code
 
 ═══════════════════════════════════════════════════════════
 
-IMPORTANT REMINDERS:
-- Build mobile-first, then enhance for larger screens
-- Use semantic HTML5 (header, nav, main, section, article, aside, footer)
-- Keep CSS organized and commented
-- Use meaningful class names (BEM methodology recommended)
-- Test after each major component
-- Commit code frequently with descriptive messages
-- Ask clarifying questions if requirements are unclear
-- Prioritize performance and accessibility
-- Make it easy for the client to update content (if required)
+IMPORTANT NEXT.JS & REACT REMINDERS:
 
-Start with Phase 1 and work through systematically. Show your progress after each phase for review.`;
+ARCHITECTURE:
+✓ Server Components by default - Only add 'use client' when necessary
+✓ Fetch data in Server Components - Avoid useEffect for data fetching
+✓ Keep Client Components small - Push 'use client' as deep as possible
+✓ Use TypeScript strictly - No 'any' types, define all interfaces
+✓ Composition over complexity - Small, focused components
+
+PERFORMANCE:
+✓ Always use next/image - Never use <img> tags
+✓ Always use next/link - Never use <a> for internal navigation
+✓ Optimize fonts with next/font - Self-host and eliminate layout shift
+✓ Implement Suspense boundaries - Show loading states for async content
+✓ Use dynamic imports - Code-split heavy components
+
+STYLING:
+✓ Choose ONE approach - Tailwind CSS or CSS Modules (be consistent)
+✓ Mobile-first design - Start at 375px, then scale up
+✓ Use CSS variables - Define design tokens in globals.css
+✓ Semantic HTML5 - Use proper header, nav, main, section, article, footer
+
+CODE QUALITY:
+✓ Type everything - Components, props, API responses, form data
+✓ Validate forms with Zod - Type-safe validation schemas
+✓ Handle errors gracefully - error.tsx, try-catch, form errors
+✓ Add loading states - loading.tsx, Suspense, skeleton screens
+✓ Test TypeScript - Run 'npm run type-check' frequently
+✓ Test builds - Run 'npm run build' before pushing
+
+WORKFLOW:
+✓ Commit frequently - Descriptive commit messages
+✓ Test after each component - Don't wait until the end
+✓ Ask clarifying questions - If requirements are unclear
+✓ Follow phases systematically - Don't skip steps
+✓ Show progress regularly - After each major phase
+
+═══════════════════════════════════════════════════════════
+
+EXAMPLE CODE PATTERNS:
+
+1. SERVER COMPONENT (Default - fetch data, render content):
+\`\`\`typescript
+// app/page.tsx
+import { Metadata } from 'next'
+import Image from 'next/image'
+import { Hero } from '@/components/sections/Hero'
+
+export const metadata: Metadata = {
+  title: '${quote.businessName || 'Business Name'} - ${quote.businessType || 'Industry Leader'}',
+  description: '${quote.businessDescription?.substring(0, 155) || 'Professional business description'}',
+}
+
+export default async function HomePage() {
+  // Fetch data directly in Server Component
+  const testimonials = await fetch('https://api.example.com/testimonials', {
+    next: { revalidate: 3600 } // Revalidate every hour
+  }).then(res => res.json())
+
+  return (
+    <main>
+      <Hero />
+      <section className="py-16">
+        <h2>Client Testimonials</h2>
+        {testimonials.map(testimonial => (
+          <TestimonialCard key={testimonial.id} data={testimonial} />
+        ))}
+      </section>
+    </main>
+  )
+}
+\`\`\`
+
+2. CLIENT COMPONENT (Interactive, state, events):
+\`\`\`typescript
+// components/layout/MobileMenu.tsx
+'use client' // Required for useState
+
+import { useState } from 'react'
+import Link from 'next/link'
+
+export function MobileMenu() {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label="Toggle menu"
+        className="md:hidden"
+      >
+        {isOpen ? 'Close' : 'Menu'}
+      </button>
+
+      {isOpen && (
+        <nav className="md:hidden">
+          <Link href="/" onClick={() => setIsOpen(false)}>Home</Link>
+          <Link href="/about" onClick={() => setIsOpen(false)}>About</Link>
+          <Link href="/contact" onClick={() => setIsOpen(false)}>Contact</Link>
+        </nav>
+      )}
+    </>
+  )
+}
+\`\`\`
+
+3. FORM WITH VALIDATION (Client Component with Zod):
+\`\`\`typescript
+// components/sections/ContactForm.tsx
+'use client'
+
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+
+const contactSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  message: z.string().min(10, 'Message must be at least 10 characters'),
+})
+
+type ContactFormData = z.infer<typeof contactSchema>
+
+export function ContactForm() {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema)
+  })
+
+  const onSubmit = async (data: ContactFormData) => {
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) throw new Error('Failed to send message')
+
+      alert('Message sent successfully!')
+    } catch (error) {
+      alert('Failed to send message. Please try again.')
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <label htmlFor="name">Name</label>
+        <input
+          {...register('name')}
+          id="name"
+          className="w-full px-4 py-2 border rounded"
+        />
+        {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+      </div>
+
+      <div>
+        <label htmlFor="email">Email</label>
+        <input
+          {...register('email')}
+          id="email"
+          type="email"
+          className="w-full px-4 py-2 border rounded"
+        />
+        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+      </div>
+
+      <div>
+        <label htmlFor="message">Message</label>
+        <textarea
+          {...register('message')}
+          id="message"
+          rows={5}
+          className="w-full px-4 py-2 border rounded"
+        />
+        {errors.message && <p className="text-red-500 text-sm">{errors.message.message}</p>}
+      </div>
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="px-6 py-3 bg-primary text-white rounded hover:bg-primary-dark disabled:opacity-50"
+      >
+        {isSubmitting ? 'Sending...' : 'Send Message'}
+      </button>
+    </form>
+  )
+}
+\`\`\`
+
+4. API ROUTE (Server-side endpoint):
+\`\`\`typescript
+// app/api/contact/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
+const contactSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  message: z.string().min(10),
+})
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+
+    // Validate request body
+    const validatedData = contactSchema.parse(body)
+
+    // Send email (use Resend, SendGrid, or similar)
+    // await sendEmail(validatedData)
+
+    // Save to database if needed
+    // await db.contacts.create(validatedData)
+
+    return NextResponse.json(
+      { message: 'Contact form submitted successfully' },
+      { status: 200 }
+    )
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid form data', details: error.errors },
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+\`\`\`
+
+5. ROOT LAYOUT (Typography, metadata, providers):
+\`\`\`typescript
+// app/layout.tsx
+import type { Metadata } from 'next'
+import { Inter, Playfair_Display } from 'next/font/google'
+import './globals.css'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  display: 'swap',
+})
+
+export const metadata: Metadata = {
+  title: {
+    default: '${quote.businessName || 'Business Name'} - ${quote.businessType || 'Industry Leader'}',
+    template: '%s | ${quote.businessName || 'Business Name'}',
+  },
+  description: '${quote.businessDescription?.substring(0, 155) || 'Professional business description'}',
+  openGraph: {
+    title: '${quote.businessName || 'Business Name'}',
+    description: '${quote.businessDescription?.substring(0, 155) || 'Professional business description'}',
+    type: 'website',
+  },
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en" className={\`\${inter.variable} \${playfair.variable}\`}>
+      <body className={inter.className}>
+        <Header />
+        {children}
+        <Footer />
+      </body>
+    </html>
+  )
+}
+\`\`\`
+
+6. LOADING STATE (Suspense boundary):
+\`\`\`typescript
+// app/loading.tsx
+export default function Loading() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+    </div>
+  )
+}
+\`\`\`
+
+7. ERROR BOUNDARY:
+\`\`\`typescript
+// app/error.tsx
+'use client'
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string }
+  reset: () => void
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <h2 className="text-2xl font-bold mb-4">Something went wrong!</h2>
+      <p className="text-gray-600 mb-6">{error.message}</p>
+      <button
+        onClick={() => reset()}
+        className="px-6 py-3 bg-primary text-white rounded hover:bg-primary-dark"
+      >
+        Try again
+      </button>
+    </div>
+  )
+}
+\`\`\`
+
+═══════════════════════════════════════════════════════════
+
+Start with Phase 1 and work through systematically. Build incrementally, test frequently, and commit often. Show your progress after each major phase for review.`;
 
             // Show in modal with copy button
             const modalContent = `
